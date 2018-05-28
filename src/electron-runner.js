@@ -6,6 +6,8 @@ const url = require( 'url' );
 
 const assetsDirectory = path.join( __dirname, '/../assets/' )
 
+const { registerJobs } = require( './services' );
+
 const preferences = new ElectronPreferences( {
 	dataStore: path.resolve( app.getPath( 'userData' ), 'preferences.json' ),
 	defaults: {
@@ -62,8 +64,7 @@ function createWindow() {
 		transparent: true,
 		skipTaskbar: true,
 		webPreferences: {
-		  // Prevents renderer process code from not running when window is
-		  // hidden
+		  // Prevents renderer process code from not running when window is hidden
 		  backgroundThrottling: false,
 		},
 	  } );
@@ -125,6 +126,7 @@ const getWindowPosition = () => {
 app.on( 'ready', () => {
 	createTray();
 	createWindow();
+	registerJobs();
 } );
 
 // Quit when all windows are closed.
