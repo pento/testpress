@@ -1,28 +1,28 @@
 {
-  "name": "wordpress-development-environment",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "electron-preferences": "1.1.0",
-    "gridicons": "3.0.1",
-    "react": "16.4.0",
-    "react-dom": "16.4.0"
-  },
-  "homepage": "./",
-  "main": "src/electron-runner.js",
-  "scripts": {
-    "start": "concurrently --kill-others 'npm run react-start' 'wait-on http://localhost:3000/ && npm run electron-start'",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject",
-    "electron-start": "cross-env ELECTRON_START_URL=http://localhost:3000/ electron .",
-    "react-start": "cross-env BROWSER=0 NODE_ENV=development react-scripts start"
-  },
-  "devDependencies": {
-    "concurrently": "3.5.1",
-    "cross-env": "5.1.6",
-    "electron": "2.0.2",
-    "react-scripts": "1.1.4",
-    "wait-on": "2.1.0"
-  }
+	"name": "wordpress-development-environment",
+	"version": "0.1.0",
+	"license": "GPL-2.0-or-later",
+	"dependencies": {
+		"electron-preferences": "1.1.0",
+		"gridicons": "3.0.1",
+		"react": "16.4.0",
+		"react-dom": "16.4.0"
+	},
+	"homepage": "./",
+	"main": "src/electron-runner.js",
+	"scripts": {
+		"start": "concurrently --kill-others 'npm run react-start' 'wait-on http://localhost:3000/ && npm run electron-start'",
+		"build": "react-scripts build",
+		"test": "react-scripts test --env=jsdom",
+		"eject": "react-scripts eject",
+		"electron-start": "cross-env ELECTRON_START_URL=http://localhost:3000/ electron .",
+		"react-start": "cross-env BROWSER=0 NODE_ENV=development react-scripts start"
+	},
+	"devDependencies": {
+		"concurrently": "3.5.1",
+		"cross-env": "5.1.6",
+		"electron": "2.0.2",
+		"react-scripts": "1.1.4",
+		"wait-on": "2.1.0"
+	}
 }

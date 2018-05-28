@@ -1,10 +1,10 @@
-const {app, BrowserWindow, ipcMain, Tray} = require('electron')
+const { app, BrowserWindow, ipcMain, Tray } = require( 'electron' );
 const ElectronPreferences = require( 'electron-preferences' );
 
-const path = require('path');
-const url = require('url');
+const path = require( 'path' );
+const url = require( 'url' );
 
-const assetsDirectory = path.join(__dirname, '/../assets/')
+const assetsDirectory = path.join( __dirname, '/../assets/' )
 
 const preferences = new ElectronPreferences( {
 	dataStore: path.resolve( app.getPath( 'userData' ), 'preferences.json' ),
@@ -52,7 +52,7 @@ const createTray = () => {
 
 function createWindow() {
     // Create the browser window.
-    window = new BrowserWindow({
+    window = new BrowserWindow( {
 		width: 300,
 		height: 500,
 		show: false,
