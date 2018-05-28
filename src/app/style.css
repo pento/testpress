@@ -1,29 +1,29 @@
-.App {
+.wpde {
 	text-align: center;
 	background-color: #222;
 	padding: 10px;
 	color: white;
 }
 
-.App-logo {
+.wpde-logo {
 	animation: App-logo-spin infinite 20s linear;
 	height: 80px;
 }
 
-.App-header {
+.wpde-header {
 	height: 150px;
 	padding: 20px;
 }
 
-.App-title {
+.wpde-title {
 	font-size: 1.5em;
 }
 
-.App-intro {
+.wpde-intro {
 	font-size: large;
 }
 
-@keyframes App-logo-spin {
-	from { transform: rotate(0deg); }
-	to { transform: rotate(360deg); }
+@keyframes wpde-logo-spin {
+	from { transform: rotate( 0deg ); }
+	to { transform: rotate( 360deg ); }
 }
