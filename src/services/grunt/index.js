@@ -1,4 +1,4 @@
-const { spawn, spawnSync } = require( 'child_process' );
+const { spawn } = require( 'child_process' );
 const { addAction } = require( '@wordpress/hooks' );
 
 const { TOOLS_DIR } = require( '../constants.js' );
@@ -7,7 +7,7 @@ const { preferences } = require( '../../preferences' );
 const NODE_DIR = TOOLS_DIR + '/node';
 const NODE_BIN = NODE_DIR + '/bin/node';
 
-let watchProcess = null;
+let watchProcess = buildProcess = null;
 
 /**
  * Registers a watcher for when Grunt needs to run on the WordPress install.
@@ -20,6 +20,11 @@ function registerGruntJob() {
  * If the WordPress folder is defined, run `grunt build`, then `grunt watch` on it.
  */
 function runGruntBuild() {
+	if ( buildProcess ) {
+		buildProcess.kill();
+		buildProcess = null;
+	}
+
 	if ( watchProcess ) {
 		watchProcess.kill();
 		watchProcess = null;
@@ -32,7 +37,7 @@ function runGruntBuild() {
 
 	const grunt = cwd + '/node_modules/.bin/grunt';
 
-	spawnSync( NODE_BIN, [
+	buildProcess = spawn( NODE_BIN, [
 		grunt,
 		'build',
 	], {
@@ -40,12 +45,18 @@ function runGruntBuild() {
 		env: {},
 	} );
 
-	watchProcess = spawn( NODE_BIN, [
-		grunt,
-		'watch',
-	], {
-		cwd,
-		env: {},
+	buildProcess.on( 'close', ( code ) => {
+		if ( 0 !== code ) {
+			return;
+		}
+
+		watchProcess = spawn( NODE_BIN, [
+			grunt,
+			'watch',
+		], {
+			cwd,
+			env: {},
+		} );
 	} );
 }
 

@@ -4,7 +4,7 @@ const fetch = require( 'node-fetch' );
 const { createWriteStream, createReadStream, mkdirSync, existsSync, readFileSync } = require( 'fs' );
 const { app } = require( 'electron' );
 const tar = require( 'tar' );
-const { spawnSync } = require( 'child_process' );
+const { spawn, spawnSync } = require( 'child_process' );
 const promisePipe = require( 'promisepipe' );
 const hasha = require( 'hasha' );
 const { TOOLS_DIR, ARCHIVE_DIR } = require( '../constants.js' );
@@ -67,14 +67,11 @@ async function checkAndInstallUpdates() {
 			file: fileName,
 			cwd: NODE_DIR,
 			strip: 1,
-			sync: true,
 			onwarn: ( msg ) => console.log( msg ),
 		} );
 	}
 
 	updateNPM();
-
-	doAction( 'updated_node_and_npm' );
 
 	return true;
 }
@@ -150,7 +147,7 @@ async function checksumLocalArchive( filename ) {
  * Install the latest version of NPM in our local copy of Node.
  */
 function updateNPM() {
-	spawnSync( NODE_BIN, [
+	const update = spawn( NODE_BIN, [
 		NPM_BIN,
 		'install',
 		'-g',
@@ -158,6 +155,7 @@ function updateNPM() {
 	], {
 		env: {},
 	} );
+	update.on( 'close', () => doAction( 'updated_node_and_npm' ) );
 }
 
 module.exports = {
