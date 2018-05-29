@@ -1,5 +1,6 @@
 const { spawnSync } = require( 'child_process' );
 const { mkdirSync, existsSync } = require( 'fs' );
+const { watch } = require( 'chokidar' );
 const { addAction } = require( '@wordpress/hooks' );
 const { app } = require( 'electron' );
 const process = require( 'process' );
@@ -18,6 +19,13 @@ const NPM_BIN = NODE_DIR + '/bin/npm';
  */
 function registerNPMJob() {
 	addAction( 'updated_node_and_npm', 'runNPMInstall', runNPMInstall );
+
+	const packageJson = preferences.value( 'basic.wordpress-folder' ) + '/package.json';
+	console.log( packageJson );
+	if ( existsSync( packageJson ) ) {
+		console.log( 'exists' );
+		watch( packageJson ).on( 'all', runNPMInstall );
+	}
 }
 
 /**
@@ -25,15 +33,16 @@ function registerNPMJob() {
  */
 function runNPMInstall() {
 	const cwd = preferences.value( 'basic.wordpress-folder' );
+	console.log(1);
 
 	if ( ! cwd ) {
 		return;
 	}
-
+	console.log(2);
 	if ( ! existsSync( NPM_CACHE_DIR ) ) {
 		mkdirSync( NPM_CACHE_DIR );
 	}
-
+	console.log(3);
 	spawnSync( NODE_BIN, [
 		NPM_BIN,
 		'install',
@@ -44,6 +53,7 @@ function runNPMInstall() {
 			PATH: process.env.PATH,
 		},
 	} );
+	console.log(4);
 }
 
 module.exports = {
