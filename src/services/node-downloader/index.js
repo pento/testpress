@@ -16,6 +16,7 @@ const VERSION_REGEX = new RegExp( `href="(node-v([0-9\\.]+)-${ PLATFORM }\\.tar\
 const NODE_DIR = app.getPath( 'userData' ) + '/tools/node';
 
 const NODE_BIN = NODE_DIR + '/bin/node';
+const NPM_BIN = NODE_DIR + '/bin/npm';
 
 /**
  * Registers a check for new versions of Node every 12 hours.
@@ -70,6 +71,8 @@ async function checkAndInstallUpdates() {
 		} );
 	}
 
+	updateNPM();
+
 	return true;
 }
 
@@ -86,7 +89,7 @@ function getLocalVersion() {
 
 	const versionInfo = spawnSync( NODE_BIN, [ '-v' ] );
 
-	return versionInfo.stdout.toString().replace( 'v', '' );
+	return versionInfo.stdout.toString().replace( 'v', '' ).trim();
 }
 
 /**
@@ -138,6 +141,20 @@ async function checksumLocalArchive( filename ) {
 		}
 		return allowed;
 	}, false );
+}
+
+/**
+ * Install the latest version of NPM in our local copy of Node.
+ */
+function updateNPM() {
+	const output = spawnSync( NODE_BIN, [
+		NPM_BIN,
+		'install',
+		'-g',
+		'npm',
+	], {
+		env: {},
+	} );
 }
 
 module.exports = {
