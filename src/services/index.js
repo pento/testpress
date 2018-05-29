@@ -1,6 +1,7 @@
 const { mkdirSync, existsSync } = require( 'fs' );
 
 const { TOOLS_DIR, ARCHIVE_DIR } = require( './constants.js' );
+const { registerDockerJob } = require( './docker' );
 const { registerNodeJob } = require( './node-downloader' );
 const { registerNPMJob } = require( './npm-watcher' );
 const { registerGruntJob } = require( './grunt' );
@@ -14,6 +15,7 @@ const registerJobs = () => {
 		mkdirSync( ARCHIVE_DIR );
 	}
 
+	registerDockerJob();
 	registerNodeJob();
 	registerNPMJob();
 	registerGruntJob();
