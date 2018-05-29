@@ -3,6 +3,7 @@
 	"version": "0.1.0",
 	"license": "GPL-2.0-or-later",
 	"dependencies": {
+		"@wordpress/hooks": "1.1.8",
 		"compare-versions": "3.2.1",
 		"electron-preferences": "1.1.0",
 		"gridicons": "3.0.1",

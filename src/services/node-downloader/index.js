@@ -7,13 +7,14 @@ const tar = require( 'tar' );
 const { spawnSync } = require( 'child_process' );
 const promisePipe = require( 'promisepipe' );
 const hasha = require( 'hasha' );
-const { ARCHIVE_DIR } = require( '../constants.js' );
+const { TOOLS_DIR, ARCHIVE_DIR } = require( '../constants.js' );
+const { doAction } = require( '@wordpress/hooks' );
 
 const NODE_URL = 'https://nodejs.org/dist/latest-carbon/';
 const PLATFORM = 'darwin-x64';
 const VERSION_REGEX = new RegExp( `href="(node-v([0-9\\.]+)-${ PLATFORM }\\.tar\\.gz)`, 'g' );
 
-const NODE_DIR = app.getPath( 'userData' ) + '/tools/node';
+const NODE_DIR = TOOLS_DIR + '/node';
 
 const NODE_BIN = NODE_DIR + '/bin/node';
 const NPM_BIN = NODE_DIR + '/bin/npm';
@@ -72,6 +73,8 @@ async function checkAndInstallUpdates() {
 	}
 
 	updateNPM();
+
+	doAction( 'updated_node_and_npm' );
 
 	return true;
 }
@@ -147,7 +150,7 @@ async function checksumLocalArchive( filename ) {
  * Install the latest version of NPM in our local copy of Node.
  */
 function updateNPM() {
-	const output = spawnSync( NODE_BIN, [
+	spawnSync( NODE_BIN, [
 		NPM_BIN,
 		'install',
 		'-g',

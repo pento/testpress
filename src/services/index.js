@@ -2,6 +2,7 @@ const { mkdirSync, existsSync } = require( 'fs' );
 
 const { TOOLS_DIR, ARCHIVE_DIR } = require( './constants.js' );
 const { registerNodeJob } = require( './node-downloader' );
+const { registerNPMJob } = require( './npm-watcher' );
 
 const registerJobs = () => {
 	if ( ! existsSync( TOOLS_DIR ) ) {
@@ -13,6 +14,7 @@ const registerJobs = () => {
 	}
 
 	registerNodeJob();
+	registerNPMJob();
 };
 
 module.exports = {
