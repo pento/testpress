@@ -1,18 +1,22 @@
 const { mkdirSync, existsSync } = require( 'fs' );
-const { app } = require( 'electron' );
 
+const { TOOLS_DIR, ARCHIVE_DIR } = require( './constants.js' );
 const { registerNodeJob } = require( './node-downloader' );
-
-const TOOLS_DIR = app.getPath( 'userData' ) + '/tools';
 
 const registerJobs = () => {
 	if ( ! existsSync( TOOLS_DIR ) ) {
 		mkdirSync( TOOLS_DIR );
 	}
 
+	if ( ! existsSync( ARCHIVE_DIR ) ) {
+		mkdirSync( ARCHIVE_DIR );
+	}
+
 	registerNodeJob();
 };
 
 module.exports = {
-	registerJobs
+	registerJobs,
+	TOOLS_DIR,
+	ARCHIVE_DIR,
 };
