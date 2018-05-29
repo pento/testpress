@@ -1,6 +1,8 @@
 const compose = require( 'docker-compose' );
 const yaml = require( 'node-yaml' );
 const { copyFileSync } = require( 'fs' );
+const { spawn, spawnSync } = require( 'child_process' );
+const process = require( 'process' );
 
 const { TOOLS_DIR } = require( '../constants.js' );
 const { preferences } = require( '../../preferences' );
@@ -65,7 +67,63 @@ function registerDockerJob() {
 	copyFileSync( __dirname + '/Dockerfile-phpunit', TOOLS_DIR + '/Dockerfile-phpunit' );
 
 	compose.up( { cwd: TOOLS_DIR } )
-		.then( () => console.log( 'Containers started' ) );
+		.then( () => {
+			console.log( 'Containers started' );
+			installWordPress();
+		} );
+}
+
+function installWordPress() {
+	const port = preferences.value( 'site.port' ) || 9999;
+
+	const isInstalled = spawnSync( 'docker-compose', [
+		'run',
+		'cli',
+		'core',
+		'is-installed',
+	], {
+		cwd: TOOLS_DIR,
+		env: {
+			PATH: process.env.PATH,
+		},
+	} );
+
+	if ( 0 !== isInstalled.status ) {
+		const configCreate = spawn( 'docker-compose', [
+			'run',
+			'cli',
+			'config',
+			'create',
+			'--dbname=wordpress_develop',
+			'--dbuser=root',
+			'--dbpass=password',
+			'--dbhost=mysql',
+		], {
+			cwd: TOOLS_DIR,
+			env: {
+				PATH: process.env.PATH,
+			},
+		} );
+
+		configCreate.on( 'close', () => {
+			spawn( 'docker-compose', [
+				'run',
+				'cli',
+				'core',
+				'install',
+				'--url=localhost:' + port,
+				'--title="WordPress Develop"',
+				'--admin_user=admin',
+				'--admin_password=password',
+				'--admin_email=test@test.test',
+			], {
+				cwd: TOOLS_DIR,
+				env: {
+					PATH: process.env.PATH,
+				},
+			} );
+		} );
+	}
 }
 
 module.exports = {
