@@ -13,6 +13,7 @@ const NODE_BIN = NODE_DIR + '/bin/node';
  */
 function registerDockerJob() {
 	const cwd = preferences.value( 'basic.wordpress-folder' );
+	const port = preferences.value( 'site.port' ) || 9999;
 
 	if ( ! cwd ) {
 		return;
@@ -27,7 +28,7 @@ function registerDockerJob() {
 					dockerfile: 'Dockerfile',
 				},
 				ports: [
-					'9999:80',
+					port + ':80',
 				],
 				volumes: [
 					cwd + '/build:/var/www/html',
@@ -64,7 +65,7 @@ function registerDockerJob() {
 	copyFileSync( __dirname + '/Dockerfile-phpunit', TOOLS_DIR + '/Dockerfile-phpunit' );
 
 	compose.up( { cwd: TOOLS_DIR } )
-		.then( () => console.log( 'DOCKER COMPOSED' ) );
+		.then( () => console.log( 'Containers started' ) );
 }
 
 module.exports = {

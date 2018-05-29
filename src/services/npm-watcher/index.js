@@ -1,4 +1,4 @@
-const { spawnSync } = require( 'child_process' );
+const { spawn } = require( 'child_process' );
 const { mkdirSync, existsSync } = require( 'fs' );
 const { watch } = require( 'chokidar' );
 const { addAction, doAction } = require( '@wordpress/hooks' );
@@ -12,6 +12,8 @@ const NPM_CACHE_DIR = ARCHIVE_DIR + '/npm-cache';
 
 const NODE_BIN = NODE_DIR + '/bin/node';
 const NPM_BIN = NODE_DIR + '/bin/npm';
+
+let installProcess = null;
 
 /**
  * Registers a watcher for when NPM needs to run on the WordPress install.
@@ -30,6 +32,10 @@ function registerNPMJob() {
  * If the WordPress folder is defined, run `npm install` in it.
  */
 function runNPMInstall() {
+	if ( installProcess ) {
+		installProcess.kill();
+		installProcess = null;
+	}
 	const cwd = preferences.value( 'basic.wordpress-folder' );
 
 	if ( ! cwd ) {
@@ -39,7 +45,8 @@ function runNPMInstall() {
 	if ( ! existsSync( NPM_CACHE_DIR ) ) {
 		mkdirSync( NPM_CACHE_DIR );
 	}
-	spawnSync( NODE_BIN, [
+
+	installProcess = spawn( NODE_BIN, [
 		NPM_BIN,
 		'install',
 	], {
@@ -50,7 +57,12 @@ function runNPMInstall() {
 		},
 	} );
 
-	doAction( 'npm_install_finished' );
+	installProcess.on( 'close', ( code ) => {
+		if ( 0 !== code ) {
+			return;
+		}
+		doAction( 'npm_install_finished' );
+	} );
 }
 
 module.exports = {

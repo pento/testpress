@@ -10,10 +10,13 @@ const preferences = new ElectronPreferences( {
 		basic: {
 			'wordpress-folder': '',
 		},
+		site: {
+			port: 9999,
+		},
 	},
 	sections: [ {
 		id: 'basic',
-		label: 'Basic Settings',
+		label: 'Basic',
 		icon: 'folder-15',
 		form: {
 			groups: [ {
@@ -23,6 +26,22 @@ const preferences = new ElectronPreferences( {
 					key: 'wordpress-folder',
 					type: 'directory',
 					help: 'The location where your WordPress repo is stored.'
+				} ],
+			} ],
+		},
+	}, {
+		id: 'site',
+		label: 'Site',
+		icon: 'cloud-26',
+		form: {
+			groups: [ {
+				label: 'Site',
+				fields: [ {
+					label: 'Port Number',
+					key: 'port',
+					type: 'text',
+					inputType: 'number',
+					help: 'The port to run your development site on.'
 				} ],
 			} ],
 		},
