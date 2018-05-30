@@ -7,7 +7,7 @@
 		"chokidar": "2.0.3",
 		"compare-versions": "3.2.1",
 		"docker-compose": "0.4.3",
-		"electron-preferences": "1.1.0",
+		"electron-preferences": "1.2.0",
 		"gridicons": "3.0.1",
 		"hasha": "3.0.0",
 		"node-fetch": "2.1.2",
