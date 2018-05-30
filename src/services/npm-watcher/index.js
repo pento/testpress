@@ -71,6 +71,11 @@ function runNPMInstall() {
 	} );
 }
 
+/**
+ * Action handler for when preferences have been saved.
+ *
+ * @param {Object} newPreferences The new preferences that have just been saved.
+ */
 function preferencesSaved( newPreferences ) {
 	if ( cwd === newPreferences.basic[ 'wordpress-folder' ] ) {
 		return;
