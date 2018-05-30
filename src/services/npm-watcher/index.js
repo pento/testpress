@@ -14,14 +14,21 @@ const NODE_BIN = NODE_DIR + '/bin/node';
 const NPM_BIN = NODE_DIR + '/bin/npm';
 
 let installProcess = null;
+let cwd = '';
 
 /**
  * Registers a watcher for when NPM needs to run on the WordPress install.
  */
 function registerNPMJob() {
 	addAction( 'updated_node_and_npm', 'runNPMInstall', runNPMInstall );
+	addAction( 'preferences_saved', 'preferencesSaved', preferencesUpdated, 10 );
 
-	const packageJson = preferences.value( 'basic.wordpress-folder' ) + '/package.json';
+	cwd = preferences.value( 'basic.wordpress-folder' );
+	if ( ! cwd ) {
+		return;
+	}
+
+	const packageJson = cwd + '/package.json';
 
 	if ( existsSync( packageJson ) ) {
 		watch( packageJson ).on( 'all', runNPMInstall );
@@ -36,7 +43,6 @@ function runNPMInstall() {
 		installProcess.kill();
 		installProcess = null;
 	}
-	const cwd = preferences.value( 'basic.wordpress-folder' );
 
 	if ( ! cwd ) {
 		return;
@@ -63,6 +69,16 @@ function runNPMInstall() {
 		}
 		doAction( 'npm_install_finished' );
 	} );
+}
+
+function preferencesSaved( newPreferences ) {
+	if ( cwd === newPreferences.basic[ 'wordpress-folder' ] ) {
+		return;
+	}
+
+	cwd = newPreferences.basic[ 'wordpress-folder' ];
+
+	runNPMInstall();
 }
 
 module.exports = {

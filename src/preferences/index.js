@@ -1,4 +1,5 @@
 const { app } = require( 'electron' );
+const { doAction } = require( '@wordpress/hooks' );
 
 const path = require( 'path' );
 
@@ -46,6 +47,10 @@ const preferences = new ElectronPreferences( {
 			} ],
 		},
 	} ],
+} );
+
+preferences.on( 'save', ( preferences ) => {
+	doAction( 'preferences_saved', preferences );
 } );
 
 module.exports = {

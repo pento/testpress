@@ -8,12 +8,16 @@ const NODE_DIR = TOOLS_DIR + '/node';
 const NODE_BIN = NODE_DIR + '/bin/node';
 
 let watchProcess = buildProcess = null;
+let cwd = '';
 
 /**
  * Registers a watcher for when Grunt needs to run on the WordPress install.
  */
 function registerGruntJob() {
 	addAction( 'npm_install_finished', 'runGruntBuild', runGruntBuild );
+	addAction( 'preferences_saved', 'preferencesSaved', preferencesUpdated, 9 );
+	cwd = preferences.value( 'basic.wordpress-folder' );
+
 }
 
 /**
@@ -29,7 +33,6 @@ function runGruntBuild() {
 		watchProcess.kill();
 		watchProcess = null;
 	}
-	const cwd = preferences.value( 'basic.wordpress-folder' );
 
 	if ( ! cwd ) {
 		return;
@@ -58,6 +61,24 @@ function runGruntBuild() {
 			env: {},
 		} );
 	} );
+}
+
+function preferencesSaved( newPreferences ) {
+	if ( cwd === newPreferences.basic[ 'wordpress-folder' ] ) {
+		return;
+	}
+
+	cwd = newPreferences.basic[ 'wordpress-folder' ];
+
+	if ( buildProcess ) {
+		buildProcess.kill();
+		buildProcess = null;
+	}
+
+	if ( watchProcess ) {
+		watchProcess.kill();
+		watchProcess = null;
+	}
 }
 
 module.exports = {
