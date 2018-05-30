@@ -15,7 +15,7 @@ let cwd = '';
  */
 function registerGruntJob() {
 	addAction( 'npm_install_finished', 'runGruntBuild', runGruntBuild );
-	addAction( 'preferences_saved', 'preferencesSaved', preferencesUpdated, 9 );
+	addAction( 'preferences_saved', 'preferencesSaved', preferencesSaved, 9 );
 	cwd = preferences.value( 'basic.wordpress-folder' );
 
 }

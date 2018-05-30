@@ -21,7 +21,7 @@ let cwd = '';
  */
 function registerNPMJob() {
 	addAction( 'updated_node_and_npm', 'runNPMInstall', runNPMInstall );
-	addAction( 'preferences_saved', 'preferencesSaved', preferencesUpdated, 10 );
+	addAction( 'preferences_saved', 'preferencesSaved', preferencesSaved, 10 );
 
 	cwd = preferences.value( 'basic.wordpress-folder' );
 	if ( ! cwd ) {
