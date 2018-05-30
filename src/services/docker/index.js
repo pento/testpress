@@ -1,5 +1,6 @@
 const yaml = require( 'node-yaml' );
 const { copyFileSync } = require( 'fs' );
+const { spawnSync } = require( 'child_process' );
 const { spawn } = require( 'promisify-child-process' );
 const process = require( 'process' );
 const { addAction } = require( '@wordpress/hooks' );
@@ -19,6 +20,7 @@ let port = 9999;
  */
 function registerDockerJob() {
 	addAction( 'preferences_saved', 'preferencesSaved', preferencesSaved, 9 );
+	addAction( 'shutdown', 'shutdown', shutdown );
 	startDocker();
 }
 
@@ -178,6 +180,20 @@ async function preferencesSaved( newPreferences ) {
 	} );
 
 	startDocker();
+}
+
+/**
+ * Shutdown handler, to ensure the docker containers are shut down cleanly.
+ */
+function shutdown() {
+	spawnSync( 'docker-compose', [
+		'down',
+	], {
+		cwd: TOOLS_DIR,
+		env: {
+			PATH: process.env.PATH,
+		},
+	} );
 }
 
 module.exports = {

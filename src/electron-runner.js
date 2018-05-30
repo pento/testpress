@@ -1,13 +1,12 @@
 const { app, BrowserWindow, ipcMain, Tray } = require( 'electron' );
-
+const { doAction } = require( '@wordpress/hooks' );
 const path = require( 'path' );
 const url = require( 'url' );
 
-const assetsDirectory = path.join( __dirname, '/../assets/' )
-
 const { preferences } = require( './preferences' );
-
 const { registerJobs } = require( './services' );
+
+const assetsDirectory = path.join( __dirname, '/../assets/' )
 
 let tray = undefined;
 let window = undefined;
@@ -113,3 +112,8 @@ app.on( 'window-all-closed', () => {
         app.quit();
     }
 } );
+
+app.on( 'quit', () => {
+	doAction( 'shutdown' );
+} );
+
