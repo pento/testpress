@@ -6,7 +6,7 @@ const { registerNodeJob } = require( './node-downloader' );
 const { registerNPMJob } = require( './npm-watcher' );
 const { registerGruntJob } = require( './grunt' );
 
-const registerJobs = () => {
+const registerJobs = ( window ) => {
 	if ( ! existsSync( TOOLS_DIR ) ) {
 		mkdirSync( TOOLS_DIR );
 	}
@@ -15,10 +15,10 @@ const registerJobs = () => {
 		mkdirSync( ARCHIVE_DIR );
 	}
 
-	registerDockerJob();
-	registerNodeJob();
-	registerNPMJob();
-	registerGruntJob();
+	registerDockerJob( window );
+	registerNodeJob( window );
+	registerNPMJob( window );
+	registerGruntJob( window );
 };
 
 module.exports = {

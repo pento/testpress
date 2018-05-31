@@ -1,8 +1,11 @@
 .wpde {
 	text-align: center;
 	background-color: #222;
-	padding: 10px;
 	color: white;
+}
+
+.wpde-main {
+	padding: 10px;
 }
 
 .wpde-logo {

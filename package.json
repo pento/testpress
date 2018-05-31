@@ -5,6 +5,7 @@
 	"dependencies": {
 		"@wordpress/hooks": "1.1.8",
 		"chokidar": "2.0.3",
+		"classname": "0.0.0",
 		"compare-versions": "3.2.1",
 		"debug": "3.1.0",
 		"docker-compose": "0.4.3",
