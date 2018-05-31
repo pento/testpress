@@ -1,16 +1,14 @@
 const yaml = require( 'node-yaml' );
-const { copyFileSync } = require( 'fs' );
+const { copyFileSync, existsSync, renameSync } = require( 'fs' );
 const { spawnSync } = require( 'child_process' );
 const { spawn } = require( 'promisify-child-process' );
 const process = require( 'process' );
-const { addAction } = require( '@wordpress/hooks' );
+const { addAction, didAction } = require( '@wordpress/hooks' );
 const sleep = require( 'system-sleep' );
+const debug = require( 'debug' )( 'wpde:services:docker' );
 
 const { TOOLS_DIR } = require( '../constants.js' );
 const { preferences } = require( '../../preferences' );
-
-const NODE_DIR = TOOLS_DIR + '/node';
-const NODE_BIN = NODE_DIR + '/bin/node';
 
 let cwd = '';
 let port = 9999;
@@ -19,6 +17,7 @@ let port = 9999;
  * Registers the Docker actions, then starts Docker.
  */
 function registerDockerJob() {
+	debug( 'Registering job' );
 	addAction( 'preferences_saved', 'preferencesSaved', preferencesSaved, 9 );
 	addAction( 'shutdown', 'shutdown', shutdown );
 	startDocker();
@@ -28,10 +27,12 @@ function registerDockerJob() {
  * Get docker up and running.
  */
 async function startDocker() {
+	debug( 'Preparing to start Docker' );
 	cwd = preferences.value( 'basic.wordpress-folder' );
 	port = preferences.value( 'site.port' ) || 9999;
 
 	if ( ! cwd || ! port ) {
+		debug( 'Bailing, preferences not set' );
 		return;
 	}
 
@@ -47,13 +48,13 @@ async function startDocker() {
 					port + ':80',
 				],
 				volumes: [
-					cwd + '/build:/var/www/html',
+					cwd + ':/var/www/html',
 				],
 			},
 			cli: {
 				image: 'wordpress:cli',
 				volumes: [
-					cwd + '/build:/var/www/html',
+					cwd + ':/var/www/html',
 				],
 			},
 			mysql: {
@@ -63,7 +64,7 @@ async function startDocker() {
 					MYSQL_DATABASE: 'wordpress_develop',
 				},
 				healthcheck: {
-					test: [ 'CMD', 'mysqladmin', 'ping', '--silent' ],
+					test: [ 'CMD', 'mysql', '-e', 'SELECT 1', '-uroot', '-ppassword' ],
 					interval: '1s',
 					retries: '100',
 				}
@@ -85,6 +86,7 @@ async function startDocker() {
 	copyFileSync( __dirname + '/Dockerfile', TOOLS_DIR + '/Dockerfile' );
 	copyFileSync( __dirname + '/Dockerfile-phpunit', TOOLS_DIR + '/Dockerfile-phpunit' );
 
+	debug( 'Starting docker containers' );
 	await spawn( 'docker-compose', [
 		'up',
 		'-d',
@@ -95,7 +97,18 @@ async function startDocker() {
 		},
 	} );
 
-	// Wait for mysqld to be available before we continue.
+	addAction( 'grunt_watch_first_run_finished', 'installWordPress', installWordPress );
+
+	if ( didAction( 'grunt_watch_first_run_finished' ) ) {
+		installWordPress();
+	}
+}
+
+/**
+ * Runs the WP-CLI commands to install WordPress.
+ */
+async function installWordPress() {
+	debug( 'Waiting for mysqld to start in the MySQL container' );
 	while ( 1 ) {
 		const { stdout } = await spawn( 'docker', [
 			'inspect',
@@ -116,16 +129,35 @@ async function startDocker() {
 		sleep( 1000 );
 	}
 
+	debug( 'Checking if WordPress is installed' );
+	const isInstalled = await runCLICommand( 'core', 'is-installed' );
+	if ( isInstalled ) {
+		debug( 'Updating site URL' );
+		await runCLICommand( 'option', 'update', 'home', 'http://localhost:' + port );
+		await runCLICommand( 'option', 'update', 'siteurl', 'http://localhost:' + port );
+		return;
+	}
+
+	debug( 'Creating wp-config.php file' );
 	await runCLICommand( 'config',
 		'create',
 		'--dbname=wordpress_develop',
 		'--dbuser=root',
 		'--dbpass=password',
-		'--dbhost=mysql' );
+		'--dbhost=mysql',
+		'--path=/var/www/html/build' );
 
+	if ( existsSync( cwd + '/build/wp-config.php' ) ) {
+		debug( 'Moving wp-config.php out of the build directory' );
+		renameSync( cwd + '/build/wp-config.php', cwd + '/wp-config.php' )
+	}
+
+	debug( 'Adding debug options to wp-config.php' );
 	await runCLICommand( 'config', 'set', 'WP_DEBUG', 'true', '--raw', '--type=constant' );
 	await runCLICommand( 'config', 'set', 'SCRIPT_DEBUG', 'true', '--raw', '--type=constant' );
+	await runCLICommand( 'config', 'set', 'WP_DEBUG_DISPLAY', 'true', '--raw', '--type=constant' );
 
+	debug( 'Installing WordPress' );
 	await runCLICommand( 'core',
 		'install',
 		'--url=localhost:' + port,
@@ -133,6 +165,8 @@ async function startDocker() {
 		'--admin_user=admin',
 		'--admin_password=password',
 		'--admin_email=test@test.test' );
+
+	debug( 'WordPress ready at http://localhost:%d/', port );
 }
 
 /**
@@ -155,7 +189,7 @@ function runCLICommand( ...args ) {
 	} )
 	.then( () => true )
 	.catch( ( error ) => {
-		console.log( error.stderr.toString() );
+		debug( error.stderr.toString().trim() );
 		return false;
 	} );
 }
@@ -169,6 +203,8 @@ async function preferencesSaved( newPreferences ) {
 	if ( cwd === newPreferences.basic[ 'wordpress-folder' ] && port === newPreferences.site.port ) {
 		return;
 	}
+
+	debug( 'Preferences saved, stopping containers' );
 
 	await spawn( 'docker-compose', [
 		'down',

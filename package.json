@@ -6,6 +6,7 @@
 		"@wordpress/hooks": "1.1.8",
 		"chokidar": "2.0.3",
 		"compare-versions": "3.2.1",
+		"debug": "3.1.0",
 		"docker-compose": "0.4.3",
 		"electron-preferences": "1.2.0",
 		"gridicons": "3.0.1",
@@ -23,7 +24,7 @@
 	"homepage": "./",
 	"main": "src/electron-runner.js",
 	"scripts": {
-		"start": "concurrently --kill-others 'npm run react-start' 'wait-on http://localhost:3000/ && npm run electron-start'",
+		"start": "DEBUG_COLORS=1 concurrently --kill-others 'npm run react-start' 'wait-on http://localhost:3000/ && npm run electron-start'",
 		"build": "react-scripts build",
 		"test": "react-scripts test --env=jsdom",
 		"eject": "react-scripts eject",
