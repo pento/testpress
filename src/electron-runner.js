@@ -101,7 +101,7 @@ const getWindowPosition = () => {
 app.on( 'ready', () => {
 	createTray();
 	createWindow();
-	registerJobs();
+	registerJobs( window );
 } );
 
 // Quit when all windows are closed.

@@ -6,6 +6,7 @@ const process = require( 'process' );
 const { addAction, didAction } = require( '@wordpress/hooks' );
 const sleep = require( 'system-sleep' );
 const debug = require( 'debug' )( 'wpde:services:docker' );
+const { webContents } = require( 'electron' );
 
 const { TOOLS_DIR } = require( '../constants.js' );
 const { preferences } = require( '../../preferences' );
@@ -13,11 +14,14 @@ const { preferences } = require( '../../preferences' );
 let cwd = '';
 let port = 9999;
 
+let statusWindow = null;
+
 /**
  * Registers the Docker actions, then starts Docker.
  */
-function registerDockerJob() {
+function registerDockerJob( window ) {
 	debug( 'Registering job' );
+	statusWindow = window;
 	addAction( 'preferences_saved', 'preferencesSaved', preferencesSaved, 9 );
 	addAction( 'shutdown', 'shutdown', shutdown );
 	startDocker();
@@ -97,6 +101,8 @@ async function startDocker() {
 		},
 	} );
 
+	statusWindow.send( 'status', 'error', 'Building WordPress...' );
+
 	addAction( 'grunt_watch_first_run_finished', 'installWordPress', installWordPress );
 
 	if ( didAction( 'grunt_watch_first_run_finished' ) ) {
@@ -108,6 +114,8 @@ async function startDocker() {
  * Runs the WP-CLI commands to install WordPress.
  */
 async function installWordPress() {
+	statusWindow.send( 'status', 'error', 'Installing WordPress...' );
+
 	debug( 'Waiting for mysqld to start in the MySQL container' );
 	while ( 1 ) {
 		const { stdout } = await spawn( 'docker', [
@@ -165,6 +173,8 @@ async function installWordPress() {
 		'--admin_user=admin',
 		'--admin_password=password',
 		'--admin_email=test@test.test' );
+
+	statusWindow.send( 'status', 'okay', 'Ready!' );
 
 	debug( 'WordPress ready at http://localhost:%d/', port );
 }
