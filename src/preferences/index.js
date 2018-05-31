@@ -1,10 +1,10 @@
 const { app } = require( 'electron' );
 const { doAction } = require( '@wordpress/hooks' );
-
 const path = require( 'path' );
-
+const debug = require( 'debug' )( 'wpde:preferences' );
 const ElectronPreferences = require( 'electron-preferences' );
 
+debug( 'Initialising preferences' );
 const preferences = new ElectronPreferences( {
 	dataStore: path.resolve( app.getPath( 'userData' ), 'preferences.json' ),
 	defaults: {
@@ -50,6 +50,7 @@ const preferences = new ElectronPreferences( {
 } );
 
 preferences.on( 'save', ( preferences ) => {
+	debug( 'Preferences saved' );
 	doAction( 'preferences_saved', preferences );
 } );
 

@@ -1,5 +1,8 @@
 const { spawn } = require( 'child_process' );
-const { addAction } = require( '@wordpress/hooks' );
+const { existsSync } = require( 'fs' );
+const { watch } = require( 'chokidar' );
+const { addAction, doAction, didAction } = require( '@wordpress/hooks' );
+const debug = require( 'debug' )( 'wpde:services:grunt' );
 
 const { TOOLS_DIR } = require( '../constants.js' );
 const { preferences } = require( '../../preferences' );
@@ -7,59 +10,75 @@ const { preferences } = require( '../../preferences' );
 const NODE_DIR = TOOLS_DIR + '/node';
 const NODE_BIN = NODE_DIR + '/bin/node';
 
-let watchProcess = buildProcess = null;
+let watchProcess = null;
 let cwd = '';
 
 /**
  * Registers a watcher for when Grunt needs to run on the WordPress install.
  */
 function registerGruntJob() {
-	addAction( 'npm_install_finished', 'runGruntBuild', runGruntBuild );
+	debug( 'Registering job' );
+	addAction( 'npm_install_finished', 'runGruntWatch', runGruntWatch );
 	addAction( 'preferences_saved', 'preferencesSaved', preferencesSaved, 9 );
 	cwd = preferences.value( 'basic.wordpress-folder' );
-
-}
-
-/**
- * If the WordPress folder is defined, run `grunt build`, then `grunt watch` on it.
- */
-function runGruntBuild() {
-	if ( buildProcess ) {
-		buildProcess.kill();
-		buildProcess = null;
-	}
-
-	if ( watchProcess ) {
-		watchProcess.kill();
-		watchProcess = null;
-	}
 
 	if ( ! cwd ) {
 		return;
 	}
 
-	const grunt = cwd + '/node_modules/.bin/grunt';
+	const gruntfileJs = cwd + '/Gruntfile.js';
 
-	buildProcess = spawn( NODE_BIN, [
+	if ( existsSync( gruntfileJs ) ) {
+		debug( 'Registering Gruntfile.js watcher' );
+		watch( gruntfileJs ).on( 'change', () => {
+			debug( 'Gruntfile.js change detected' );
+			runGruntWatch();
+		 } );
+	}
+
+}
+
+/**
+ * If the WordPress folder is defined, run `grunt watch` on it.
+ */
+function runGruntWatch() {
+	debug( 'Preparing to run `grunt watch`' );
+
+	if ( watchProcess ) {
+		debug( 'Ending previous `grunt watch` process' );
+		watchProcess.kill();
+		watchProcess = null;
+	}
+
+	if ( ! didAction( 'npm_install_finished' ) ) {
+		debug( "Bailing, `npm install` isn't finished" );
+		return;
+	}
+
+	if ( ! cwd ) {
+		debug( "Bailing, WordPress folder isn't set" );
+		return;
+	}
+
+	const grunt = cwd + '/node_modules/.bin/grunt';
+	let finishedFirstRun = false;
+
+	debug( 'Starting `grunt watch`' );
+	watchProcess = spawn( NODE_BIN, [
 		grunt,
-		'build',
+		'watch',
 	], {
 		cwd,
 		env: {},
 	} );
 
-	buildProcess.on( 'close', ( code ) => {
-		if ( 0 !== code ) {
-			return;
-		}
 
-		watchProcess = spawn( NODE_BIN, [
-			grunt,
-			'watch',
-		], {
-			cwd,
-			env: {},
-		} );
+	watchProcess.stderr.on( 'data', ( data ) => debug( '`grunt warning` error: %s', data ) );
+	watchProcess.stdout.on( 'data', ( data ) => {
+		if ( ! finishedFirstRun && 'Waiting...' === data.toString().trim() ) {
+			finishedFirstRun = true;
+			doAction( 'grunt_watch_first_run_finished' );
+		}
 	} );
 }
 
@@ -73,12 +92,9 @@ function preferencesSaved( newPreferences ) {
 		return;
 	}
 
-	cwd = newPreferences.basic[ 'wordpress-folder' ];
+	debug( 'WordPress folder updated' );
 
-	if ( buildProcess ) {
-		buildProcess.kill();
-		buildProcess = null;
-	}
+	cwd = newPreferences.basic[ 'wordpress-folder' ];
 
 	if ( watchProcess ) {
 		watchProcess.kill();
