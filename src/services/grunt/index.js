@@ -5,11 +5,8 @@ const { addAction, doAction, didAction } = require( '@wordpress/hooks' );
 const debug = require( 'debug' )( 'wpde:services:grunt' );
 const { webContents } = require( 'electron' );
 
-const { TOOLS_DIR } = require( '../constants.js' );
+const { TOOLS_DIR, NODE_BIN } = require( '../constants.js' );
 const { preferences } = require( '../../preferences' );
-
-const NODE_DIR = TOOLS_DIR + '/node';
-const NODE_BIN = NODE_DIR + '/bin/node';
 
 let watchProcess = null;
 let cwd = '';
@@ -64,7 +61,7 @@ function runGruntWatch() {
 		return;
 	}
 
-	const grunt = cwd + '/node_modules/.bin/grunt';
+	const grunt = cwd + '/node_modules/grunt/bin/grunt';
 	let finishedFirstRun = false;
 
 	debug( 'Starting `grunt watch`' );
@@ -83,8 +80,10 @@ function runGruntWatch() {
 
 		if ( finishedFirstRun ) {
 			if ( waiting ) {
+				debug( 'Ready' );
 				statusWindow.send( 'status', 'okay', 'Ready!' );
 			} else {
+				debug( 'Building...' );
 				statusWindow.send( 'status', 'warning', 'Building...' );
 			}
 		} else if ( waiting ) {
