@@ -193,34 +193,53 @@ async function checksumLocalArchive( filename ) {
  * Install the latest version of NPM in our local copy of Node.
  */
 function updateNPM() {
-	debug( 'Updating npm' );
+	debug( 'Preparing to update npm' );
 	if ( ! existsSync( NODE_BIN ) ) {
 		debug( "Bailing, couldn't find node binary" );
 		return;
 	}
 
-	// Windows needs these files removed before NPM will update.
-	if ( 'win32' === process.platform ) {
-		[ 'npm', 'npm.cmd', 'npx', 'npx.cmd' ].forEach( ( file ) => {
-			const path = normalize( NODE_DIR + '/' + file );
-			try {
-				unlinkSync( path );
-			} catch ( error ) {}
-		} );
-	}
-
-	const update = spawn( NODE_BIN, [
+	const updateCheck = spawn( NODE_BIN, [
 		NPM_BIN,
-		'install',
+		'outdated',
 		'-g',
 		'npm',
 	], {
 		env: {},
 	} );
 
-	update.on( 'close', () => {
-		debug( 'npm updated' );
-		doAction( 'updated_node_and_npm' );
+	updateCheck.on( 'close', ( code ) => {
+		if ( ! code ) {
+			debug( 'npm running latest version' );
+			doAction( 'updated_node_and_npm' );
+			return;
+		}
+
+		// Windows needs these files removed before NPM will update.
+		if ( 'win32' === process.platform ) {
+			debug( 'Deleting npm files' );
+			[ 'npm', 'npm.cmd', 'npx', 'npx.cmd' ].forEach( ( file ) => {
+				const path = normalize( NODE_DIR + '/' + file );
+				try {
+					unlinkSync( path );
+				} catch ( error ) {}
+			} );
+		}
+
+		debug( 'Starting npm update' );
+		const update = spawn( NODE_BIN, [
+			NPM_BIN,
+			'install',
+			'-g',
+			'npm',
+		], {
+			env: {},
+		} );
+
+		update.on( 'close', () => {
+			debug( 'npm updated' );
+			doAction( 'updated_node_and_npm' );
+		} );
 	} );
 }
 
