@@ -1,24 +1,27 @@
 const schedule = require( 'node-schedule' );
 const compareVersions = require( 'compare-versions' );
 const fetch = require( 'node-fetch' );
-const { createWriteStream, createReadStream, mkdirSync, existsSync, readFileSync } = require( 'fs' );
+const { createWriteStream, createReadStream, mkdirSync, existsSync, readFileSync, unlinkSync } = require( 'fs' );
 const { app } = require( 'electron' );
+const { normalize } = require( 'path' );
 const tar = require( 'tar' );
 const { spawn, spawnSync } = require( 'child_process' );
+const { promisify } = require( 'util' );
 const promisePipe = require( 'promisepipe' );
 const hasha = require( 'hasha' );
-const { TOOLS_DIR, ARCHIVE_DIR } = require( '../constants.js' );
+const { TOOLS_DIR, ARCHIVE_DIR, NODE_DIR, NODE_BIN, NPM_BIN } = require( '../constants.js' );
 const { doAction } = require( '@wordpress/hooks' );
 const debug = require( 'debug' )( 'wpde:services:node-downloader' );
+const originalUnzip = require( 'extract-zip' );
+const unzip = promisify( originalUnzip );
 
 const NODE_URL = 'https://nodejs.org/dist/latest-carbon/';
-const PLATFORM = 'darwin-x64';
-const VERSION_REGEX = new RegExp( `href="(node-v([0-9\\.]+)-${ PLATFORM }\\.tar\\.gz)`, 'g' );
 
-const NODE_DIR = TOOLS_DIR + '/node';
+const PLATFORM = ( 'win32' === process.platform ) ? 'win' : process.platform;
+const ARCH = ( 'x32' === process.arch ) ? 'x86' : process.arch;
+const ZIP = ( 'win32' === process.platform ) ? 'zip' : 'tar.gz';
 
-const NODE_BIN = NODE_DIR + '/bin/node';
-const NPM_BIN = NODE_DIR + '/bin/npm';
+const VERSION_REGEX = new RegExp( `href="(node-v([0-9\\.]+)-${ PLATFORM }-${ ARCH }\\.${ ZIP })`, 'g' );
 
 /**
  * Registers a check for new versions of Node every 12 hours.
@@ -47,7 +50,7 @@ async function checkAndInstallUpdates() {
 
 	if ( compareVersions( remoteVersion.version, currentVersion ) > 0 ) {
 		debug( 'Newer version found, starting install...' );
-		const filename = ARCHIVE_DIR + '/' + remoteVersion.filename;
+		const filename = normalize( ARCHIVE_DIR + '/' + remoteVersion.filename );
 
 		if ( ! await checksumLocalArchive( remoteVersion.filename ) ) {
 			const url = NODE_URL + remoteVersion.filename;
@@ -77,12 +80,21 @@ async function checkAndInstallUpdates() {
 
 		debug( 'Extracting new version from %s to %s', filename, NODE_DIR );
 
-		await tar.extract( {
-			file: filename,
-			cwd: NODE_DIR,
-			strip: 1,
-			onwarn: ( msg ) => console.log( msg ),
-		} );
+		if ( 'win32' === process.platform ) {
+			await unzip( filename, {
+				dir: NODE_DIR,
+				onEntry: ( entry ) => {
+					entry.fileName = entry.fileName.split( '/' ).slice( 1 ).join( '/' );
+				}
+			} );
+		} else {
+			await tar.extract( {
+				file: filename,
+				cwd: NODE_DIR,
+				strip: 1,
+				onwarn: ( msg ) => console.log( msg ),
+			} );
+		}
 	}
 
 	updateNPM();
@@ -100,6 +112,7 @@ function getLocalVersion() {
 	if ( ! existsSync( NODE_BIN ) ) {
 		return '0.0.0';
 	}
+	console.log( NODE_BIN );
 
 	const versionInfo = spawnSync( NODE_BIN, [ '-v' ] );
 
@@ -139,8 +152,8 @@ async function getRemoteVersion() {
  * @return {Boolean} True if the checksum matches, false if it doesn't.
  */
 async function checksumLocalArchive( filename ) {
-	const archiveFilename = ARCHIVE_DIR + '/' + filename;
-	const checksumFilename = ARCHIVE_DIR + '/' + 'node-SHASUMS256.txt';
+	const archiveFilename = normalize( ARCHIVE_DIR + '/' + filename );
+	const checksumFilename = normalize( ARCHIVE_DIR + '/' + 'node-SHASUMS256.txt' );
 
 	if ( ! existsSync( archiveFilename ) ) {
 		debug( "Checksum file doesn't exist" );
@@ -181,6 +194,21 @@ async function checksumLocalArchive( filename ) {
  */
 function updateNPM() {
 	debug( 'Updating npm' );
+	if ( ! existsSync( NODE_BIN ) ) {
+		debug( "Bailing, couldn't find node binary" );
+		return;
+	}
+
+	// Windows needs these files removed before NPM will update.
+	if ( 'win32' === process.platform ) {
+		[ 'npm', 'npm.cmd', 'npx', 'npx.cmd' ].forEach( ( file ) => {
+			const path = normalize( NODE_DIR + '/' + file );
+			try {
+				unlinkSync( path );
+			} catch ( error ) {}
+		} );
+	}
+
 	const update = spawn( NODE_BIN, [
 		NPM_BIN,
 		'install',
@@ -189,6 +217,7 @@ function updateNPM() {
 	], {
 		env: {},
 	} );
+
 	update.on( 'close', () => {
 		debug( 'npm updated' );
 		doAction( 'updated_node_and_npm' );
