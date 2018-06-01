@@ -11,7 +11,9 @@ const assetsDirectory = path.join( __dirname, '/../assets/' )
 let tray = undefined;
 let window = undefined;
 
-app.dock.hide();
+if ( 'darwin' === process.platform ) {
+	app.dock.hide();
+}
 
 const createTray = () => {
 	tray = new Tray( path.join( assetsDirectory, 'tray-logo.png' ) );
@@ -87,10 +89,10 @@ const getWindowPosition = () => {
 	const trayBounds = tray.getBounds();
 
 	// Center window horizontally below the tray icon
-	const x = Math.round( trayBounds.x + ( trayBounds.width / 2 ) - ( windowBounds.width / 2 ) );
+	const x = Math.round( trayBounds.x - ( trayBounds.width / 2 ) - ( windowBounds.width / 2 ) );
 
 	// Position window 4 pixels vertically below the tray icon
-	const y = Math.round( trayBounds.y + trayBounds.height + 4 );
+	const y = Math.round( trayBounds.y - trayBounds.height + 4 );
 
 	return { x: x, y: y };
 }
