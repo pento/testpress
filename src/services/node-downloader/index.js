@@ -5,15 +5,15 @@ const { createWriteStream, createReadStream, mkdirSync, existsSync, readFileSync
 const { app } = require( 'electron' );
 const { normalize } = require( 'path' );
 const tar = require( 'tar' );
-const { spawn, spawnSync } = require( 'child_process' );
+const { spawnSync } = require( 'child_process' );
+const { spawn } = require( 'promisify-child-process' );
 const { promisify } = require( 'util' );
 const promisePipe = require( 'promisepipe' );
 const hasha = require( 'hasha' );
 const { TOOLS_DIR, ARCHIVE_DIR, NODE_DIR, NODE_BIN, NPM_BIN } = require( '../constants.js' );
 const { doAction } = require( '@wordpress/hooks' );
 const debug = require( 'debug' )( 'wpde:services:node-downloader' );
-const originalUnzip = require( 'extract-zip' );
-const unzip = promisify( originalUnzip );
+const DecompressZip = require( 'decompress-zip' );
 
 const NODE_URL = 'https://nodejs.org/dist/latest-carbon/';
 
@@ -43,7 +43,7 @@ function registerNodeJob() {
  */
 async function checkAndInstallUpdates() {
 	debug( 'Checking for updates' );
-	const currentVersion = getLocalVersion();
+	const currentVersion = await getLocalVersion();
 	const remoteVersion = await getRemoteVersion();
 
 	debug( 'Installed version: %s, remote version: %s', currentVersion, remoteVersion.version );
@@ -81,12 +81,18 @@ async function checkAndInstallUpdates() {
 		debug( 'Extracting new version from %s to %s', filename, NODE_DIR );
 
 		if ( 'win32' === process.platform ) {
-			await unzip( filename, {
-				dir: NODE_DIR,
-				onEntry: ( entry ) => {
-					entry.fileName = entry.fileName.split( '/' ).slice( 1 ).join( '/' );
-				}
-			} );
+			unzipper = new DecompressZip( filename );
+
+			await new Promise( ( resolve, reject ) => {
+				unzipper.on( 'extract', resolve );
+				unzipper.on( 'error', reject );
+
+				unzipper.extract( {
+					path: NODE_DIR,
+					strip: 1,
+					filter: ( file ) => file.type !== 'Directory',
+				} );
+			} )
 		} else {
 			await tar.extract( {
 				file: filename,
@@ -108,13 +114,12 @@ async function checkAndInstallUpdates() {
  *
  * @return {String} The version number of the local copy of node.
  */
-function getLocalVersion() {
+async function getLocalVersion() {
 	if ( ! existsSync( NODE_BIN ) ) {
 		return '0.0.0';
 	}
-	console.log( NODE_BIN );
 
-	const versionInfo = spawnSync( NODE_BIN, [ '-v' ] );
+	const versionInfo = await spawn( NODE_BIN, [ '-v' ] );
 
 	return versionInfo.stdout.toString().replace( 'v', '' ).trim();
 }
@@ -192,55 +197,70 @@ async function checksumLocalArchive( filename ) {
 /**
  * Install the latest version of NPM in our local copy of Node.
  */
-function updateNPM() {
+async function updateNPM() {
 	debug( 'Preparing to update npm' );
 	if ( ! existsSync( NODE_BIN ) ) {
 		debug( "Bailing, couldn't find node binary" );
 		return;
 	}
 
-	const updateCheck = spawn( NODE_BIN, [
+	const npmIsUpdated = await spawn( NODE_BIN, [
 		NPM_BIN,
 		'outdated',
 		'-g',
 		'npm',
 	], {
 		env: {},
-	} );
+	} ).then( () => false ).catch( () => false );
 
-	updateCheck.on( 'close', ( code ) => {
-		if ( ! code ) {
-			debug( 'npm running latest version' );
-			doAction( 'updated_node_and_npm' );
-			return;
-		}
+	if ( npmIsUpdated ) {
+		debug( 'npm running latest version' );
+		doAction( 'updated_node_and_npm' );
+		return;
+	}
 
+	const requiredPackages = [ 'npm' ];
+
+	if ( 'win32' === process.platform ) {
+		debug( 'Deleting npm files' );
 		// Windows needs these files removed before NPM will update.
-		if ( 'win32' === process.platform ) {
-			debug( 'Deleting npm files' );
-			[ 'npm', 'npm.cmd', 'npx', 'npx.cmd' ].forEach( ( file ) => {
-				const path = normalize( NODE_DIR + '/' + file );
-				try {
-					unlinkSync( path );
-				} catch ( error ) {}
-			} );
-		}
-
-		debug( 'Starting npm update' );
-		const update = spawn( NODE_BIN, [
-			NPM_BIN,
-			'install',
-			'-g',
-			'npm',
-		], {
-			env: {},
+		[ 'npm', 'npm.cmd', 'npx', 'npx.cmd' ].forEach( ( file ) => {
+			const path = normalize( NODE_DIR + '/' + file );
+			try {
+				unlinkSync( path );
+			} catch ( error ) {}
 		} );
 
-		update.on( 'close', () => {
-			debug( 'npm updated' );
-			doAction( 'updated_node_and_npm' );
-		} );
+		// Windows can't deal with long file paths, so needs to be flattened.
+		requiredPackages.push( 'flatten-packages' );
+	}
+
+	debug( 'Starting npm update' );
+	await spawn( NODE_BIN, [
+		NPM_BIN,
+		'install',
+		'-g',
+		...requiredPackages,
+	], {
+		env: {},
 	} );
+
+	debug( 'npm updated' );
+	
+	if ( 'win32' === process.platform ) {
+		debug( 'Flattening node packages' );
+
+		await spawn( NODE_BIN, [
+			normalize( NODE_DIR + '/node_modules/flatten-packages/bin/flatten' ),
+		], {
+			cwd: NODE_DIR,
+			env: {},
+		} );	
+
+		debug( 'Packages flattened' );
+	}
+
+	doAction( 'updated_node_and_npm' );
 }
 
 module.exports = {

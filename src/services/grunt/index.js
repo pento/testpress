@@ -4,6 +4,7 @@ const { watch } = require( 'chokidar' );
 const { addAction, doAction, didAction } = require( '@wordpress/hooks' );
 const debug = require( 'debug' )( 'wpde:services:grunt' );
 const { webContents } = require( 'electron' );
+const { normalize } = require( 'path' );
 
 const { TOOLS_DIR, NODE_BIN } = require( '../constants.js' );
 const { preferences } = require( '../../preferences' );
@@ -27,7 +28,7 @@ function registerGruntJob( window ) {
 		return;
 	}
 
-	const gruntfileJs = cwd + '/Gruntfile.js';
+	const gruntfileJs = normalize( cwd + '/Gruntfile.js' );
 
 	if ( existsSync( gruntfileJs ) ) {
 		debug( 'Registering Gruntfile.js watcher' );
