@@ -88,6 +88,7 @@ function runGruntWatch() {
 				statusWindow.send( 'status', 'warning', 'Building...' );
 			}
 		} else if ( waiting ) {
+			debug( 'Ready' );
 			finishedFirstRun = true;
 			doAction( 'grunt_watch_first_run_finished' );
 		}

@@ -7,6 +7,8 @@ const { addAction, didAction } = require( '@wordpress/hooks' );
 const sleep = require( 'system-sleep' );
 const debug = require( 'debug' )( 'wpde:services:docker' );
 const { webContents } = require( 'electron' );
+const { normalize } = require( 'path' );
+const csv = require( 'csvtojson' );
 
 const { TOOLS_DIR } = require( '../constants.js' );
 const { preferences } = require( '../../preferences' );
@@ -16,14 +18,24 @@ let port = 9999;
 
 let statusWindow = null;
 
+const dockerEnv = {};
+
+let USING_TOOLBOX = false;
+
 /**
  * Registers the Docker actions, then starts Docker.
  */
-function registerDockerJob( window ) {
+async function registerDockerJob( window ) {
 	debug( 'Registering job' );
+
 	statusWindow = window;
+	if ( 'win32' === process.platform ) {
+		USING_TOOLBOX = await detectToolbox();
+	}
+
 	addAction( 'preferences_saved', 'preferencesSaved', preferencesSaved, 9 );
 	addAction( 'shutdown', 'shutdown', shutdown );
+
 	startDocker();
 }
 
@@ -52,13 +64,13 @@ async function startDocker() {
 					port + ':80',
 				],
 				volumes: [
-					cwd + ':/var/www/html',
+					normalize( cwd ) + ':/var/www/html',
 				],
 			},
 			cli: {
 				image: 'wordpress:cli',
 				volumes: [
-					cwd + ':/var/www/html',
+					normalize( cwd ) + ':/var/www/html',
 				],
 			},
 			mysql: {
@@ -85,10 +97,14 @@ async function startDocker() {
 		},
 	};
 
-	yaml.writeSync( TOOLS_DIR + '/docker-compose.yml', defaultOptions );
+	yaml.writeSync( normalize( TOOLS_DIR + '/docker-compose.yml' ), defaultOptions );
 
-	copyFileSync( __dirname + '/Dockerfile', TOOLS_DIR + '/Dockerfile' );
-	copyFileSync( __dirname + '/Dockerfile-phpunit', TOOLS_DIR + '/Dockerfile-phpunit' );
+	copyFileSync( normalize( __dirname + '/Dockerfile' ), normalize( TOOLS_DIR + '/Dockerfile' ) );
+	copyFileSync( normalize( __dirname + '/Dockerfile-phpunit' ), normalize( TOOLS_DIR + '/Dockerfile-phpunit' ) );
+
+	if ( USING_TOOLBOX ) {
+		await startDockerMachine();
+	}
 
 	debug( 'Starting docker containers' );
 	await spawn( 'docker-compose', [
@@ -98,8 +114,12 @@ async function startDocker() {
 		cwd: TOOLS_DIR,
 		env: {
 			PATH: process.env.PATH,
+			...dockerEnv,
 		},
-	} );
+		shell: true,
+	} ).catch( ( error ) => debug( error.stderr.toString() ) );
+
+	debug( 'Docker containers started' );
 
 	statusWindow.send( 'status', 'error', 'Building WordPress...' );
 
@@ -108,6 +128,81 @@ async function startDocker() {
 	if ( didAction( 'grunt_watch_first_run_finished' ) ) {
 		installWordPress();
 	}
+}
+
+/**
+ * When we're using Docker Toolbox, then we need to check that the host machine is up and running.
+ */
+async function startDockerMachine() {
+	debug( 'Starting docker machine' );
+	await spawn( 'docker-machine', [
+		'start',
+		'default',
+	], {
+		cwd: TOOLS_DIR,
+		env: {
+			PATH: process.env.PATH,
+		},
+		shell: true,
+	} ).catch( ( error ) => debug( error.stderr.toString() ) );
+
+	const vboxManage = normalize( process.env.VBOX_MSI_INSTALL_PATH + '/VBoxManage' );
+
+	debug( 'Configuring machine port forwarding' );
+	await spawn( '"' + vboxManage + '"', [
+		'controlvm',
+		'"default"',
+		'natpf1',
+		'delete',
+		'wphttp',
+	], {
+		cwd: TOOLS_DIR,
+		env: {
+			PATH: process.env.PATH,
+		},
+		shell: true,
+	} ).catch( ( error ) => debug( error.stderr.toString() ) );
+
+	await spawn( '"' + vboxManage + '"', [
+		'controlvm',
+		'"default"',
+		'natpf1',
+		'wphttp,tcp,127.0.0.1,' + port + ',,' + port,
+	], {
+		cwd: TOOLS_DIR,
+		env: {
+			PATH: process.env.PATH,
+		},
+		shell: true,
+	} ).catch( ( error ) => debug( error.stderr.toString() ) );
+
+	debug( 'Collecting docker environment info' );
+	const { stdout } = await spawn( 'docker-machine', [
+		'env',
+		'default',
+		'--shell',
+		'cmd',
+	], {
+		cwd: TOOLS_DIR,
+		env: {
+			PATH: process.env.PATH,
+		},
+		shell: true,
+	} ).catch( ( error ) => debug( error.stderr.toString() ) );
+
+	stdout.toString().split( "\n" ).forEach( ( line ) => {
+		// Environment info is in the form: SET ENV_VAR=value
+		if ( ! line.startsWith( 'SET' ) ) {
+			return;
+		};
+
+		const parts = line.trim().split( /[ =]/, 3 );
+		if ( 3 === parts.length ) {
+			dockerEnv[ parts[ 1 ] ] = parts[ 2 ];
+		}
+	} );
+
+	debug( 'Docker environment: %O', dockerEnv );
 }
 
 /**
@@ -127,6 +222,7 @@ async function installWordPress() {
 			cwd: TOOLS_DIR,
 			env: {
 				PATH: process.env.PATH,
+				...dockerEnv,
 			},
 		} );
 
@@ -195,6 +291,7 @@ function runCLICommand( ...args ) {
 		cwd: TOOLS_DIR,
 		env: {
 			PATH: process.env.PATH,
+			...dockerEnv,
 		},
 	} )
 	.then( () => true )
@@ -202,6 +299,52 @@ function runCLICommand( ...args ) {
 		debug( error.stderr.toString().trim() );
 		return false;
 	} );
+}
+
+/**
+ * Figure out if we're using Docker Toolbox or not. Uses Docker for Windows' version and Hyper-V
+ * requirements as a baseline to determine whether Toolbox is being used.
+ * 
+ * @returns {Boolean} true if Docker Toolbox is being used, false if it isn't.
+ */
+async function detectToolbox() {
+	debug( 'Detecting if we should use Docker Toolbox or not' );
+	const { stdout } = await spawn( 'systeminfo', [
+			'/FO',
+			'CSV',
+		], {
+		env: {
+			PATH: process.env.PATH,
+		},
+	} );
+
+	const info = ( await csv().fromString( stdout.toString() ) )[ 0 ];
+
+	if ( ! info[ 'OS Name' ].includes( 'Pro' ) ) {
+		debug( 'Not running Windows Pro' );
+		return true;
+	}
+
+	if ( info[ 'OS Version' ].match( /^\d+/ )[0] < 10 ) {
+		debug( 'Not running Windows 10' );
+		return true;
+	}
+
+	if ( info[ 'OS Version' ].match( /\d+$/ )[0] < 14393 ) {
+		debug( 'Not running build 14393 or later' );
+		return true;
+	}
+
+	const hyperv = info[ 'Hyper-V Requirements' ].split( ',' );
+
+	return hyperv.reduce( ( allowed, line ) => {
+		const [ requirement, enabled ] = line.split( ':' ).map( ( val ) => val.trim().toLowerCase() );
+		if ( 'yes' !== enabled ) {
+			debug( "Don't have Hyper-V requirement \"%s\" available", requirement );
+			return false;
+		}
+		return allowed;
+	}, true );
 }
 
 /**
@@ -222,6 +365,7 @@ async function preferencesSaved( newPreferences ) {
 		cwd: TOOLS_DIR,
 		env: {
 			PATH: process.env.PATH,
+			...dockerEnv,
 		},
 	} );
 
@@ -232,12 +376,14 @@ async function preferencesSaved( newPreferences ) {
  * Shutdown handler, to ensure the docker containers are shut down cleanly.
  */
 function shutdown() {
+	debug( 'Shutdown, stopping containers' );
 	spawnSync( 'docker-compose', [
 		'down',
 	], {
 		cwd: TOOLS_DIR,
 		env: {
 			PATH: process.env.PATH,
+			...dockerEnv,
 		},
 	} );
 }

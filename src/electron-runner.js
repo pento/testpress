@@ -118,4 +118,3 @@ app.on( 'window-all-closed', () => {
 app.on( 'quit', () => {
 	doAction( 'shutdown' );
 } );
-

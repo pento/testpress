@@ -136,7 +136,7 @@ async function getRemoteVersion() {
 	const versionInfo = VERSION_REGEX.exec( remotels );
 
 	if ( ! versionInfo ) {
-		debug( 'Remote version regex failed on %s', remotels );
+		debug( "Remote version regex (%s) failed on html:\n%s\n%O", VERSION_REGEX, remotels, versionInfo );
 		return {
 			version: '0.0.0',
 			filename: '',
@@ -211,7 +211,7 @@ async function updateNPM() {
 		'npm',
 	], {
 		env: {},
-	} ).then( () => false ).catch( () => false );
+	} ).then( () => true ).catch( () => false );
 
 	if ( npmIsUpdated ) {
 		debug( 'npm running latest version' );
