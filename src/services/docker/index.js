@@ -116,7 +116,6 @@ async function startDocker() {
 			PATH: process.env.PATH,
 			...dockerEnv,
 		},
-		shell: true,
 	} ).catch( ( error ) => debug( error.stderr.toString() ) );
 
 	debug( 'Docker containers started' );
@@ -143,7 +142,6 @@ async function startDockerMachine() {
 		env: {
 			PATH: process.env.PATH,
 		},
-		shell: true,
 	} ).catch( ( error ) => debug( error.stderr.toString() ) );
 
 	const vboxManage = normalize( process.env.VBOX_MSI_INSTALL_PATH + '/VBoxManage' );
@@ -187,7 +185,6 @@ async function startDockerMachine() {
 		env: {
 			PATH: process.env.PATH,
 		},
-		shell: true,
 	} ).catch( ( error ) => debug( error.stderr.toString() ) );
 
 	stdout.toString().split( "\n" ).forEach( ( line ) => {
