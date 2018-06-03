@@ -239,6 +239,10 @@ async function installWordPress() {
 		debug( 'Updating site URL' );
 		await runCLICommand( 'option', 'update', 'home', 'http://localhost:' + port );
 		await runCLICommand( 'option', 'update', 'siteurl', 'http://localhost:' + port );
+
+		statusWindow.send( 'status', 'okay', 'Ready!' );
+		debug( 'WordPress ready at http://localhost:%d/', port );
+
 		return;
 	}
 
