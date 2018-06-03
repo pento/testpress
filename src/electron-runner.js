@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain, Tray } = require( 'electron' );
 const { doAction } = require( '@wordpress/hooks' );
 const path = require( 'path' );
 const url = require( 'url' );
+const positioner = require( 'electron-traywindow-positioner' );
 
 const { preferences } = require( './preferences' );
 const { registerJobs } = require( './services' );
@@ -33,7 +34,7 @@ function createWindow() {
     // Create the browser window.
     window = new BrowserWindow( {
 		width: 300,
-		height: 500,
+		height: 400,
 		show: false,
 		frame: false,
 		fullscreenable: false,
@@ -78,24 +79,12 @@ const toggleWindow = () => {
 };
 
 const showWindow = () => {
-	const position = getWindowPosition();
-	window.setPosition( position.x, position.y, false );
+	const trayBounds = tray.getBounds();
+
+	positioner.position( window, trayBounds );
 	window.show();
 	window.focus();
 };
-
-const getWindowPosition = () => {
-	const windowBounds = window.getBounds();
-	const trayBounds = tray.getBounds();
-
-	// Center window horizontally below the tray icon
-	const x = Math.round( trayBounds.x - ( trayBounds.width / 2 ) - ( windowBounds.width / 2 ) );
-
-	// Position window 4 pixels vertically below the tray icon
-	const y = Math.round( trayBounds.y - trayBounds.height + 4 );
-
-	return { x: x, y: y };
-}
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
