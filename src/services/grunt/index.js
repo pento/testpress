@@ -63,7 +63,6 @@ function runGruntWatch() {
 	}
 
 	const grunt = cwd + '/node_modules/grunt/bin/grunt';
-	let finishedFirstRun = false;
 
 	debug( 'Starting `grunt watch`' );
 	watchProcess = spawn( NODE_BIN, [
@@ -74,6 +73,8 @@ function runGruntWatch() {
 		env: {},
 	} );
 
+	let finishedFirstRun = false;
+	let showedBuilding = true;
 
 	watchProcess.stderr.on( 'data', ( data ) => debug( '`grunt warning` error: %s', data ) );
 	watchProcess.stdout.on( 'data', ( data ) => {
@@ -81,15 +82,18 @@ function runGruntWatch() {
 
 		if ( finishedFirstRun ) {
 			if ( waiting ) {
+				showedBuilding = false;
 				debug( 'Ready' );
 				statusWindow.send( 'status', 'okay', 'Ready!' );
 			} else {
+				showedBuilding = true;
 				debug( 'Building...' );
 				statusWindow.send( 'status', 'warning', 'Building...' );
 			}
 		} else if ( waiting ) {
 			debug( 'Ready' );
 			finishedFirstRun = true;
+			showedBuilding = true;
 			doAction( 'grunt_watch_first_run_finished' );
 		}
 
