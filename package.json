@@ -3,7 +3,7 @@
 	"version": "0.1.0",
 	"license": "GPL-2.0-or-later",
 	"dependencies": {
-		"@wordpress/hooks": "1.1.8",
+		"@wordpress/hooks": "1.2.0",
 		"chokidar": "2.0.3",
 		"classname": "0.0.0",
 		"compare-versions": "3.2.1",
