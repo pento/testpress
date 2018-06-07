@@ -17,7 +17,7 @@ if ( 'darwin' === process.platform ) {
 }
 
 const createTray = () => {
-	tray = new Tray( path.join( assetsDirectory, 'tray-logo.png' ) );
+	tray = new Tray( path.join( assetsDirectory, 'tray-logoTemplate.png' ) );
 	tray.on( 'right-click', toggleWindow );
 	tray.on( 'double-click', toggleWindow );
 	tray.on( 'click', ( event ) => {
@@ -33,8 +33,8 @@ const createTray = () => {
 function createWindow() {
     // Create the browser window.
     window = new BrowserWindow( {
-		width: 300,
-		height: 400,
+		width: 350,
+		height: 300,
 		show: false,
 		frame: false,
 		fullscreenable: false,
