@@ -21,7 +21,7 @@ const PLATFORM = ( 'win32' === process.platform ) ? 'win' : process.platform;
 const ARCH = ( 'x32' === process.arch ) ? 'x86' : process.arch;
 const ZIP = ( 'win32' === process.platform ) ? 'zip' : 'tar.gz';
 
-const VERSION_REGEX = new RegExp( `href="(node-v([0-9\\.]+)-${ PLATFORM }-${ ARCH }\\.${ ZIP })`, 'g' );
+const VERSION_REGEX = new RegExp( `href="(node-v([0-9\\.]+)-${ PLATFORM }-${ ARCH }\\.${ ZIP })` );
 
 /**
  * Registers a check for new versions of Node every 12 hours.
@@ -246,7 +246,7 @@ async function updateNPM() {
 	} );
 
 	debug( 'npm updated' );
-	
+
 	if ( 'win32' === process.platform ) {
 		debug( 'Flattening node packages' );
 
@@ -255,7 +255,7 @@ async function updateNPM() {
 		], {
 			cwd: NODE_DIR,
 			env: {},
-		} );	
+		} );
 
 		debug( 'Packages flattened' );
 	}
