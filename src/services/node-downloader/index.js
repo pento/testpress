@@ -1,24 +1,27 @@
 const schedule = require( 'node-schedule' );
 const compareVersions = require( 'compare-versions' );
 const fetch = require( 'node-fetch' );
-const { createWriteStream, createReadStream, mkdirSync, existsSync, readFileSync } = require( 'fs' );
+const { createWriteStream, createReadStream, mkdirSync, existsSync, readFileSync, unlinkSync } = require( 'fs' );
 const { app } = require( 'electron' );
+const { normalize } = require( 'path' );
 const tar = require( 'tar' );
-const { spawn, spawnSync } = require( 'child_process' );
+const { spawnSync } = require( 'child_process' );
+const { spawn } = require( 'promisify-child-process' );
+const { promisify } = require( 'util' );
 const promisePipe = require( 'promisepipe' );
 const hasha = require( 'hasha' );
-const { TOOLS_DIR, ARCHIVE_DIR } = require( '../constants.js' );
+const { TOOLS_DIR, ARCHIVE_DIR, NODE_DIR, NODE_BIN, NPM_BIN } = require( '../constants.js' );
 const { doAction } = require( '@wordpress/hooks' );
 const debug = require( 'debug' )( 'wpde:services:node-downloader' );
+const DecompressZip = require( 'decompress-zip' );
 
 const NODE_URL = 'https://nodejs.org/dist/latest-carbon/';
-const PLATFORM = 'darwin-x64';
-const VERSION_REGEX = new RegExp( `href="(node-v([0-9\\.]+)-${ PLATFORM }\\.tar\\.gz)`, 'g' );
 
-const NODE_DIR = TOOLS_DIR + '/node';
+const PLATFORM = ( 'win32' === process.platform ) ? 'win' : process.platform;
+const ARCH = ( 'x32' === process.arch ) ? 'x86' : process.arch;
+const ZIP = ( 'win32' === process.platform ) ? 'zip' : 'tar.gz';
 
-const NODE_BIN = NODE_DIR + '/bin/node';
-const NPM_BIN = NODE_DIR + '/bin/npm';
+const VERSION_REGEX = new RegExp( `href="(node-v([0-9\\.]+)-${ PLATFORM }-${ ARCH }\\.${ ZIP })`, 'g' );
 
 /**
  * Registers a check for new versions of Node every 12 hours.
@@ -40,14 +43,14 @@ function registerNodeJob() {
  */
 async function checkAndInstallUpdates() {
 	debug( 'Checking for updates' );
-	const currentVersion = getLocalVersion();
+	const currentVersion = await getLocalVersion();
 	const remoteVersion = await getRemoteVersion();
 
 	debug( 'Installed version: %s, remote version: %s', currentVersion, remoteVersion.version );
 
 	if ( compareVersions( remoteVersion.version, currentVersion ) > 0 ) {
 		debug( 'Newer version found, starting install...' );
-		const filename = ARCHIVE_DIR + '/' + remoteVersion.filename;
+		const filename = normalize( ARCHIVE_DIR + '/' + remoteVersion.filename );
 
 		if ( ! await checksumLocalArchive( remoteVersion.filename ) ) {
 			const url = NODE_URL + remoteVersion.filename;
@@ -77,12 +80,27 @@ async function checkAndInstallUpdates() {
 
 		debug( 'Extracting new version from %s to %s', filename, NODE_DIR );
 
-		await tar.extract( {
-			file: filename,
-			cwd: NODE_DIR,
-			strip: 1,
-			onwarn: ( msg ) => console.log( msg ),
-		} );
+		if ( 'win32' === process.platform ) {
+			unzipper = new DecompressZip( filename );
+
+			await new Promise( ( resolve, reject ) => {
+				unzipper.on( 'extract', resolve );
+				unzipper.on( 'error', reject );
+
+				unzipper.extract( {
+					path: NODE_DIR,
+					strip: 1,
+					filter: ( file ) => file.type !== 'Directory',
+				} );
+			} )
+		} else {
+			await tar.extract( {
+				file: filename,
+				cwd: NODE_DIR,
+				strip: 1,
+				onwarn: ( msg ) => console.log( msg ),
+			} );
+		}
 	}
 
 	updateNPM();
@@ -96,12 +114,12 @@ async function checkAndInstallUpdates() {
  *
  * @return {String} The version number of the local copy of node.
  */
-function getLocalVersion() {
+async function getLocalVersion() {
 	if ( ! existsSync( NODE_BIN ) ) {
 		return '0.0.0';
 	}
 
-	const versionInfo = spawnSync( NODE_BIN, [ '-v' ] );
+	const versionInfo = await spawn( NODE_BIN, [ '-v' ] );
 
 	return versionInfo.stdout.toString().replace( 'v', '' ).trim();
 }
@@ -118,7 +136,7 @@ async function getRemoteVersion() {
 	const versionInfo = VERSION_REGEX.exec( remotels );
 
 	if ( ! versionInfo ) {
-		debug( 'Remote version regex failed on %s', remotels );
+		debug( "Remote version regex (%s) failed on html:\n%s\n%O", VERSION_REGEX, remotels, versionInfo );
 		return {
 			version: '0.0.0',
 			filename: '',
@@ -139,8 +157,8 @@ async function getRemoteVersion() {
  * @return {Boolean} True if the checksum matches, false if it doesn't.
  */
 async function checksumLocalArchive( filename ) {
-	const archiveFilename = ARCHIVE_DIR + '/' + filename;
-	const checksumFilename = ARCHIVE_DIR + '/' + 'node-SHASUMS256.txt';
+	const archiveFilename = normalize( ARCHIVE_DIR + '/' + filename );
+	const checksumFilename = normalize( ARCHIVE_DIR + '/' + 'node-SHASUMS256.txt' );
 
 	if ( ! existsSync( archiveFilename ) ) {
 		debug( "Checksum file doesn't exist" );
@@ -179,20 +197,70 @@ async function checksumLocalArchive( filename ) {
 /**
  * Install the latest version of NPM in our local copy of Node.
  */
-function updateNPM() {
-	debug( 'Updating npm' );
-	const update = spawn( NODE_BIN, [
+async function updateNPM() {
+	debug( 'Preparing to update npm' );
+	if ( ! existsSync( NODE_BIN ) ) {
+		debug( "Bailing, couldn't find node binary" );
+		return;
+	}
+
+	const npmIsUpdated = await spawn( NODE_BIN, [
 		NPM_BIN,
-		'install',
+		'outdated',
 		'-g',
 		'npm',
 	], {
 		env: {},
-	} );
-	update.on( 'close', () => {
-		debug( 'npm updated' );
+	} ).then( () => true ).catch( () => false );
+
+	if ( npmIsUpdated ) {
+		debug( 'npm running latest version' );
 		doAction( 'updated_node_and_npm' );
+		return;
+	}
+
+	const requiredPackages = [ 'npm' ];
+
+	if ( 'win32' === process.platform ) {
+		debug( 'Deleting npm files' );
+		// Windows needs these files removed before NPM will update.
+		[ 'npm', 'npm.cmd', 'npx', 'npx.cmd' ].forEach( ( file ) => {
+			const path = normalize( NODE_DIR + '/' + file );
+			try {
+				unlinkSync( path );
+			} catch ( error ) {}
+		} );
+
+		// Windows can't deal with long file paths, so needs to be flattened.
+		requiredPackages.push( 'flatten-packages' );
+	}
+
+	debug( 'Starting npm update' );
+	await spawn( NODE_BIN, [
+		NPM_BIN,
+		'install',
+		'-g',
+		...requiredPackages,
+	], {
+		env: {},
 	} );
+
+	debug( 'npm updated' );
+	
+	if ( 'win32' === process.platform ) {
+		debug( 'Flattening node packages' );
+
+		await spawn( NODE_BIN, [
+			normalize( NODE_DIR + '/node_modules/flatten-packages/bin/flatten' ),
+		], {
+			cwd: NODE_DIR,
+			env: {},
+		} );	
+
+		debug( 'Packages flattened' );
+	}
+
+	doAction( 'updated_node_and_npm' );
 }
 
 module.exports = {

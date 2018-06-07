@@ -3,13 +3,16 @@
 	"version": "0.1.0",
 	"license": "GPL-2.0-or-later",
 	"dependencies": {
-		"@wordpress/hooks": "1.1.8",
+		"@wordpress/hooks": "1.2.0",
 		"chokidar": "2.0.3",
 		"classname": "0.0.0",
 		"compare-versions": "3.2.1",
+		"csvtojson": "2.0.3",
 		"debug": "3.1.0",
+		"decompress-zip": "0.3.1",
 		"docker-compose": "0.4.3",
 		"electron-preferences": "1.2.0",
+		"electron-traywindow-positioner": "0.0.2",
 		"gridicons": "3.0.1",
 		"hasha": "3.0.0",
 		"node-fetch": "2.1.2",
@@ -25,12 +28,12 @@
 	"homepage": "./",
 	"main": "src/electron-runner.js",
 	"scripts": {
-		"start": "DEBUG_COLORS=1 concurrently --kill-others 'npm run react-start' 'wait-on http://localhost:3000/ && npm run electron-start'",
+		"start": "cross-env DEBUG_COLORS=1 concurrently --kill-others \"npm run react-start\" \"wait-on http://localhost:3000/ && npm run electron-start\"",
 		"build": "react-scripts build",
 		"test": "react-scripts test --env=jsdom",
 		"eject": "react-scripts eject",
 		"electron-start": "cross-env ELECTRON_START_URL=http://localhost:3000/ electron .",
-		"react-start": "cross-env BROWSER=0 NODE_ENV=development react-scripts start"
+		"react-start": "cross-env BROWSER=none NODE_ENV=development react-scripts start"
 	},
 	"devDependencies": {
 		"concurrently": "3.5.1",

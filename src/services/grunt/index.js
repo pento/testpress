@@ -4,12 +4,10 @@ const { watch } = require( 'chokidar' );
 const { addAction, doAction, didAction } = require( '@wordpress/hooks' );
 const debug = require( 'debug' )( 'wpde:services:grunt' );
 const { webContents } = require( 'electron' );
+const { normalize } = require( 'path' );
 
-const { TOOLS_DIR } = require( '../constants.js' );
+const { TOOLS_DIR, NODE_BIN } = require( '../constants.js' );
 const { preferences } = require( '../../preferences' );
-
-const NODE_DIR = TOOLS_DIR + '/node';
-const NODE_BIN = NODE_DIR + '/bin/node';
 
 let watchProcess = null;
 let cwd = '';
@@ -30,7 +28,7 @@ function registerGruntJob( window ) {
 		return;
 	}
 
-	const gruntfileJs = cwd + '/Gruntfile.js';
+	const gruntfileJs = normalize( cwd + '/Gruntfile.js' );
 
 	if ( existsSync( gruntfileJs ) ) {
 		debug( 'Registering Gruntfile.js watcher' );
@@ -64,8 +62,7 @@ function runGruntWatch() {
 		return;
 	}
 
-	const grunt = cwd + '/node_modules/.bin/grunt';
-	let finishedFirstRun = false;
+	const grunt = cwd + '/node_modules/grunt/bin/grunt';
 
 	debug( 'Starting `grunt watch`' );
 	watchProcess = spawn( NODE_BIN, [
@@ -76,6 +73,8 @@ function runGruntWatch() {
 		env: {},
 	} );
 
+	let finishedFirstRun = false;
+	let showedBuilding = true;
 
 	watchProcess.stderr.on( 'data', ( data ) => debug( '`grunt warning` error: %s', data ) );
 	watchProcess.stdout.on( 'data', ( data ) => {
@@ -83,12 +82,18 @@ function runGruntWatch() {
 
 		if ( finishedFirstRun ) {
 			if ( waiting ) {
+				showedBuilding = false;
+				debug( 'Ready' );
 				statusWindow.send( 'status', 'okay', 'Ready!' );
 			} else {
+				showedBuilding = true;
+				debug( 'Building...' );
 				statusWindow.send( 'status', 'warning', 'Building...' );
 			}
 		} else if ( waiting ) {
+			debug( 'Ready' );
 			finishedFirstRun = true;
+			showedBuilding = true;
 			doAction( 'grunt_watch_first_run_finished' );
 		}
 

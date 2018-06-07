@@ -1,18 +1,13 @@
 const { spawn } = require( 'child_process' );
 const { mkdirSync, existsSync } = require( 'fs' );
 const { watch } = require( 'chokidar' );
+const { normalize } = require( 'path' );
 const { addAction, doAction } = require( '@wordpress/hooks' );
 const process = require( 'process' );
 const debug = require( 'debug' )( 'wpde:services:npm-watcher' );
 
-const { TOOLS_DIR, ARCHIVE_DIR } = require( '../constants.js' );
+const { TOOLS_DIR, NPM_CACHE_DIR, NODE_BIN, NPM_BIN } = require( '../constants.js' );
 const { preferences } = require( '../../preferences' );
-
-const NODE_DIR = TOOLS_DIR + '/node';
-const NPM_CACHE_DIR = ARCHIVE_DIR + '/npm-cache';
-
-const NODE_BIN = NODE_DIR + '/bin/node';
-const NPM_BIN = NODE_DIR + '/bin/npm';
 
 let installProcess = null;
 let cwd = '';
@@ -30,7 +25,7 @@ function registerNPMJob() {
 		return;
 	}
 
-	const packageJson = cwd + '/package.json';
+	const packageJson = normalize( cwd + '/package.json' );
 
 	if ( existsSync( packageJson ) ) {
 		debug( 'Registering package.json watcher' );
