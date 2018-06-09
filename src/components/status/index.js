@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import classname from 'classname';
 
+import 'status-indicator/styles.css'
 import './style.css';
 
 const { shell, ipcRenderer } = window.require( 'electron' );
@@ -10,7 +10,7 @@ class StatusPanel extends Component {
 		super( ...arguments );
 
 		this.state = {
-			status: 'error',
+			status: 'intermediary',
 			message: 'Starting...',
 		}
 
@@ -27,21 +27,23 @@ class StatusPanel extends Component {
 
 	render() {
 		const { status, message } = this.state;
-		const statusClasses = classname( [
-			'status-state',
-			'status-state_' + status,
-		] );
+		const statusProps = {};
+		statusProps[ status ] = '';
+
+		if ( [ 'intermediary', 'negative' ].indexOf( status ) > -1 ) {
+			statusProps.pulse = '';
+		}
 
 		const preferences = ipcRenderer.sendSync( 'getPreferences' );
 		const url = 'http://localhost:' + preferences.site.port;
 
 		return (
 			<div className="status">
-				<div className={ statusClasses } />
-				<div className="status-message">
+				<status-indicator { ...statusProps } />
+				<span className="status-message">
 					{ message }
-				</div>
-				{ 'error' !== status &&
+				</span>
+				{ 'positive' === status &&
 					<div
 						className="status-site"
 						onClick={ () => shell.openExternal( url ) }

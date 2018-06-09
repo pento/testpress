@@ -84,11 +84,11 @@ function runGruntWatch() {
 			if ( waiting ) {
 				showedBuilding = false;
 				debug( 'Ready' );
-				statusWindow.send( 'status', 'okay', 'Ready!' );
+				statusWindow.send( 'status', 'positive', 'Ready!' );
 			} else {
 				showedBuilding = true;
 				debug( 'Building...' );
-				statusWindow.send( 'status', 'warning', 'Building...' );
+				statusWindow.send( 'status', 'intermediary', 'Building...' );
 			}
 		} else if ( waiting ) {
 			debug( 'Ready' );

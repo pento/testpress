@@ -120,7 +120,7 @@ async function startDocker() {
 
 	debug( 'Docker containers started' );
 
-	statusWindow.send( 'status', 'error', 'Building WordPress...' );
+	statusWindow.send( 'status', 'intermediary', 'Building WordPress...' );
 
 	addAction( 'grunt_watch_first_run_finished', 'installWordPress', installWordPress );
 
@@ -206,7 +206,7 @@ async function startDockerMachine() {
  * Runs the WP-CLI commands to install WordPress.
  */
 async function installWordPress() {
-	statusWindow.send( 'status', 'error', 'Installing WordPress...' );
+	statusWindow.send( 'status', 'intermediary', 'Installing WordPress...' );
 
 	debug( 'Waiting for mysqld to start in the MySQL container' );
 	while ( 1 ) {
@@ -237,7 +237,7 @@ async function installWordPress() {
 		await runCLICommand( 'option', 'update', 'home', 'http://localhost:' + port );
 		await runCLICommand( 'option', 'update', 'siteurl', 'http://localhost:' + port );
 
-		statusWindow.send( 'status', 'okay', 'Ready!' );
+		statusWindow.send( 'status', 'positive', 'Ready!' );
 		debug( 'WordPress ready at http://localhost:%d/', port );
 
 		return;
@@ -271,7 +271,7 @@ async function installWordPress() {
 		'--admin_password=password',
 		'--admin_email=test@test.test' );
 
-	statusWindow.send( 'status', 'okay', 'Ready!' );
+	statusWindow.send( 'status', 'positive', 'Ready!' );
 
 	debug( 'WordPress ready at http://localhost:%d/', port );
 }
