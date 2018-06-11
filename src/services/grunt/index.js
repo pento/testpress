@@ -3,23 +3,21 @@ const { existsSync } = require( 'fs' );
 const { watch } = require( 'chokidar' );
 const { addAction, doAction, didAction } = require( '@wordpress/hooks' );
 const debug = require( 'debug' )( 'wpde:services:grunt' );
-const { webContents } = require( 'electron' );
 const { normalize } = require( 'path' );
 
-const { TOOLS_DIR, NODE_BIN } = require( '../constants.js' );
+const { NODE_BIN } = require( '../constants.js' );
 const { preferences } = require( '../../preferences' );
+const { setStatus } = require( '../../utils/status' );
 
 let watchProcess = null;
 let cwd = '';
 
-let statusWindow = null;
-
 /**
  * Registers a watcher for when Grunt needs to run on the WordPress install.
  */
-function registerGruntJob( window ) {
+function registerGruntJob() {
 	debug( 'Registering job' );
-	statusWindow = window;
+
 	addAction( 'npm_install_finished', 'runGruntWatch', runGruntWatch );
 	addAction( 'preferences_saved', 'preferencesSaved', preferencesSaved, 9 );
 	cwd = preferences.value( 'basic.wordpress-folder' );
@@ -84,11 +82,11 @@ function runGruntWatch() {
 			if ( waiting ) {
 				showedBuilding = false;
 				debug( 'Ready' );
-				statusWindow.send( 'status', 'positive', 'Ready!' );
-			} else {
+				setStatus( 'okay', 'Ready!' );
+			} else if ( ! showedBuilding ) {
 				showedBuilding = true;
 				debug( 'Building...' );
-				statusWindow.send( 'status', 'intermediary', 'Building...' );
+				setStatus( 'okay', 'Building...' );
 			}
 		} else if ( waiting ) {
 			debug( 'Ready' );

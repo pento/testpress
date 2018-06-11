@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Tray } = require( 'electron' );
+const { app, BrowserWindow, Tray } = require( 'electron' );
 const { doAction } = require( '@wordpress/hooks' );
 const path = require( 'path' );
 const url = require( 'url' );
@@ -6,6 +6,7 @@ const positioner = require( 'electron-traywindow-positioner' );
 
 const { preferences } = require( './preferences' );
 const { registerJobs } = require( './services' );
+const { setStatusWindow } = require( './utils/status' );
 
 const assetsDirectory = path.join( __dirname, '/../assets/' )
 
@@ -46,6 +47,8 @@ function createWindow() {
 		  backgroundThrottling: false,
 		},
 	  } );
+
+	setStatusWindow( window );
 
     // and load the index.html of the app.
     const startUrl = process.env.ELECTRON_START_URL || url.format( {
@@ -92,7 +95,7 @@ const showWindow = () => {
 app.on( 'ready', () => {
 	createTray();
 	createWindow();
-	registerJobs( window );
+	registerJobs();
 } );
 
 // Quit when all windows are closed.

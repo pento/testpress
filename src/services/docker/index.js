@@ -6,17 +6,15 @@ const process = require( 'process' );
 const { addAction, didAction } = require( '@wordpress/hooks' );
 const sleep = require( 'system-sleep' );
 const debug = require( 'debug' )( 'wpde:services:docker' );
-const { webContents } = require( 'electron' );
 const { normalize } = require( 'path' );
 const csv = require( 'csvtojson' );
 
-const { TOOLS_DIR } = require( '../constants.js' );
+const { TOOLS_DIR } = require( '../constants' );
 const { preferences } = require( '../../preferences' );
+const { setStatus } = require( '../../utils/status' );
 
 let cwd = '';
 let port = 9999;
-
-let statusWindow = null;
 
 const dockerEnv = {};
 
@@ -25,10 +23,9 @@ let USING_TOOLBOX = false;
 /**
  * Registers the Docker actions, then starts Docker.
  */
-async function registerDockerJob( window ) {
+async function registerDockerJob() {
 	debug( 'Registering job' );
 
-	statusWindow = window;
 	if ( 'win32' === process.platform ) {
 		USING_TOOLBOX = await detectToolbox();
 	}
@@ -120,7 +117,7 @@ async function startDocker() {
 
 	debug( 'Docker containers started' );
 
-	statusWindow.send( 'status', 'intermediary', 'Building WordPress...' );
+	setStatus( 'warning', 'Building WordPress...' );
 
 	addAction( 'grunt_watch_first_run_finished', 'installWordPress', installWordPress );
 
@@ -206,7 +203,7 @@ async function startDockerMachine() {
  * Runs the WP-CLI commands to install WordPress.
  */
 async function installWordPress() {
-	statusWindow.send( 'status', 'intermediary', 'Installing WordPress...' );
+	setStatus( 'warning', 'Installing WordPress...' );
 
 	debug( 'Waiting for mysqld to start in the MySQL container' );
 	while ( 1 ) {
@@ -237,7 +234,7 @@ async function installWordPress() {
 		await runCLICommand( 'option', 'update', 'home', 'http://localhost:' + port );
 		await runCLICommand( 'option', 'update', 'siteurl', 'http://localhost:' + port );
 
-		statusWindow.send( 'status', 'positive', 'Ready!' );
+		setStatus( 'okay', 'Ready!' );
 		debug( 'WordPress ready at http://localhost:%d/', port );
 
 		return;
@@ -271,7 +268,7 @@ async function installWordPress() {
 		'--admin_password=password',
 		'--admin_email=test@test.test' );
 
-	statusWindow.send( 'status', 'positive', 'Ready!' );
+	setStatus( 'okay', 'Ready!' );
 
 	debug( 'WordPress ready at http://localhost:%d/', port );
 }

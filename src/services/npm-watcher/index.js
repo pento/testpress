@@ -6,7 +6,7 @@ const { addAction, doAction } = require( '@wordpress/hooks' );
 const process = require( 'process' );
 const debug = require( 'debug' )( 'wpde:services:npm-watcher' );
 
-const { TOOLS_DIR, NPM_CACHE_DIR, NODE_BIN, NPM_BIN } = require( '../constants.js' );
+const { NPM_CACHE_DIR, NODE_BIN, NPM_BIN } = require( '../constants.js' );
 const { preferences } = require( '../../preferences' );
 
 let installProcess = null;
