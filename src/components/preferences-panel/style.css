@@ -1,0 +1,12 @@
+.preferences {
+	padding: 15px;
+}
+
+.preferences label {
+    display: block;
+    margin: 10px 0;
+}
+
+.preferences label span {
+    display: block;
+}

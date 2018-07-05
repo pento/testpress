@@ -3,19 +3,15 @@ import Gridicon from 'gridicons';
 
 import './style.css';
 
-const { ipcRenderer } = window.require( 'electron' );
-
 class PreferencesButton extends Component {
-	openPreferences() {
-		ipcRenderer.send( 'showPreferences' );
-	}
-
 	render() {
+		const { togglePreferences, preferencesOpen } = this.props;
+		const icon = preferencesOpen ? 'cross' : 'cog';
 		return (
 			<div className="preferences-button">
 				<Gridicon
-					icon="cog"
-					onClick={ this.openPreferences }
+					icon={ icon }
+					onClick={ togglePreferences }
 				/>
 			</div>
 		);
