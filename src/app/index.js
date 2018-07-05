@@ -22,7 +22,7 @@ class WPde extends Component {
 
 	render() {
 		const { preferencesOpen } = this.state;
-		const heading = preferencesOpen ? 'Preferences' : 'Welcome to WPal';
+		const heading = preferencesOpen ? 'Preferences' : 'Welcome to WPDE';
 
 		return (
 			<div>
