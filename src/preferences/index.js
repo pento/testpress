@@ -1,13 +1,19 @@
-const { app } = require( 'electron' );
+const { app, ipcMain } = require( 'electron' );
 const { doAction } = require( '@wordpress/hooks' );
 const path = require( 'path' );
 const debug = require( 'debug' )( 'wpde:preferences' );
-const { readFileSync, writeFileSync } = require( 'fs' );
+const { existsSync, readFileSync, writeFileSync } = require( 'fs' );
 
 class Preferences {
 	constructor() {
 		debug( 'Creating Preferences store' );
-		this.dataStore = path.resolve( app.getPath( 'userData' ), 'preferences.json' ),
+		this.dataStore = path.resolve( app.getPath( 'userData' ), 'preferences.json' );
+		if ( ! existsSync( this.dataStore ) ) {
+			writeFileSync( this.dataStore, '{}', {
+					encoding: 'utf-8',
+				}
+			);
+		}
 
 		this.defaults = {
 			basic: {
@@ -19,6 +25,11 @@ class Preferences {
 		};
 
 		this.readPreferences();
+
+		ipcMain.on( 'getPreferences', ( event ) => {
+			debug( 'Sending preferences to render process' );
+			event.returnValue = this.preferences;
+		} );
 	}
 
 	readPreferences() {
