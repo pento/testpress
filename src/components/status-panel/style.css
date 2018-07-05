@@ -1,20 +1,41 @@
-.status {
+.status-row {
 	padding: 15px;
+	border-bottom: 1px solid #82878C;
+	display: flex;
+	flex-direction: row;
 }
 
 status-indicator {
-	margin: 0 8px;
+	margin: 7px 8px -7px;
+	height: 15px;
+	width: 15px;
+}
+
+.status-message {
+	padding: 5px 0;
+	font-weight: bold;
 }
 
 .status-site {
-    background-color: #666;
+    background-color: #F6F6F6;
     margin-left: 25px;
-	padding: 2px 6px;
-	border: 1px solid #444;
+	padding: 5px 10px;
+	border: 1px solid #808080;
+	color: #808080;
 	border-radius: 2px;
 	cursor: pointer;
+	flex: auto;
 }
 
 .status-site:hover {
-	background-color: #777;
+	background-color: #F0F0F0;
+}
+
+.status-description {
+	padding: 0 15px;
+}
+
+textarea {
+	width: 98%;
+	height: 65px;
 }

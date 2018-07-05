@@ -82,11 +82,11 @@ function runGruntWatch() {
 			if ( waiting ) {
 				showedBuilding = false;
 				debug( 'Ready' );
-				setStatus( 'okay', 'Ready!' );
+				setStatus( 'okay', 'Ready :' );
 			} else if ( ! showedBuilding ) {
 				showedBuilding = true;
 				debug( 'Building...' );
-				setStatus( 'okay', 'Building...' );
+				setStatus( 'okay', 'Building environment...' );
 			}
 		} else if ( waiting ) {
 			debug( 'Ready' );

@@ -117,7 +117,7 @@ async function startDocker() {
 
 	debug( 'Docker containers started' );
 
-	setStatus( 'warning', 'Building WordPress...' );
+	setStatus( 'warning', 'Building environment ...' );
 
 	addAction( 'grunt_watch_first_run_finished', 'installWordPress', installWordPress );
 
@@ -203,7 +203,7 @@ async function startDockerMachine() {
  * Runs the WP-CLI commands to install WordPress.
  */
 async function installWordPress() {
-	setStatus( 'warning', 'Installing WordPress...' );
+	setStatus( 'warning', 'Building environment ...' );
 
 	debug( 'Waiting for mysqld to start in the MySQL container' );
 	while ( 1 ) {
@@ -268,7 +268,7 @@ async function installWordPress() {
 		'--admin_password=password',
 		'--admin_email=test@test.test' );
 
-	setStatus( 'okay', 'Ready!' );
+	setStatus( 'okay', 'Ready :' );
 
 	debug( 'WordPress ready at http://localhost:%d/', port );
 }

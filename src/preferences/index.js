@@ -33,10 +33,13 @@ class Preferences {
 
 		ipcMain.on( 'updatePreference', ( event, section, preference, value ) => {
 			debug( 'Recieved updatePreference signal from render process' );
-			this.updatePreference( section, preference, value );
+			this.update( section, preference, value );
 		} );
 	}
 
+	/**
+	 * Reads the preferences from the file they've been save to on disk.
+	 */
 	readPreferences() {
 		debug( 'Reading preferences from disk' );
 		this.preferences = JSON.parse( readFileSync( this.dataStore, {
@@ -60,6 +63,9 @@ class Preferences {
 		this.writePreferences();
 	}
 
+	/**
+	 * Writes the current preferences to disk.
+	 */
 	writePreferences() {
 		debug( 'Writing preferences to disk' );
 		writeFileSync( this.dataStore, JSON.stringify( this.preferences ), {
@@ -68,7 +74,14 @@ class Preferences {
 		);
 	}
 
-	updatePreference( section, preference, value ) {
+	/**
+	 * Updates a preference value.
+	 *
+	 * @param {String} section    The preferences section to save the preference in.
+	 * @param {String} preference The preference to save.
+	 * @param {*}      value      The value of the preference.
+	 */
+	update( section, preference, value ) {
 		debug( `Updated preference "${ section }.${ preference }" to "${ value }"`)
 		this.preferences[ section ][ preference ]  = value;
 		this.writePreferences();
@@ -76,6 +89,14 @@ class Preferences {
 		doAction( 'preference_saved', section, preference, value, this.preferences );
 	}
 
+	/**
+	 * Get the value of a preference.
+	 *
+	 * @param {String} section    The preferences section that the preference is in.
+	 * @param {String} preference The preference to retrieve.
+	 *
+	 * @returns The value of the preference.
+	 */
 	value( section, preference ) {
 		return this.preferences[ section ][ preference ];
 	}
