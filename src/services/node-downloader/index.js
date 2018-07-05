@@ -59,7 +59,7 @@ async function checkAndInstallUpdates() {
 		debug( 'Newer version found, starting install...' );
 		const filename = normalize( ARCHIVE_DIR + '/' + remoteVersion.filename );
 
-		if ( ! await checksumLocalArchive( remoteVersion.filename ) ) {
+		if ( ! await checksumLocalArchive( remoteVersion.filename, remoteVersion.version ) ) {
 			const url = NODE_URL + remoteVersion.filename;
 
 			debug( 'Downloading from %s', url );
@@ -79,7 +79,7 @@ async function checkAndInstallUpdates() {
 
 			debug( 'Finished downloading' );
 
-			if ( ! await checksumLocalArchive( remoteVersion.filename ) ) {
+			if ( ! await checksumLocalArchive( remoteVersion.filename, remoteVersion.version ) ) {
 				debug( 'Checksum failed, bailing before install' );
 				triggerNextService();
 				return false;
@@ -167,12 +167,13 @@ async function getRemoteVersion() {
  * Checksums the local copy of the Node archive against the official checksums.
  *
  * @param {String} filename The filename to be using for checks.
+ * @param {String} version  The Node version corresponding to the archive.
  *
  * @return {Boolean} True if the checksum matches, false if it doesn't.
  */
-async function checksumLocalArchive( filename ) {
+async function checksumLocalArchive( filename, version ) {
 	const archiveFilename = normalize( ARCHIVE_DIR + '/' + filename );
-	const checksumFilename = normalize( ARCHIVE_DIR + '/' + 'node-SHASUMS256.txt' );
+	const checksumFilename = normalize( ARCHIVE_DIR + '/' + `node${ version }-SHASUMS256.txt` );
 
 	if ( ! existsSync( archiveFilename ) ) {
 		debug( "Checksum file doesn't exist" );
@@ -184,7 +185,7 @@ async function checksumLocalArchive( filename ) {
 		const writeFile = createWriteStream( checksumFilename );
 
 		const downloadedChecksums = await fetchWrite( NODE_URL + 'SHASUMS256.txt', writeFile );
-		
+
 		if ( ! downloadedChecksums ) {
 			debug( 'Unable to download checksum file' );
 			return false;

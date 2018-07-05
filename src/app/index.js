@@ -39,7 +39,7 @@ class WPde extends Component {
 						</h1>
 						<PreferencesButton togglePreferences={ this.togglePreferences } preferencesOpen={ preferencesOpen } />
 					</header>
-					
+
 					{ ! preferencesOpen && <StatusPanel /> }
 
 					{ preferencesOpen && <PreferencesPanel /> }

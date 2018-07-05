@@ -4,13 +4,13 @@
 	"license": "GPL-2.0-or-later",
 	"dependencies": {
 		"@wordpress/hooks": "1.2.0",
-		"chokidar": "2.0.3",
+		"chokidar": "2.0.4",
 		"classname": "0.0.0",
-		"compare-versions": "3.2.1",
-		"csvtojson": "2.0.3",
+		"compare-versions": "3.3.0",
+		"csvtojson": "2.0.4",
 		"debug": "3.1.0",
 		"decompress-zip": "0.3.1",
-		"docker-compose": "0.4.3",
+		"docker-compose": "0.8.1",
 		"electron-preferences": "1.2.0",
 		"electron-traywindow-positioner": "0.0.2",
 		"gridicons": "3.0.1",
@@ -19,14 +19,14 @@
 		"node-schedule": "1.3.0",
 		"node-yaml": "3.1.1",
 		"promisepipe": "2.1.3",
-		"promisify-child-process": "1.0.6",
-		"react": "16.4.0",
-		"react-dom": "16.4.0",
+		"promisify-child-process": "2.0.0",
+		"react": "16.4.1",
+		"react-dom": "16.4.1",
 		"status-indicator": "1.0.9",
 		"system-sleep": "1.3.6",
 		"tar": "4.4.4"
 	},
-	"homepage": "./",
+	"homepage": "http://localhost:3000/",
 	"main": "src/electron-runner.js",
 	"scripts": {
 		"start": "cross-env DEBUG_COLORS=1 concurrently --kill-others \"npm run react-start\" \"wait-on http://localhost:3000/ && npm run electron-start\"",
@@ -38,8 +38,9 @@
 	},
 	"devDependencies": {
 		"concurrently": "3.5.1",
-		"cross-env": "5.1.6",
-		"electron": "2.0.2",
+		"cross-env": "5.2.0",
+		"electron": "2.0.4",
+		"electron-devtools-installer": "2.2.4",
 		"react-scripts": "1.1.4",
 		"wait-on": "2.1.0"
 	}

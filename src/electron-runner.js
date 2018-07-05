@@ -4,7 +4,6 @@ const path = require( 'path' );
 const url = require( 'url' );
 const positioner = require( 'electron-traywindow-positioner' );
 
-const { preferences } = require( './preferences' );
 const { registerJobs } = require( './services' );
 const { setStatusWindow } = require( './utils/status' );
 
@@ -43,26 +42,27 @@ function createWindow() {
 		transparent: true,
 		skipTaskbar: true,
 		webPreferences: {
-		  // Prevents renderer process code from not running when window is hidden
-		  backgroundThrottling: false,
+			// Prevents renderer process code from not running when window is hidden
+			backgroundThrottling: false,
 		},
-	  } );
+	} );
 
 	setStatusWindow( window );
 
     // and load the index.html of the app.
     const startUrl = process.env.ELECTRON_START_URL || url.format( {
-            pathname: path.join( __dirname, '/../build/index.html' ),
-            protocol: 'file:',
-            slashes: true,
-        } );
-		window.loadURL( startUrl );
+		pathname: path.join( __dirname, '/../build/index.html' ),
+		protocol: 'file:',
+		slashes: true,
+	} );
 
-	window.on('blur', () => {
+	window.loadURL( startUrl );
+
+	window.on( 'blur', () => {
 		if ( ! window.webContents.isDevToolsOpened() ) {
-		  window.hide();
+			window.hide();
 		}
-	  })
+	} );
 
     // Emitted when the window is closed.
     window.on( 'closed', () => {

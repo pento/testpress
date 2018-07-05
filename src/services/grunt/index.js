@@ -19,8 +19,8 @@ function registerGruntJob() {
 	debug( 'Registering job' );
 
 	addAction( 'npm_install_finished', 'runGruntWatch', runGruntWatch );
-	addAction( 'preferences_saved', 'preferencesSaved', preferencesSaved, 9 );
-	cwd = preferences.value( 'basic.wordpress-folder' );
+	addAction( 'preference_saved', 'preferenceSaved', preferenceSaved, 9 );
+	cwd = preferences.value( 'basic', 'wordpress-folder' );
 
 	if ( ! cwd ) {
 		return;
@@ -101,16 +101,22 @@ function runGruntWatch() {
 /**
  * Action handler for when preferences have been saved.
  *
- * @param {Object} newPreferences The new preferences that have just been saved.
+ * @param {String} section    The preferences section that the saved preference is in.
+ * @param {String} preference The preferences that has been saved.
+ * @param {*}      value      The value that the preference has been changed to.
  */
-function preferencesSaved( newPreferences ) {
-	if ( cwd === newPreferences.basic[ 'wordpress-folder' ] ) {
+function preferenceSaved( section, preference, value ) {
+	if ( section !== 'basic' || preference !== 'wordpress-folder' ) {
+		return;
+	}
+
+	if ( value === cwd ) {
 		return;
 	}
 
 	debug( 'WordPress folder updated' );
 
-	cwd = newPreferences.basic[ 'wordpress-folder' ];
+	cwd = value;
 
 	if ( watchProcess ) {
 		watchProcess.kill();

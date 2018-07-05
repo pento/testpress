@@ -30,7 +30,7 @@ async function registerDockerJob() {
 		USING_TOOLBOX = await detectToolbox();
 	}
 
-	addAction( 'preferences_saved', 'preferencesSaved', preferencesSaved, 9 );
+	addAction( 'preference_saved', 'preferenceSaved', preferenceSaved, 9 );
 	addAction( 'shutdown', 'shutdown', shutdown );
 
 	startDocker();
@@ -41,8 +41,8 @@ async function registerDockerJob() {
  */
 async function startDocker() {
 	debug( 'Preparing to start Docker' );
-	cwd = preferences.value( 'basic.wordpress-folder' );
-	port = preferences.value( 'site.port' ) || 9999;
+	cwd = preferences.value( 'basic', 'wordpress-folder' );
+	port = preferences.value( 'site', 'port' ) || 9999;
 
 	if ( ! cwd || ! port ) {
 		debug( 'Bailing, preferences not set' );
@@ -302,7 +302,7 @@ function runCLICommand( ...args ) {
 /**
  * Figure out if we're using Docker Toolbox or not. Uses Docker for Windows' version and Hyper-V
  * requirements as a baseline to determine whether Toolbox is being used.
- * 
+ *
  * @returns {Boolean} true if Docker Toolbox is being used, false if it isn't.
  */
 async function detectToolbox() {
@@ -348,10 +348,22 @@ async function detectToolbox() {
 /**
  * Action handler for when preferences have been saved.
  *
- * @param {Object} newPreferences The new preferences that have just been saved.
+ * @param {String} section    The preferences section that the saved preference is in.
+ * @param {String} preference The preferences that has been saved.
+ * @param {*}      value      The value that the preference has been changed to.
  */
-async function preferencesSaved( newPreferences ) {
-	if ( cwd === newPreferences.basic[ 'wordpress-folder' ] && port === newPreferences.site.port ) {
+async function preferenceSaved( section, preference, value ) {
+	let changed = false;
+
+	if ( section === 'basic' && preference !== 'wordpress-folder' && value !== cwd ) {
+		changed = true;
+	}
+
+	if ( section === 'site' && preference === 'port' && value !== port ) {
+		changed = true;
+	}
+
+	if ( ! changed ) {
 		return;
 	}
 
