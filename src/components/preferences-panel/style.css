@@ -1,12 +1,63 @@
-.preferences {
-	padding: 15px;
+.preferences-tabs {
+	padding: 20px 15px 10px;
+	border-bottom: 1px solid #808080;
+	color: #82878C;
 }
 
-.preferences label {
-    display: block;
-    margin: 10px 0;
+.preferences-tabs span {
+	margin-right: 20px;
+	padding-bottom: 10px;
+	cursor: pointer;
 }
 
-.preferences label span {
+.preferences-tabs span.active {
+	color: #000;
+	border-bottom: 3px solid #377EB6;
+}
+
+.preferences-pages {
+	padding: 20px 15px;
+	color: #82878C;
+}
+
+.preferences-pages div.active {
+	display: block;
+}
+
+.preferences-pages div.inactive {
+	display: none;
+}
+
+.preferences-pages button {
+	border: none;
+	color: #377EB6;
+	text-decoration: underline;
+	cursor: pointer;
+	background: none;
+	display: block;
+	font-size: inherit;
+	margin: 10px 0;
+	padding: 0;
+}
+
+.preferences-pages label {
     display: block;
+	margin: 10px 0;
+	color: #000;
+}
+
+.preferences-pages .page-site label {
+	display: inline-block;
+	margin-right: 10px;
+}
+
+.preferences-pages input {
+	padding: 5px 10px;
+	background-color: #F6F6F6;
+	border: 1px solid #E8E8E8;
+	border-radius: 3px;
+}
+
+.preferences-pages input.shortinput {
+	width: 50px;
 }

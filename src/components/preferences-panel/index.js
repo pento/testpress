@@ -14,6 +14,7 @@ class PreferencesPanel extends Component {
 			directory: preferences.basic[ 'wordpress-folder' ],
 			port: preferences.site.port,
 			editedPort: preferences.site.port,
+			activeTab: 'Basic',
 		};
 
 		this.showDirectorySelect = this.showDirectorySelect.bind( this );
@@ -33,8 +34,8 @@ class PreferencesPanel extends Component {
 
 	directorySelected( paths ) {
 		const directory = paths ? paths.shift() : '';
-		console.log( paths, directory, this.state.directory );
-		if ( directory !== this.state.directory ) {
+
+		if ( directory && directory !== this.state.directory ) {
 			this.setState( { directory } );
 			ipcRenderer.send( 'updatePreference', 'basic', 'wordpress-folder', directory );
 		}
@@ -42,6 +43,7 @@ class PreferencesPanel extends Component {
 
 	portChanged() {
 		const { editedPort, port } = this.state;
+
 		if ( editedPort !== port ) {
 			this.setState( { port: editedPort } );
 			ipcRenderer.send( 'updatePreference', 'site', 'port', editedPort );
@@ -49,32 +51,67 @@ class PreferencesPanel extends Component {
 	}
 
 	render() {
-		const { directory, editedPort } = this.state;
+		const { directory, editedPort, activeTab } = this.state;
 
 		const dirLabel = directory ? directory : 'No folder selected';
 
-		return (
-			<div className="preferences">
-				<label htmlFor="preferences-folder">
-					<span>WordPress Folder</span>
+		const tabs = {
+			Basic: (
+				<div>
+					<label htmlFor="preferences-folder">Folder:</label>
+					{ dirLabel }
 					<button
 						id="preferences-folder"
 						onClick={ this.showDirectorySelect }
 					>
-						{ 'Select a folder' }
+						{ 'Choose a folder' }
 					</button>
-					{ dirLabel }
-				</label>
-				<label htmlFor="preferences-port">
-					<span>Port</span>
+				</div>
+			),
+			Site: (
+				<div>
+					<label htmlFor="preferences-port">Port Number:</label>
 					<input
-						type="port"
+						type="number"
 						id="preferences-port"
+						className="shortinput"
 						value={ editedPort }
 						onChange= { event => this.setState( { editedPort: event.target.value } ) }
 						onBlur={ () => this.portChanged() }
 					/>
-				</label>
+				</div>
+			)
+		};
+
+		return (
+			<div className="preferences">
+				<div className="preferences-tabs">
+					{ Object.keys( tabs ).map( ( label ) => {
+						const className = label === activeTab ? 'active' : 'inactive';
+						return (
+							<span
+								className={ className }
+								onClick={ () => this.setState( { activeTab: label } ) }
+								key={ label + '-tab' }
+							>
+								{ label }
+							</span>
+						);
+					} ) }
+				</div>
+				<div className="preferences-pages">
+					{ Object.keys( tabs ).map( ( label ) => {
+						const className = 'page-' + label.toLowerCase() + ' ' + ( label === activeTab ? 'active' : 'inactive' );
+						return (
+							<div
+								className={ className }
+								key={ label + '-page' }
+							>
+								{ tabs[ label ] }
+							</div>
+						);
+					} ) }
+				</div>
 			</div>
 		);
 	}
