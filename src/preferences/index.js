@@ -30,6 +30,11 @@ class Preferences {
 			debug( 'Sending preferences to render process' );
 			event.returnValue = this.preferences;
 		} );
+
+		ipcMain.on( 'updatePreference', ( event, section, preference, value ) => {
+			debug( 'Recieved updatePreference signal from render process' );
+			this.updatePreference( section, preference, value );
+		} );
 	}
 
 	readPreferences() {

@@ -2,19 +2,23 @@ import React, { Component } from 'react';
 
 import './style.css';
 
-const { remote } = window.require( 'electron' );
+const { remote, ipcRenderer } = window.require( 'electron' );
 
 class PreferencesPanel extends Component {
 	constructor() {
 		super( ...arguments );
 
+		const preferences = ipcRenderer.sendSync( 'getPreferences' );
+
 		this.state = {
-			directory: '',
-			port: 9999,
+			directory: preferences.basic[ 'wordpress-folder' ],
+			port: preferences.site.port,
+			editedPort: preferences.site.port,
 		};
 
 		this.showDirectorySelect = this.showDirectorySelect.bind( this );
 		this.directorySelected = this.directorySelected.bind( this );
+		this.portChanged = this.portChanged.bind( this );
 	}
 
 	showDirectorySelect() {
@@ -28,21 +32,30 @@ class PreferencesPanel extends Component {
 	}
 
 	directorySelected( paths ) {
-		if ( ! paths ) {
-			this.setState( { directory: '' } );
-		} else {
-			this.setState( { directory: paths.shift() } );
+		const directory = paths ? paths.shift() : '';
+		console.log( paths, directory, this.state.directory );
+		if ( directory !== this.state.directory ) {
+			this.setState( { directory } );
+			ipcRenderer.send( 'updatePreference', 'basic', 'wordpress-folder', directory );
+		}
+	}
+
+	portChanged() {
+		const { editedPort, port } = this.state;
+		if ( editedPort !== port ) {
+			this.setState( { port: editedPort } );
+			ipcRenderer.send( 'updatePreference', 'site', 'port', editedPort );
 		}
 	}
 
 	render() {
-		const { directory, port } = this.state;
+		const { directory, editedPort } = this.state;
 
 		const dirLabel = directory ? directory : 'No folder selected';
 
 		return (
 			<div className="preferences">
-				<label for="preferences-folder">
+				<label htmlFor="preferences-folder">
 					<span>WordPress Folder</span>
 					<button
 						id="preferences-folder"
@@ -52,13 +65,14 @@ class PreferencesPanel extends Component {
 					</button>
 					{ dirLabel }
 				</label>
-				<label for="preferences-port">
+				<label htmlFor="preferences-port">
 					<span>Port</span>
 					<input
 						type="port"
 						id="preferences-port"
-						value={ port }
-						onBlur={ ( event ) => this.setState( { port: event.target.value } ) }
+						value={ editedPort }
+						onChange= { event => this.setState( { editedPort: event.target.value } ) }
+						onBlur={ () => this.portChanged() }
 					/>
 				</label>
 			</div>
