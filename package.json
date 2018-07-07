@@ -1,5 +1,11 @@
 {
 	"name": "wordpress-development-environment",
+	"description": "A simple method for getting a WordPress development environment up and running.",
+	"author": "The WordPress Contributors",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/pento/wordpress-development-environment"
+	},
 	"version": "0.1.0",
 	"license": "GPL-2.0-or-later",
 	"dependencies": {
@@ -11,7 +17,6 @@
 		"debug": "3.1.0",
 		"decompress-zip": "0.3.1",
 		"docker-compose": "0.8.1",
-		"electron-preferences": "1.2.0",
 		"electron-traywindow-positioner": "0.0.2",
 		"gridicons": "3.0.1",
 		"hasha": "3.0.0",
@@ -37,10 +42,9 @@
 		"react-start": "cross-env BROWSER=none NODE_ENV=development react-scripts start"
 	},
 	"devDependencies": {
-		"concurrently": "3.5.1",
+		"concurrently": "3.6.0",
 		"cross-env": "5.2.0",
 		"electron": "2.0.4",
-		"electron-devtools-installer": "2.2.4",
 		"react-scripts": "1.1.4",
 		"wait-on": "2.1.0"
 	}
