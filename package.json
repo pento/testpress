@@ -35,12 +35,12 @@
 	"main": "src/electron-runner.js",
 	"scripts": {
 		"start": "npm run electron-start",
-		"dev": "cross-env DEBUG_COLORS=1 concurrently --kill-others \"npm run react-start\" \"wait-on http://localhost:3000/ && npm run electron-start\"",
+		"dev": "cross-env DEBUG_COLORS=1 concurrently --kill-others --success first \"npm run react-start\" \"wait-on http://localhost:3000/ && npm run electron-start\"",
 		"build": "react-scripts build",
 		"test": "react-scripts test --env=jsdom",
 		"eject": "react-scripts eject",
 		"electron-start": "cross-env ELECTRON_START_URL=http://localhost:3000/ electron .",
-		"react-start": "cross-env BROWSER=none NODE_ENV=development react-scripts start"
+		"react-start": "cross-env BROWSER=none NODE_ENV=development react-scripts start || true"
 	},
 	"devDependencies": {
 		"concurrently": "3.6.0",
