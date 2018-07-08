@@ -34,7 +34,8 @@
 	"homepage": "./",
 	"main": "src/electron-runner.js",
 	"scripts": {
-		"start": "cross-env DEBUG_COLORS=1 concurrently --kill-others \"npm run react-start\" \"wait-on http://localhost:3000/ && npm run electron-start\"",
+		"start": "npm run electron-start",
+		"dev": "cross-env DEBUG_COLORS=1 concurrently --kill-others \"npm run react-start\" \"wait-on http://localhost:3000/ && npm run electron-start\"",
 		"build": "react-scripts build",
 		"test": "react-scripts test --env=jsdom",
 		"eject": "react-scripts eject",

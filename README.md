@@ -2,7 +2,7 @@ This is an experiment with creating a WordPress Development Environment.
 
 ## Usage
 
-Run `npm install`, then `npm start` to check it out.
+Run `npm install`, then `npm run dev` to check it out.
 
 ## Notes
 
