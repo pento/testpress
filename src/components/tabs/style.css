@@ -1,0 +1,63 @@
+.tabs-headings {
+	padding: 20px 15px 10px;
+	border-bottom: 1px solid #808080;
+	color: #82878C;
+}
+
+.tabs-headings span {
+	margin-right: 20px;
+	padding-bottom: 10px;
+	cursor: pointer;
+}
+
+.tabs-headings span.active {
+	color: #000;
+	border-bottom: 3px solid #377EB6;
+}
+
+.tabs-pages {
+	padding: 20px 15px;
+	color: #82878C;
+}
+
+.tabs-pages div.active {
+	display: block;
+}
+
+.tabs-pages div.inactive {
+	display: none;
+}
+
+.tabs-pages button {
+	border: none;
+	color: #377EB6;
+	text-decoration: underline;
+	cursor: pointer;
+	background: none;
+	display: block;
+	font-size: inherit;
+	margin: 10px 0;
+	padding: 0;
+}
+
+.tabs-pages label {
+    display: block;
+	margin: 10px 0;
+	color: #000;
+}
+
+.tabs-pages .page-site label {
+	display: inline-block;
+	margin-right: 10px;
+}
+
+.tabs-pages input {
+	padding: 5px 10px;
+	background-color: #F6F6F6;
+	border: 1px solid #E8E8E8;
+	border-radius: 3px;
+}
+
+.tabs-pages input.shortinput {
+	width: 50px;
+}

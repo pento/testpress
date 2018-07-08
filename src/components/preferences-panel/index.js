@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Tabs from '../tabs';
 
 import './style.css';
 
@@ -14,7 +15,6 @@ class PreferencesPanel extends Component {
 			directory: preferences.basic[ 'wordpress-folder' ],
 			port: preferences.site.port,
 			editedPort: preferences.site.port,
-			activeTab: 'Basic',
 		};
 
 		this.showDirectorySelect = this.showDirectorySelect.bind( this );
@@ -51,7 +51,7 @@ class PreferencesPanel extends Component {
 	}
 
 	render() {
-		const { directory, editedPort, activeTab } = this.state;
+		const { directory, editedPort } = this.state;
 
 		const dirLabel = directory ? directory : 'No folder selected';
 
@@ -85,33 +85,7 @@ class PreferencesPanel extends Component {
 
 		return (
 			<div className="preferences">
-				<div className="preferences-tabs">
-					{ Object.keys( tabs ).map( ( label ) => {
-						const className = label === activeTab ? 'active' : 'inactive';
-						return (
-							<span
-								className={ className }
-								onClick={ () => this.setState( { activeTab: label } ) }
-								key={ label + '-tab' }
-							>
-								{ label }
-							</span>
-						);
-					} ) }
-				</div>
-				<div className="preferences-pages">
-					{ Object.keys( tabs ).map( ( label ) => {
-						const className = 'page-' + label.toLowerCase() + ' ' + ( label === activeTab ? 'active' : 'inactive' );
-						return (
-							<div
-								className={ className }
-								key={ label + '-page' }
-							>
-								{ tabs[ label ] }
-							</div>
-						);
-					} ) }
-				</div>
+				<Tabs tabs={ tabs } />
 			</div>
 		);
 	}
