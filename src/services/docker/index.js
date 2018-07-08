@@ -1,6 +1,5 @@
 const yaml = require( 'node-yaml' );
 const { copyFileSync, existsSync, renameSync } = require( 'fs' );
-const { spawnSync } = require( 'child_process' );
 const { spawn } = require( 'promisify-child-process' );
 const process = require( 'process' );
 const { addAction, didAction } = require( '@wordpress/hooks' );
@@ -387,7 +386,7 @@ async function preferenceSaved( section, preference, value ) {
  */
 function shutdown() {
 	debug( 'Shutdown, stopping containers' );
-	spawnSync( 'docker-compose', [
+	spawn( 'docker-compose', [
 		'down',
 	], {
 		cwd: TOOLS_DIR,

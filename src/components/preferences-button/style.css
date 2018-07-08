@@ -1,7 +1,7 @@
 .preferences-button {
-	position: absolute;
-	top: 15px;
-	right: 7px;
+	border: none;
+	background: none;
+	cursor: pointer;
 }
 
 .preferences-button .gridicon {

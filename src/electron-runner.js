@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Tray } = require( 'electron' );
+const { app, BrowserWindow, Tray, ipcMain } = require( 'electron' );
 const { doAction } = require( '@wordpress/hooks' );
 const path = require( 'path' );
 const url = require( 'url' );
@@ -64,11 +64,7 @@ function createWindow() {
 		}
 	} );
 
-    // Emitted when the window is closed.
     window.on( 'closed', () => {
-        // Dereference the window object, usually you would store windows
-        // in an array if your app supports multi windows, this is the time
-		// when you should delete the corresponding element.
         window = null;
     } );
 }
@@ -105,6 +101,11 @@ app.on( 'window-all-closed', () => {
     if ( process.platform !== 'darwin' ) {
         app.quit();
     }
+} );
+
+ipcMain.on( 'quit', () => {
+	window.close();
+	app.quit();
 } );
 
 app.on( 'quit', () => {
