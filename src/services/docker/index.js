@@ -76,10 +76,13 @@ async function startDocker() {
 					MYSQL_DATABASE: 'wordpress_develop',
 				},
 				healthcheck: {
-					test: [ 'CMD', 'mysql', '-e', 'SELECT 1', '-uroot', '-ppassword' ],
+					test: [ 'CMD', 'mysql', '-e', 'SHOW TABLES FROM wordpress_develop', '-uroot', '-ppassword', '-hmysql', '--protocol=tcp' ],
 					interval: '1s',
 					retries: '100',
-				}
+				},
+				volumes: [
+					'mysql:/var/lib/mysql',
+				]
 			},
 			phpunit: {
 				build: {
@@ -87,11 +90,14 @@ async function startDocker() {
 					dockerfile: 'Dockerfile-phpunit',
 				},
 				volumes: [
-					cwd + ':/wordpress-develop',
+					normalize( cwd ) + ':/wordpress-develop',
 				],
 			},
 		},
-	};
+		volumes: {
+			mysql: {},
+		},
+};
 
 	yaml.writeSync( normalize( TOOLS_DIR + '/docker-compose.yml' ), defaultOptions );
 
@@ -226,46 +232,46 @@ async function installWordPress() {
 		sleep( 1000 );
 	}
 
+	debug( 'Checking if a config file exists' );
+	const configExists = await runCLICommand( 'config', 'path' );
+	if ( ! configExists ) {
+		debug( 'Creating wp-config.php file' );
+		await runCLICommand( 'config',
+			'create',
+			'--dbname=wordpress_develop',
+			'--dbuser=root',
+			'--dbpass=password',
+			'--dbhost=mysql',
+			'--path=/var/www/html/build' );
+
+		if ( existsSync( cwd + '/build/wp-config.php' ) ) {
+			debug( 'Moving wp-config.php out of the build directory' );
+			renameSync( cwd + '/build/wp-config.php', cwd + '/wp-config.php' )
+		}
+
+		debug( 'Adding debug options to wp-config.php' );
+		await runCLICommand( 'config', 'set', 'WP_DEBUG', 'true', '--raw', '--type=constant' );
+		await runCLICommand( 'config', 'set', 'SCRIPT_DEBUG', 'true', '--raw', '--type=constant' );
+		await runCLICommand( 'config', 'set', 'WP_DEBUG_DISPLAY', 'true', '--raw', '--type=constant' );
+	}
+
 	debug( 'Checking if WordPress is installed' );
 	const isInstalled = await runCLICommand( 'core', 'is-installed' );
 	if ( isInstalled ) {
 		debug( 'Updating site URL' );
 		await runCLICommand( 'option', 'update', 'home', 'http://localhost:' + port );
 		await runCLICommand( 'option', 'update', 'siteurl', 'http://localhost:' + port );
-
-		setStatus( 'okay', 'Ready!' );
-		debug( 'WordPress ready at http://localhost:%d/', port );
-
-		return;
+	} else {
+		debug( 'Installing WordPress' );
+		await runCLICommand( 'core',
+			'install',
+			'--url=localhost:' + port,
+			'--title=WordPress Develop',
+			'--admin_user=admin',
+			'--admin_password=password',
+			'--admin_email=test@test.test',
+			'--skip-email' );
 	}
-
-	debug( 'Creating wp-config.php file' );
-	await runCLICommand( 'config',
-		'create',
-		'--dbname=wordpress_develop',
-		'--dbuser=root',
-		'--dbpass=password',
-		'--dbhost=mysql',
-		'--path=/var/www/html/build' );
-
-	if ( existsSync( cwd + '/build/wp-config.php' ) ) {
-		debug( 'Moving wp-config.php out of the build directory' );
-		renameSync( cwd + '/build/wp-config.php', cwd + '/wp-config.php' )
-	}
-
-	debug( 'Adding debug options to wp-config.php' );
-	await runCLICommand( 'config', 'set', 'WP_DEBUG', 'true', '--raw', '--type=constant' );
-	await runCLICommand( 'config', 'set', 'SCRIPT_DEBUG', 'true', '--raw', '--type=constant' );
-	await runCLICommand( 'config', 'set', 'WP_DEBUG_DISPLAY', 'true', '--raw', '--type=constant' );
-
-	debug( 'Installing WordPress' );
-	await runCLICommand( 'core',
-		'install',
-		'--url=localhost:' + port,
-		'--title=WordPress Develop',
-		'--admin_user=admin',
-		'--admin_password=password',
-		'--admin_email=test@test.test' );
 
 	setStatus( 'okay', 'Ready :' );
 
@@ -292,8 +298,8 @@ function runCLICommand( ...args ) {
 		},
 	} )
 	.then( () => true )
-	.catch( ( error ) => {
-		debug( error.stderr.toString().trim() );
+	.catch( ( { stdout, stderr } ) => {
+		debug( stderr.toString().trim() );
 		return false;
 	} );
 }
