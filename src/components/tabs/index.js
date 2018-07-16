@@ -7,13 +7,12 @@ class Tabs extends Component {
 		super( ...arguments );
 
 		this.state = {
-			activeTab: 'Basic',
+			activeTab: Object.keys( this.props.tabs ).get( 0 ),
 		};
 	}
 	render() {
 		const { activeTab } = this.state;
 		const { tabs } = this.props;
-
 
 		return (
 			<div className="tabs">
