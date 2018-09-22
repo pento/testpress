@@ -1,6 +1,6 @@
 .status-row {
 	padding: 15px;
-	border-bottom: 1px solid #82878C;
+	border-bottom: 1px solid #cccccc;
 	display: flex;
 	flex-direction: row;
 }
@@ -20,7 +20,7 @@ status-indicator {
     background-color: #F6F6F6;
     margin-left: 25px;
 	padding: 5px 10px;
-	border: 1px solid #808080;
+	border: 1px solid #cccccc;
 	color: #808080;
 	border-radius: 2px;
 	cursor: pointer;
