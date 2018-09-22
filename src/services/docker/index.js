@@ -1,3 +1,6 @@
+// Hazardous overrides some of the functions from "path" to make them work correctly when WPDE is packaged.
+require( 'hazardous' );
+
 const yaml = require( 'node-yaml' );
 const { copyFileSync, existsSync, renameSync } = require( 'fs' );
 const { spawn } = require( 'promisify-child-process' );
