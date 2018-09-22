@@ -43,6 +43,7 @@
 		"electron-start": "cross-env ELECTRON_START_URL=http://localhost:3000/ electron .",
 		"react-start": "cross-env BROWSER=none NODE_ENV=development react-scripts start",
 		"pack": "electron-builder --dir",
+		"dist": "electron-builder",
 		"postinstall": "electron-builder install-app-deps"
 	},
 	"devDependencies": {
@@ -68,7 +69,6 @@
 		"mac": {
 			"category": "public.app-category.developer-tools",
 			"icon": "assets/icon.png"
-		},
-		"dmg": {}
+		}
 	}
 }
