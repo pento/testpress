@@ -33,6 +33,8 @@ status-indicator {
 
 .status-description {
 	padding: 0 15px;
+	font-size: 15px;
+	line-height: 1.3;
 }
 
 textarea {
