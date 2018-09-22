@@ -1,13 +1,10 @@
 import React, { Component } from 'react';
-import Gridicon from 'gridicons';
 
 import PreferencesButton from '../components/preferences-button';
 import PreferencesPanel from '../components/preferences-panel';
 import StatusPanel from '../components/status-panel';
 
 import './style.css';
-
-const { ipcRenderer } = window.require( 'electron' );
 
 class WPde extends Component {
 	constructor() {
@@ -21,10 +18,6 @@ class WPde extends Component {
 
 	togglePreferences() {
 		this.setState( { preferencesOpen: ! this.state.preferencesOpen } );
-	}
-
-	quit() {
-		ipcRenderer.send( 'quit' );
 	}
 
 	render() {
@@ -48,13 +41,6 @@ class WPde extends Component {
 							togglePreferences={ this.togglePreferences }
 							preferencesOpen={ preferencesOpen }
 						/>
-						<button
-							className="quit-button"
-							onClick={ this.quit }
-							title="Quit WPDE"
-						>
-							<Gridicon icon="sign-out" />
-						</button>
 					</header>
 
 					{ ! preferencesOpen && <StatusPanel /> }
