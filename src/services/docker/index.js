@@ -55,21 +55,31 @@ async function startDocker() {
 		version: '3',
 		services: {
 			'wordpress-develop': {
-				build: {
-					context: '.',
-					dockerfile: 'Dockerfile',
-				},
+				image: 'nginx:alpine',
 				ports: [
 					port + ':80',
 				],
 				volumes: [
-					normalize( cwd ) + ':/var/www/html',
+					'./site.conf:/etc/nginx/conf.d/default.conf',
+					normalize( cwd ) + ':/var/www',
+				],
+				links: [
+					'php',
+				],
+			},
+			php: {
+				image: 'garypendergast/wordpress-develop-php',
+				volumes: [
+					normalize( cwd ) + ':/var/www',
+				],
+				links: [
+					'mysql',
 				],
 			},
 			cli: {
 				image: 'wordpress:cli',
 				volumes: [
-					normalize( cwd ) + ':/var/www/html',
+					normalize( cwd ) + ':/var/www',
 				],
 			},
 			mysql: {
@@ -88,10 +98,7 @@ async function startDocker() {
 				]
 			},
 			phpunit: {
-				build: {
-					context: '.',
-					dockerfile: 'Dockerfile-phpunit',
-				},
+				image: 'garypendergast/wordpress-develop-phpunit',
 				volumes: [
 					normalize( cwd ) + ':/wordpress-develop',
 				],
@@ -104,8 +111,7 @@ async function startDocker() {
 
 	yaml.writeSync( normalize( TOOLS_DIR + '/docker-compose.yml' ), defaultOptions );
 
-	copyFileSync( normalize( __dirname + '/Dockerfile' ), normalize( TOOLS_DIR + '/Dockerfile' ) );
-	copyFileSync( normalize( __dirname + '/Dockerfile-phpunit' ), normalize( TOOLS_DIR + '/Dockerfile-phpunit' ) );
+	copyFileSync( normalize( __dirname + '/default.conf' ), normalize( TOOLS_DIR + '/default.conf' ) );
 
 	if ( USING_TOOLBOX ) {
 		await startDockerMachine();
