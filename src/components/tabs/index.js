@@ -7,7 +7,7 @@ class Tabs extends Component {
 		super( ...arguments );
 
 		this.state = {
-			activeTab: Object.keys( this.props.tabs ).get( 0 ),
+			activeTab: Object.keys( this.props.tabs )[ 0 ],
 		};
 	}
 	render() {
