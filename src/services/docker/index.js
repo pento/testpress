@@ -1,22 +1,19 @@
 const yaml = require( 'node-yaml' );
 const { copyFileSync, existsSync, renameSync } = require( 'fs' );
-const { spawnSync } = require( 'child_process' );
 const { spawn } = require( 'promisify-child-process' );
 const process = require( 'process' );
 const { addAction, didAction } = require( '@wordpress/hooks' );
 const sleep = require( 'system-sleep' );
 const debug = require( 'debug' )( 'wpde:services:docker' );
-const { webContents } = require( 'electron' );
 const { normalize } = require( 'path' );
 const csv = require( 'csvtojson' );
 
-const { TOOLS_DIR } = require( '../constants.js' );
+const { TOOLS_DIR } = require( '../constants' );
 const { preferences } = require( '../../preferences' );
+const { setStatus } = require( '../../utils/status' );
 
 let cwd = '';
 let port = 9999;
-
-let statusWindow = null;
 
 const dockerEnv = {};
 
@@ -25,15 +22,14 @@ let USING_TOOLBOX = false;
 /**
  * Registers the Docker actions, then starts Docker.
  */
-async function registerDockerJob( window ) {
+async function registerDockerJob() {
 	debug( 'Registering job' );
 
-	statusWindow = window;
 	if ( 'win32' === process.platform ) {
 		USING_TOOLBOX = await detectToolbox();
 	}
 
-	addAction( 'preferences_saved', 'preferencesSaved', preferencesSaved, 9 );
+	addAction( 'preference_saved', 'preferenceSaved', preferenceSaved, 9 );
 	addAction( 'shutdown', 'shutdown', shutdown );
 
 	startDocker();
@@ -44,8 +40,8 @@ async function registerDockerJob( window ) {
  */
 async function startDocker() {
 	debug( 'Preparing to start Docker' );
-	cwd = preferences.value( 'basic.wordpress-folder' );
-	port = preferences.value( 'site.port' ) || 9999;
+	cwd = preferences.value( 'basic', 'wordpress-folder' );
+	port = preferences.value( 'site', 'port' ) || 9999;
 
 	if ( ! cwd || ! port ) {
 		debug( 'Bailing, preferences not set' );
@@ -80,10 +76,13 @@ async function startDocker() {
 					MYSQL_DATABASE: 'wordpress_develop',
 				},
 				healthcheck: {
-					test: [ 'CMD', 'mysql', '-e', 'SELECT 1', '-uroot', '-ppassword' ],
+					test: [ 'CMD', 'mysql', '-e', 'SHOW TABLES FROM wordpress_develop', '-uroot', '-ppassword', '-hmysql', '--protocol=tcp' ],
 					interval: '1s',
 					retries: '100',
-				}
+				},
+				volumes: [
+					'mysql:/var/lib/mysql',
+				]
 			},
 			phpunit: {
 				build: {
@@ -91,11 +90,14 @@ async function startDocker() {
 					dockerfile: 'Dockerfile-phpunit',
 				},
 				volumes: [
-					cwd + ':/wordpress-develop',
+					normalize( cwd ) + ':/wordpress-develop',
 				],
 			},
 		},
-	};
+		volumes: {
+			mysql: {},
+		},
+};
 
 	yaml.writeSync( normalize( TOOLS_DIR + '/docker-compose.yml' ), defaultOptions );
 
@@ -120,7 +122,7 @@ async function startDocker() {
 
 	debug( 'Docker containers started' );
 
-	statusWindow.send( 'status', 'error', 'Building WordPress...' );
+	setStatus( 'warning', 'Building environment ...' );
 
 	addAction( 'grunt_watch_first_run_finished', 'installWordPress', installWordPress );
 
@@ -206,7 +208,7 @@ async function startDockerMachine() {
  * Runs the WP-CLI commands to install WordPress.
  */
 async function installWordPress() {
-	statusWindow.send( 'status', 'error', 'Installing WordPress...' );
+	setStatus( 'warning', 'Building environment ...' );
 
 	debug( 'Waiting for mysqld to start in the MySQL container' );
 	while ( 1 ) {
@@ -230,48 +232,48 @@ async function installWordPress() {
 		sleep( 1000 );
 	}
 
+	debug( 'Checking if a config file exists' );
+	const configExists = await runCLICommand( 'config', 'path' );
+	if ( ! configExists ) {
+		debug( 'Creating wp-config.php file' );
+		await runCLICommand( 'config',
+			'create',
+			'--dbname=wordpress_develop',
+			'--dbuser=root',
+			'--dbpass=password',
+			'--dbhost=mysql',
+			'--path=/var/www/html/build' );
+
+		if ( existsSync( cwd + '/build/wp-config.php' ) ) {
+			debug( 'Moving wp-config.php out of the build directory' );
+			renameSync( cwd + '/build/wp-config.php', cwd + '/wp-config.php' )
+		}
+
+		debug( 'Adding debug options to wp-config.php' );
+		await runCLICommand( 'config', 'set', 'WP_DEBUG', 'true', '--raw', '--type=constant' );
+		await runCLICommand( 'config', 'set', 'SCRIPT_DEBUG', 'true', '--raw', '--type=constant' );
+		await runCLICommand( 'config', 'set', 'WP_DEBUG_DISPLAY', 'true', '--raw', '--type=constant' );
+	}
+
 	debug( 'Checking if WordPress is installed' );
 	const isInstalled = await runCLICommand( 'core', 'is-installed' );
 	if ( isInstalled ) {
 		debug( 'Updating site URL' );
 		await runCLICommand( 'option', 'update', 'home', 'http://localhost:' + port );
 		await runCLICommand( 'option', 'update', 'siteurl', 'http://localhost:' + port );
-
-		statusWindow.send( 'status', 'okay', 'Ready!' );
-		debug( 'WordPress ready at http://localhost:%d/', port );
-
-		return;
+	} else {
+		debug( 'Installing WordPress' );
+		await runCLICommand( 'core',
+			'install',
+			'--url=localhost:' + port,
+			'--title=WordPress Develop',
+			'--admin_user=admin',
+			'--admin_password=password',
+			'--admin_email=test@test.test',
+			'--skip-email' );
 	}
 
-	debug( 'Creating wp-config.php file' );
-	await runCLICommand( 'config',
-		'create',
-		'--dbname=wordpress_develop',
-		'--dbuser=root',
-		'--dbpass=password',
-		'--dbhost=mysql',
-		'--path=/var/www/html/build' );
-
-	if ( existsSync( cwd + '/build/wp-config.php' ) ) {
-		debug( 'Moving wp-config.php out of the build directory' );
-		renameSync( cwd + '/build/wp-config.php', cwd + '/wp-config.php' )
-	}
-
-	debug( 'Adding debug options to wp-config.php' );
-	await runCLICommand( 'config', 'set', 'WP_DEBUG', 'true', '--raw', '--type=constant' );
-	await runCLICommand( 'config', 'set', 'SCRIPT_DEBUG', 'true', '--raw', '--type=constant' );
-	await runCLICommand( 'config', 'set', 'WP_DEBUG_DISPLAY', 'true', '--raw', '--type=constant' );
-
-	debug( 'Installing WordPress' );
-	await runCLICommand( 'core',
-		'install',
-		'--url=localhost:' + port,
-		'--title=WordPress Develop',
-		'--admin_user=admin',
-		'--admin_password=password',
-		'--admin_email=test@test.test' );
-
-	statusWindow.send( 'status', 'okay', 'Ready!' );
+	setStatus( 'okay', 'Ready :' );
 
 	debug( 'WordPress ready at http://localhost:%d/', port );
 }
@@ -296,8 +298,8 @@ function runCLICommand( ...args ) {
 		},
 	} )
 	.then( () => true )
-	.catch( ( error ) => {
-		debug( error.stderr.toString().trim() );
+	.catch( ( { stdout, stderr } ) => {
+		debug( stderr.toString().trim() );
 		return false;
 	} );
 }
@@ -305,7 +307,7 @@ function runCLICommand( ...args ) {
 /**
  * Figure out if we're using Docker Toolbox or not. Uses Docker for Windows' version and Hyper-V
  * requirements as a baseline to determine whether Toolbox is being used.
- * 
+ *
  * @returns {Boolean} true if Docker Toolbox is being used, false if it isn't.
  */
 async function detectToolbox() {
@@ -351,10 +353,22 @@ async function detectToolbox() {
 /**
  * Action handler for when preferences have been saved.
  *
- * @param {Object} newPreferences The new preferences that have just been saved.
+ * @param {String} section    The preferences section that the saved preference is in.
+ * @param {String} preference The preferences that has been saved.
+ * @param {*}      value      The value that the preference has been changed to.
  */
-async function preferencesSaved( newPreferences ) {
-	if ( cwd === newPreferences.basic[ 'wordpress-folder' ] && port === newPreferences.site.port ) {
+async function preferenceSaved( section, preference, value ) {
+	let changed = false;
+
+	if ( section === 'basic' && preference !== 'wordpress-folder' && value !== cwd ) {
+		changed = true;
+	}
+
+	if ( section === 'site' && preference === 'port' && value !== port ) {
+		changed = true;
+	}
+
+	if ( ! changed ) {
 		return;
 	}
 
@@ -378,7 +392,7 @@ async function preferencesSaved( newPreferences ) {
  */
 function shutdown() {
 	debug( 'Shutdown, stopping containers' );
-	spawnSync( 'docker-compose', [
+	spawn( 'docker-compose', [
 		'down',
 	], {
 		cwd: TOOLS_DIR,

@@ -6,7 +6,7 @@ const { addAction, doAction } = require( '@wordpress/hooks' );
 const process = require( 'process' );
 const debug = require( 'debug' )( 'wpde:services:npm-watcher' );
 
-const { TOOLS_DIR, NPM_CACHE_DIR, NODE_BIN, NPM_BIN } = require( '../constants.js' );
+const { NPM_CACHE_DIR, NODE_BIN, NPM_BIN } = require( '../constants.js' );
 const { preferences } = require( '../../preferences' );
 
 let installProcess = null;
@@ -18,9 +18,9 @@ let cwd = '';
 function registerNPMJob() {
 	debug( 'Registering job' );
 	addAction( 'updated_node_and_npm', 'runNPMInstall', runNPMInstall );
-	addAction( 'preferences_saved', 'preferencesSaved', preferencesSaved, 10 );
+	addAction( 'preference_saved', 'preferenceSaved', preferenceSaved, 10 );
 
-	cwd = preferences.value( 'basic.wordpress-folder' );
+	cwd = preferences.value( 'basic', 'wordpress-folder' );
 	if ( ! cwd ) {
 		return;
 	}
@@ -85,16 +85,22 @@ function runNPMInstall() {
 /**
  * Action handler for when preferences have been saved.
  *
- * @param {Object} newPreferences The new preferences that have just been saved.
+ * @param {String} section    The preferences section that the saved preference is in.
+ * @param {String} preference The preferences that has been saved.
+ * @param {*}      value      The value that the preference has been changed to.
  */
-function preferencesSaved( newPreferences ) {
-	if ( cwd === newPreferences.basic[ 'wordpress-folder' ] ) {
+function preferenceSaved( section, preference, value ) {
+	if ( section !== 'basic' || preference !== 'wordpress-folder' ) {
+		return;
+	}
+
+	if ( value === cwd ) {
 		return;
 	}
 
 	debug( 'WordPress folder updated' );
 
-	cwd = newPreferences.basic[ 'wordpress-folder' ];
+	cwd = value;
 
 	runNPMInstall();
 }

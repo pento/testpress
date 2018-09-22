@@ -6,5 +6,5 @@ import registerServiceWorker from './registerServiceWorker';
 
 import './index.css';
 
-ReactDOM.render( <WPde />, document.getElementById('root') );
+ReactDOM.render( <WPde />, document.getElementById( 'root' ) );
 registerServiceWorker();

@@ -1,30 +1,55 @@
+.tray-pointer {
+	height: 0;
+	width: 0;
+	border-left: 8px solid transparent;
+	border-right: 8px solid transparent;
+	border-bottom: 8px solid #fff;
+	margin: 0 auto;
+}
+
 .wpde {
-	text-align: center;
-	background-color: #222;
-	color: white;
-	height: 400px;
+	background-color: #fff;
+	color:#000;
+	height: 290px;
 }
 
-.wpde-main {
+.header {
+	height: 35px;
 	padding: 10px;
+	color: #82878C;
+	border-bottom: 1px solid #ccc;
+	display: flex;
+	flex-direction: row;
 }
 
-.wpde-logo {
-	animation: App-logo-spin infinite 20s linear;
-	height: 80px;
+.title {
+	margin: 0;
+	flex: auto;
+	display: flex;
+	flex-direction: row;
 }
 
-.wpde-header {
-	height: 150px;
-	padding: 20px;
+.logo {
+	padding: 5px;
+	height: 25px;
+	fill: #82878C;
 }
 
-.wpde-title {
-	font-size: 1.5em;
+.title span {
+	padding-left: 5px;
+	font-size: 18px;
+	font-weight: normal;
+	margin: auto 0;
 }
 
-.wpde-intro {
-	font-size: large;
+.quit-button {
+	border: none;
+	background: none;
+	cursor: pointer;
+}
+
+.quit-button .gridicon {
+	fill: #82878C;
 }
 
 @keyframes wpde-logo-spin {

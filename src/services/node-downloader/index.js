@@ -1,19 +1,16 @@
 const schedule = require( 'node-schedule' );
 const compareVersions = require( 'compare-versions' );
-const fetch = require( 'node-fetch' );
-const { createWriteStream, createReadStream, mkdirSync, existsSync, readFileSync, unlinkSync } = require( 'fs' );
-const { app } = require( 'electron' );
+const { createWriteStream, mkdirSync, existsSync, readFileSync, unlinkSync } = require( 'fs' );
 const { normalize } = require( 'path' );
 const tar = require( 'tar' );
-const { spawnSync } = require( 'child_process' );
 const { spawn } = require( 'promisify-child-process' );
-const { promisify } = require( 'util' );
-const promisePipe = require( 'promisepipe' );
 const hasha = require( 'hasha' );
-const { TOOLS_DIR, ARCHIVE_DIR, NODE_DIR, NODE_BIN, NPM_BIN } = require( '../constants.js' );
 const { doAction } = require( '@wordpress/hooks' );
 const debug = require( 'debug' )( 'wpde:services:node-downloader' );
 const DecompressZip = require( 'decompress-zip' );
+
+const { ARCHIVE_DIR, NODE_DIR, NODE_BIN, NPM_BIN } = require( '../constants' );
+const { fetch, fetchWrite } = require( '../../utils/network' );
 
 const NODE_URL = 'https://nodejs.org/dist/latest-carbon/';
 
@@ -46,13 +43,23 @@ async function checkAndInstallUpdates() {
 	const currentVersion = await getLocalVersion();
 	const remoteVersion = await getRemoteVersion();
 
+	if ( ! remoteVersion ) {
+		debug( 'Unable to fetch remote version, bailing before install' );
+		// No point continuing if we can't find a remote version. If we have a local version,
+		// we can trigger the next service and see if they can do anything.
+		if ( currentVersion ) {
+			triggerNextService();
+		}
+		return false;
+	}
+
 	debug( 'Installed version: %s, remote version: %s', currentVersion, remoteVersion.version );
 
-	if ( compareVersions( remoteVersion.version, currentVersion ) > 0 ) {
+	if ( ! currentVersion || compareVersions( remoteVersion.version, currentVersion ) > 0 ) {
 		debug( 'Newer version found, starting install...' );
 		const filename = normalize( ARCHIVE_DIR + '/' + remoteVersion.filename );
 
-		if ( ! await checksumLocalArchive( remoteVersion.filename ) ) {
+		if ( ! await checksumLocalArchive( remoteVersion.filename, remoteVersion.version ) ) {
 			const url = NODE_URL + remoteVersion.filename;
 
 			debug( 'Downloading from %s', url );
@@ -62,13 +69,19 @@ async function checkAndInstallUpdates() {
 					encoding: 'binary',
 				} );
 
-			await fetch( url )
-				.then( ( res ) => promisePipe( res.body, writeFile ) );
+			const downloadedNode = await fetchWrite( url, writeFile );
+
+			if ( ! downloadedNode ) {
+				debug( 'Download failed, bailing before install' );
+				triggerNextService();
+				return false;
+			}
 
 			debug( 'Finished downloading' );
 
-			if ( ! await checksumLocalArchive( remoteVersion.filename ) ) {
+			if ( ! await checksumLocalArchive( remoteVersion.filename, remoteVersion.version ) ) {
 				debug( 'Checksum failed, bailing before install' );
+				triggerNextService();
 				return false;
 			}
 		}
@@ -112,11 +125,11 @@ async function checkAndInstallUpdates() {
  * Get the version of the local install of Node. If there isn't a copy of Node installed,
  * it returns a generic version number of '0.0.0', to ensure version comparisons will assume it's outdated.
  *
- * @return {String} The version number of the local copy of node.
+ * @return {String|Boolean} The version number of the local copy of node, or false if the version couldn't be retrieved.
  */
 async function getLocalVersion() {
 	if ( ! existsSync( NODE_BIN ) ) {
-		return '0.0.0';
+		return false;
 	}
 
 	const versionInfo = await spawn( NODE_BIN, [ '-v' ] );
@@ -127,20 +140,21 @@ async function getLocalVersion() {
 /**
  * Retrieves the version (and filename) of the latest remote version of Node.
  *
- * @return {Object} Object containing the `version` and `filename`.
+ * @return {Object|Boolean} Object containing the `version` and `filename`, or false if the version couldn't be fetched.
  */
 async function getRemoteVersion() {
-	const remotels = await fetch( NODE_URL )
-		.then ( ( res ) => res.text() );
+	const remotels = await fetch( NODE_URL );
+
+	if ( ! remotels ) {
+		debug( 'Unable to fetch remote directory' );
+		return false;
+	}
 
 	const versionInfo = VERSION_REGEX.exec( remotels );
 
 	if ( ! versionInfo ) {
 		debug( "Remote version regex (%s) failed on html:\n%s\n%O", VERSION_REGEX, remotels, versionInfo );
-		return {
-			version: '0.0.0',
-			filename: '',
-		};
+		return false;
 	}
 
 	return {
@@ -153,12 +167,13 @@ async function getRemoteVersion() {
  * Checksums the local copy of the Node archive against the official checksums.
  *
  * @param {String} filename The filename to be using for checks.
+ * @param {String} version  The Node version corresponding to the archive.
  *
  * @return {Boolean} True if the checksum matches, false if it doesn't.
  */
-async function checksumLocalArchive( filename ) {
+async function checksumLocalArchive( filename, version ) {
 	const archiveFilename = normalize( ARCHIVE_DIR + '/' + filename );
-	const checksumFilename = normalize( ARCHIVE_DIR + '/' + 'node-SHASUMS256.txt' );
+	const checksumFilename = normalize( ARCHIVE_DIR + '/' + `node${ version }-SHASUMS256.txt` );
 
 	if ( ! existsSync( archiveFilename ) ) {
 		debug( "Checksum file doesn't exist" );
@@ -169,8 +184,12 @@ async function checksumLocalArchive( filename ) {
 		debug( 'Downloading latest checksum file' );
 		const writeFile = createWriteStream( checksumFilename );
 
-		await fetch( NODE_URL + 'SHASUMS256.txt' )
-			.then( ( res ) => promisePipe( res.body, writeFile ) );
+		const downloadedChecksums = await fetchWrite( NODE_URL + 'SHASUMS256.txt', writeFile );
+
+		if ( ! downloadedChecksums ) {
+			debug( 'Unable to download checksum file' );
+			return false;
+		}
 	}
 
 	debug( 'Checking checksum of the local archive against checksum file' );
@@ -215,7 +234,7 @@ async function updateNPM() {
 
 	if ( npmIsUpdated ) {
 		debug( 'npm running latest version' );
-		doAction( 'updated_node_and_npm' );
+		triggerNextService();
 		return;
 	}
 
@@ -260,6 +279,10 @@ async function updateNPM() {
 		debug( 'Packages flattened' );
 	}
 
+	triggerNextService();
+}
+
+function triggerNextService() {
 	doAction( 'updated_node_and_npm' );
 }
 

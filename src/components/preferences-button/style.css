@@ -1,0 +1,9 @@
+.preferences-button {
+	border: none;
+	background: none;
+	cursor: pointer;
+}
+
+.preferences-button .gridicon {
+	fill: #82878C;
+}

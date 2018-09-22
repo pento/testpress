@@ -1,11 +1,11 @@
-const { app, BrowserWindow, ipcMain, Tray } = require( 'electron' );
+const { app, BrowserWindow, Tray, ipcMain } = require( 'electron' );
 const { doAction } = require( '@wordpress/hooks' );
 const path = require( 'path' );
 const url = require( 'url' );
 const positioner = require( 'electron-traywindow-positioner' );
 
-const { preferences } = require( './preferences' );
 const { registerJobs } = require( './services' );
+const { setStatusWindow } = require( './utils/status' );
 
 const assetsDirectory = path.join( __dirname, '/../assets/' )
 
@@ -17,7 +17,7 @@ if ( 'darwin' === process.platform ) {
 }
 
 const createTray = () => {
-	tray = new Tray( path.join( assetsDirectory, 'tray-logo.png' ) );
+	tray = new Tray( path.join( assetsDirectory, 'tray-logoTemplate.png' ) );
 	tray.on( 'right-click', toggleWindow );
 	tray.on( 'double-click', toggleWindow );
 	tray.on( 'click', ( event ) => {
@@ -33,8 +33,8 @@ const createTray = () => {
 function createWindow() {
     // Create the browser window.
     window = new BrowserWindow( {
-		width: 300,
-		height: 400,
+		width: 350,
+		height: 300,
 		show: false,
 		frame: false,
 		fullscreenable: false,
@@ -42,30 +42,29 @@ function createWindow() {
 		transparent: true,
 		skipTaskbar: true,
 		webPreferences: {
-		  // Prevents renderer process code from not running when window is hidden
-		  backgroundThrottling: false,
+			// Prevents renderer process code from not running when window is hidden
+			backgroundThrottling: false,
 		},
-	  } );
+	} );
+
+	setStatusWindow( window );
 
     // and load the index.html of the app.
     const startUrl = process.env.ELECTRON_START_URL || url.format( {
-            pathname: path.join( __dirname, '/../build/index.html' ),
-            protocol: 'file:',
-            slashes: true,
-        } );
-		window.loadURL( startUrl );
+		pathname: path.join( __dirname, '/../build/index.html' ),
+		protocol: 'file:',
+		slashes: true,
+	} );
 
-	window.on('blur', () => {
+	window.loadURL( startUrl );
+
+	window.on( 'blur', () => {
 		if ( ! window.webContents.isDevToolsOpened() ) {
-		  window.hide();
+			window.hide();
 		}
-	  })
+	} );
 
-    // Emitted when the window is closed.
     window.on( 'closed', () => {
-        // Dereference the window object, usually you would store windows
-        // in an array if your app supports multi windows, this is the time
-		// when you should delete the corresponding element.
         window = null;
     } );
 }
@@ -92,7 +91,7 @@ const showWindow = () => {
 app.on( 'ready', () => {
 	createTray();
 	createWindow();
-	registerJobs( window );
+	registerJobs();
 } );
 
 // Quit when all windows are closed.
@@ -102,6 +101,11 @@ app.on( 'window-all-closed', () => {
     if ( process.platform !== 'darwin' ) {
         app.quit();
     }
+} );
+
+ipcMain.on( 'quit', () => {
+	window.close();
+	app.quit();
 } );
 
 app.on( 'quit', () => {
