@@ -60,7 +60,7 @@ async function startDocker() {
 					port + ':80',
 				],
 				volumes: [
-					'./site.conf:/etc/nginx/conf.d/default.conf',
+					'./default.conf:/etc/nginx/conf.d/default.conf',
 					normalize( cwd ) + ':/var/www',
 				],
 				links: [
