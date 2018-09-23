@@ -3,6 +3,17 @@ const { doAction } = require( '@wordpress/hooks' );
 const path = require( 'path' );
 const url = require( 'url' );
 const positioner = require( 'electron-traywindow-positioner' );
+const { accessSync, mkdirSync } = require( 'fs' );
+const debug = require( 'debug' )( 'wpde:runner' );
+
+// Check that the userData directory exists, and create it if needed.
+try {
+	accessSync( app.getPath( 'userData' ) );
+	debug( 'userData directory exists' );
+} catch ( err ) {
+	debug( "userData directory doesn't exist" );
+	mkdirSync( app.getPath( 'userData' ) );
+}
 
 const { registerJobs } = require( './services' );
 const { setStatusWindow } = require( './utils/status' );
