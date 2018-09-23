@@ -6,7 +6,7 @@ const { copyFileSync, existsSync, renameSync } = require( 'fs' );
 const { spawn } = require( 'promisify-child-process' );
 const process = require( 'process' );
 const { addAction, didAction } = require( '@wordpress/hooks' );
-const sleep = require( 'system-sleep' );
+const sleep = require( 'await-sleep' );
 const debug = require( 'debug' )( 'wpde:services:docker' );
 const { normalize } = require( 'path' );
 const csv = require( 'csvtojson' );
@@ -60,7 +60,7 @@ async function startDocker() {
 					port + ':80',
 				],
 				volumes: [
-					'./site.conf:/etc/nginx/conf.d/default.conf',
+					'./default.conf:/etc/nginx/conf.d/default.conf',
 					normalize( cwd ) + ':/var/www',
 				],
 				links: [
@@ -238,7 +238,7 @@ async function installWordPress() {
 			break;
 		}
 
-		sleep( 1000 );
+		await sleep( 1000 );
 	}
 
 	debug( 'Checking if a config file exists' );
@@ -369,7 +369,7 @@ async function detectToolbox() {
 async function preferenceSaved( section, preference, value ) {
 	let changed = false;
 
-	if ( section === 'basic' && preference !== 'wordpress-folder' && value !== cwd ) {
+	if ( section === 'basic' && preference === 'wordpress-folder' && value !== cwd ) {
 		changed = true;
 	}
 
@@ -381,17 +381,20 @@ async function preferenceSaved( section, preference, value ) {
 		return;
 	}
 
-	debug( 'Preferences saved, stopping containers' );
+	debug( 'Preferences updated' );
 
-	await spawn( 'docker-compose', [
-		'down',
-	], {
-		cwd: TOOLS_DIR,
-		env: {
-			PATH: process.env.PATH,
-			...dockerEnv,
-		},
-	} );
+	if ( existsSync( normalize( TOOLS_DIR + '/docker-compose.yml' ) ) ) {
+		debug( 'Stopping containers' );
+		await spawn( 'docker-compose', [
+			'down',
+		], {
+			cwd: TOOLS_DIR,
+			env: {
+				PATH: process.env.PATH,
+				...dockerEnv,
+			},
+		} );
+	}
 
 	startDocker();
 }

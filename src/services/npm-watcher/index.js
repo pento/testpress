@@ -2,7 +2,7 @@ const { spawn } = require( 'child_process' );
 const { mkdirSync, existsSync } = require( 'fs' );
 const { watch } = require( 'chokidar' );
 const { normalize } = require( 'path' );
-const { addAction, doAction } = require( '@wordpress/hooks' );
+const { addAction, doAction, didAction } = require( '@wordpress/hooks' );
 const process = require( 'process' );
 const debug = require( 'debug' )( 'wpde:services:npm-watcher' );
 
@@ -45,6 +45,11 @@ function runNPMInstall() {
 		debug( 'Ending previous `npm install` process' );
 		installProcess.kill();
 		installProcess = null;
+	}
+
+	if ( ! didAction( 'updated_node_and_npm' ) ) {
+		debug( "Bailing, node hasn't finished installing" );
+		return;
 	}
 
 	if ( ! cwd ) {
