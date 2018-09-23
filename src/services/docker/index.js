@@ -381,17 +381,20 @@ async function preferenceSaved( section, preference, value ) {
 		return;
 	}
 
-	debug( 'Preferences saved, stopping containers' );
+	debug( 'Preferences updated' );
 
-	await spawn( 'docker-compose', [
-		'down',
-	], {
-		cwd: TOOLS_DIR,
-		env: {
-			PATH: process.env.PATH,
-			...dockerEnv,
-		},
-	} );
+	if ( existsSync( normalize( TOOLS_DIR + '/docker-compose.yml' ) ) ) {
+		debug( 'Stopping containers' );
+		await spawn( 'docker-compose', [
+			'down',
+		], {
+			cwd: TOOLS_DIR,
+			env: {
+				PATH: process.env.PATH,
+				...dockerEnv,
+			},
+		} );
+	}
 
 	startDocker();
 }
