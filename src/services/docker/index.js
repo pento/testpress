@@ -369,7 +369,7 @@ async function detectToolbox() {
 async function preferenceSaved( section, preference, value ) {
 	let changed = false;
 
-	if ( section === 'basic' && preference !== 'wordpress-folder' && value !== cwd ) {
+	if ( section === 'basic' && preference === 'wordpress-folder' && value !== cwd ) {
 		changed = true;
 	}
 
