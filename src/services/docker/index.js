@@ -251,7 +251,7 @@ async function installWordPress() {
 			'--dbuser=root',
 			'--dbpass=password',
 			'--dbhost=mysql',
-			'--path=/var/www/html/build' );
+			'--path=/var/www/build' );
 
 		if ( existsSync( cwd + '/build/wp-config.php' ) ) {
 			debug( 'Moving wp-config.php out of the build directory' );
