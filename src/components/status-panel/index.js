@@ -45,7 +45,18 @@ class StatusPanel extends Component {
 	}
 
 	render() {
-		const { status, message, errors } = this.state;
+		let { status, message, errors } = this.state;
+		let description = this.descriptions[ status ];
+		const preferences = ipcRenderer.sendSync( 'getPreferences' );
+
+		if ( ! preferences.basic[ 'wordpress-folder' ] ) {
+			status      = 'negative';
+			message     = 'Select WordPress folder'
+			description = (
+				<p>Please select your local WordPress folder, by clicking the Preferences button at the top right of this window.</p>
+			);
+		}
+
 		const statusProps = {};
 		statusProps[ status ] = '';
 
@@ -53,7 +64,6 @@ class StatusPanel extends Component {
 			statusProps.pulse = '';
 		}
 
-		const preferences = ipcRenderer.sendSync( 'getPreferences' );
 		const url = 'http://localhost:' + preferences.site.port;
 
 		return (
@@ -73,8 +83,8 @@ class StatusPanel extends Component {
 					}
 				</div>
 				<div className="status-description">
-					{ this.descriptions[ status ] }
-					{ 'negative' === status &&
+					{ description }
+					{ 'negative' === status && errors &&
 						<textarea readOnly>{ errors }</textarea>
 					}
 				</div>
