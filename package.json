@@ -10,6 +10,7 @@
 	"license": "GPL-2.0-or-later",
 	"dependencies": {
 		"@wordpress/hooks": "2.0.0",
+		"await-sleep": "0.0.1",
 		"chokidar": "2.0.4",
 		"classname": "0.0.0",
 		"compare-versions": "3.4.0",
@@ -29,7 +30,6 @@
 		"react": "16.5.2",
 		"react-dom": "16.5.2",
 		"status-indicator": "1.0.9",
-		"system-sleep": "1.3.6",
 		"tar": "4.4.6"
 	},
 	"homepage": "./",

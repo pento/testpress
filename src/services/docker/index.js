@@ -6,7 +6,7 @@ const { copyFileSync, existsSync, renameSync } = require( 'fs' );
 const { spawn } = require( 'promisify-child-process' );
 const process = require( 'process' );
 const { addAction, didAction } = require( '@wordpress/hooks' );
-const sleep = require( 'system-sleep' );
+const sleep = require( 'await-sleep' );
 const debug = require( 'debug' )( 'wpde:services:docker' );
 const { normalize } = require( 'path' );
 const csv = require( 'csvtojson' );
@@ -238,7 +238,7 @@ async function installWordPress() {
 			break;
 		}
 
-		sleep( 1000 );
+		await sleep( 1000 );
 	}
 
 	debug( 'Checking if a config file exists' );
