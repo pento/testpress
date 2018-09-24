@@ -2,7 +2,7 @@ const { app, BrowserWindow, Tray, ipcMain } = require( 'electron' );
 const { doAction } = require( '@wordpress/hooks' );
 const path = require( 'path' );
 const url = require( 'url' );
-const positioner = require( 'electron-traywindow-positioner' );
+const Positioner = require( 'electron-positioner' );
 const { accessSync, mkdirSync } = require( 'fs' );
 const debug = require( 'debug' )( 'testpress:runner' );
 
@@ -91,7 +91,9 @@ const toggleWindow = () => {
 const showWindow = () => {
 	const trayBounds = tray.getBounds();
 
-	positioner.position( window, trayBounds );
+	const positioner = new Positioner( window )
+
+	positioner.move( 'trayCenter', trayBounds );
 	window.show();
 	window.focus();
 };
