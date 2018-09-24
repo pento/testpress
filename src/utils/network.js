@@ -1,4 +1,4 @@
-const debug = require( 'debug' )( 'wpde:utils:network' );
+const debug = require( 'debug' )( 'testpress:utils:network' );
 const nodeFetch = require( 'node-fetch' );
 const promisePipe = require( 'promisepipe' );
 

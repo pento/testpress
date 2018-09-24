@@ -6,7 +6,7 @@ const tar = require( 'tar' );
 const { spawn } = require( 'promisify-child-process' );
 const hasha = require( 'hasha' );
 const { doAction } = require( '@wordpress/hooks' );
-const debug = require( 'debug' )( 'wpde:services:node-downloader' );
+const debug = require( 'debug' )( 'testpress:services:node-downloader' );
 const DecompressZip = require( 'decompress-zip' );
 
 const { ARCHIVE_DIR, NODE_DIR, NODE_BIN, NPM_BIN } = require( '../constants' );

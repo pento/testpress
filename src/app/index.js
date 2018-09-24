@@ -6,7 +6,7 @@ import StatusPanel from '../components/status-panel';
 
 import './style.css';
 
-class WPde extends Component {
+class TestPress extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -22,12 +22,12 @@ class WPde extends Component {
 
 	render() {
 		const { preferencesOpen } = this.state;
-		const heading = preferencesOpen ? 'Preferences' : 'Welcome to WPDE';
+		const heading = preferencesOpen ? 'Preferences' : 'Welcome to TestPress';
 
 		return (
 			<div>
 				<div className="tray-pointer" />
-				<div className="wpde">
+				<div className="testpress">
 					<header className="header">
 						<h1 className="title">
 							<svg className="logo" xmlns="http://www.w3.org/2000/svg" fillRule="evenodd" version="1.0" viewBox="0 0 5.5555557 5.5555555">
@@ -52,4 +52,4 @@ class WPde extends Component {
 	}
 }
 
-export default WPde;
+export default TestPress;

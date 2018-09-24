@@ -4,7 +4,7 @@ const { watch } = require( 'chokidar' );
 const { normalize } = require( 'path' );
 const { addAction, doAction, didAction } = require( '@wordpress/hooks' );
 const process = require( 'process' );
-const debug = require( 'debug' )( 'wpde:services:npm-watcher' );
+const debug = require( 'debug' )( 'testpress:services:npm-watcher' );
 
 const { NPM_CACHE_DIR, NODE_BIN, NPM_BIN } = require( '../constants.js' );
 const { preferences } = require( '../../preferences' );
