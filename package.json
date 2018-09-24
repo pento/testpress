@@ -69,7 +69,12 @@
 		],
 		"mac": {
 			"category": "public.app-category.developer-tools",
-			"icon": "assets/icon.png"
+			"icon": "assets/icon.png",
+			"extendInfo": {
+				"LSEnvironment": {
+					"PATH": "/usr/local/bin"
+				}
+			}
 		}
 	}
 }
