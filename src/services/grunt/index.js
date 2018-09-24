@@ -20,6 +20,8 @@ function registerGruntJob() {
 
 	addAction( 'npm_install_finished', 'runGruntWatch', runGruntWatch );
 	addAction( 'preference_saved', 'preferenceSaved', preferenceSaved, 9 );
+	addAction( 'shutdown', 'shutdown', shutdown );
+
 	cwd = preferences.value( 'basic', 'wordpress-folder' );
 
 	if ( ! cwd ) {
@@ -118,6 +120,17 @@ function preferenceSaved( section, preference, value ) {
 
 	cwd = value;
 
+	if ( watchProcess ) {
+		watchProcess.kill();
+		watchProcess = null;
+	}
+}
+
+/**
+ * Shutdown handler, to ensure the grunt watcher is stopped.
+ */
+function shutdown() {
+	debug( 'Shutdown, stopping `grunt watch` process' );
 	if ( watchProcess ) {
 		watchProcess.kill();
 		watchProcess = null;
