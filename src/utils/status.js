@@ -1,4 +1,4 @@
-const debug = require( 'debug' )( 'wpde:utils:status' );
+const debug = require( 'debug' )( 'testpress:utils:status' );
 
 let statusWindow = undefined;
 

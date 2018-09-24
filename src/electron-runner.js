@@ -4,7 +4,7 @@ const path = require( 'path' );
 const url = require( 'url' );
 const positioner = require( 'electron-traywindow-positioner' );
 const { accessSync, mkdirSync } = require( 'fs' );
-const debug = require( 'debug' )( 'wpde:runner' );
+const debug = require( 'debug' )( 'testpress:runner' );
 
 // Check that the userData directory exists, and create it if needed.
 try {

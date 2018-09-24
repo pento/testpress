@@ -7,7 +7,7 @@
 	margin: 0 auto;
 }
 
-.wpde {
+.testpress {
 	background-color: #fff;
 	color:#000;
 	height: 290px;
@@ -52,7 +52,7 @@
 	fill: #82878C;
 }
 
-@keyframes wpde-logo-spin {
+@keyframes testpress-logo-spin {
 	from { transform: rotate( 0deg ); }
 	to { transform: rotate( 360deg ); }
 }

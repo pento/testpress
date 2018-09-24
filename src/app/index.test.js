@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import WPde from '.';
+import TestPress from '.';
 
 it('renders without crashing', () => {
 	const div = document.createElement( 'div' );
-	ReactDOM.render( <WPde />, div );
+	ReactDOM.render( <TestPress />, div );
 	ReactDOM.unmountComponentAtNode( div );
 } );

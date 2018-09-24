@@ -28,7 +28,7 @@ class StatusPanel extends Component {
 			),
 			negative: (
 				<div>
-					<p>Something went wrong, here's what we know. Please send this info to your friendly WPDE support crew.</p>
+					<p>Something went wrong, here's what we know. Please send this info to your friendly TestPress support crew.</p>
 				</div>
 			),
 		}

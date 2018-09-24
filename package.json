@@ -1,10 +1,10 @@
 {
-	"name": "wordpress-development-environment",
-	"description": "A simple method for getting a WordPress development environment up and running.",
+	"name": "testpress",
+	"description": "An easy method for getting a WordPress Core test environment up and running.",
 	"author": "The WordPress Contributors",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/pento/wordpress-development-environment"
+		"url": "https://github.com/pento/testpress"
 	},
 	"version": "0.1.0",
 	"license": "GPL-2.0-or-later",
@@ -55,7 +55,7 @@
 		"wait-on": "3.0.1"
 	},
 	"build": {
-		"appId": "org.wordpress.wpde",
+		"appId": "org.wordpress.testpress",
 		"asarUnpack": [
 			"src/services/docker/Docker*"
 		],

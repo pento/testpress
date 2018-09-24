@@ -2,7 +2,7 @@ const { spawn } = require( 'child_process' );
 const { existsSync } = require( 'fs' );
 const { watch } = require( 'chokidar' );
 const { addAction, doAction, didAction } = require( '@wordpress/hooks' );
-const debug = require( 'debug' )( 'wpde:services:grunt' );
+const debug = require( 'debug' )( 'testpress:services:grunt' );
 const { normalize } = require( 'path' );
 
 const { NODE_BIN } = require( '../constants.js' );

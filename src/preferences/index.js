@@ -1,7 +1,7 @@
 const { app, ipcMain } = require( 'electron' );
 const { doAction } = require( '@wordpress/hooks' );
 const path = require( 'path' );
-const debug = require( 'debug' )( 'wpde:preferences' );
+const debug = require( 'debug' )( 'testpress:preferences' );
 const { existsSync, readFileSync, writeFileSync } = require( 'fs' );
 
 class Preferences {

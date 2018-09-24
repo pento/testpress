@@ -1,4 +1,4 @@
-// Hazardous overrides some of the functions from "path" to make them work correctly when WPDE is packaged.
+// Hazardous overrides some of the functions from "path" to make them work correctly when TestPress is packaged.
 require( 'hazardous' );
 
 const yaml = require( 'node-yaml' );
@@ -7,7 +7,7 @@ const { spawn } = require( 'promisify-child-process' );
 const process = require( 'process' );
 const { addAction, didAction } = require( '@wordpress/hooks' );
 const sleep = require( 'await-sleep' );
-const debug = require( 'debug' )( 'wpde:services:docker' );
+const debug = require( 'debug' )( 'testpress:services:docker' );
 const { normalize } = require( 'path' );
 const csv = require( 'csvtojson' );
 
