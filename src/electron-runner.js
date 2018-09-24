@@ -91,9 +91,9 @@ const toggleWindow = () => {
 const showWindow = () => {
 	const trayBounds = tray.getBounds();
 
-	const positioner = new Positioner( window )
+	const positioner = new Positioner( window );
 
-	positioner.move( 'trayCenter', trayBounds );
+	positioner.move( 'trayRight', trayBounds );
 	window.show();
 	window.focus();
 };
