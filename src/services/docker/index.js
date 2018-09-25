@@ -1,8 +1,8 @@
 // Hazardous overrides some of the functions from "path" to make them work correctly when TestPress is packaged.
 require( 'hazardous' );
 
-const yaml = require( 'node-yaml' );
-const { copyFileSync, existsSync, renameSync } = require( 'fs' );
+const yaml = require( 'js-yaml' );
+const { copyFileSync, existsSync, renameSync, writeFileSync } = require( 'fs' );
 const { spawn } = require( 'promisify-child-process' );
 const process = require( 'process' );
 const { addAction, didAction } = require( '@wordpress/hooks' );
@@ -15,7 +15,10 @@ const { TOOLS_DIR } = require( '../constants' );
 const { preferences } = require( '../../preferences' );
 const { setStatus } = require( '../../utils/status' );
 
-let cwd = '';
+let cwds = {
+	'wordpress-folder': '',
+	'gutenberg-folder': '',
+};
 let port = 9999;
 
 const dockerEnv = {};
@@ -43,10 +46,13 @@ async function registerDockerJob() {
  */
 async function startDocker() {
 	debug( 'Preparing to start Docker' );
-	cwd = preferences.value( 'basic', 'wordpress-folder' );
+
+	cwds[ 'wordpress-folder' ] = preferences.value( 'basic', 'wordpress-folder' );
+	cwds[ 'gutenberg-folder' ] = preferences.value( 'basic', 'gutenberg-folder' );
+
 	port = preferences.value( 'site', 'port' ) || 9999;
 
-	if ( ! cwd || ! port ) {
+	if ( ! cwds[ 'wordpress-folder' ] || ! port ) {
 		debug( 'Bailing, preferences not set' );
 		return;
 	}
@@ -61,7 +67,7 @@ async function startDocker() {
 				],
 				volumes: [
 					'./default.conf:/etc/nginx/conf.d/default.conf',
-					normalize( cwd ) + ':/var/www',
+					normalize( cwds[ 'wordpress-folder' ] ) + ':/var/www',
 				],
 				links: [
 					'php',
@@ -70,7 +76,7 @@ async function startDocker() {
 			php: {
 				image: 'garypendergast/wordpress-develop-php',
 				volumes: [
-					normalize( cwd ) + ':/var/www',
+					normalize( cwds[ 'wordpress-folder' ] ) + ':/var/www',
 				],
 				links: [
 					'mysql',
@@ -79,7 +85,7 @@ async function startDocker() {
 			cli: {
 				image: 'wordpress:cli',
 				volumes: [
-					normalize( cwd ) + ':/var/www',
+					normalize( cwds[ 'wordpress-folder' ] ) + ':/var/www',
 				],
 			},
 			mysql: {
@@ -100,16 +106,31 @@ async function startDocker() {
 			phpunit: {
 				image: 'garypendergast/wordpress-develop-phpunit',
 				volumes: [
-					normalize( cwd ) + ':/wordpress-develop',
+					normalize( cwds[ 'wordpress-folder' ] ) + ':/wordpress-develop',
 				],
 			},
 		},
 		volumes: {
 			mysql: {},
 		},
-};
+	};
 
-	yaml.writeSync( normalize( TOOLS_DIR + '/docker-compose.yml' ), defaultOptions );
+	if ( cwds[ 'gutenberg-folder' ] ) {
+		const gutenbergVolume = normalize( cwds[ 'gutenberg-folder' ] ) + ':/var/www/build/wp-content/plugins/gutenberg';
+		defaultOptions.services[ 'wordpress-develop' ].volumes.push( gutenbergVolume );
+		defaultOptions.services.php.volumes.push( gutenbergVolume );
+		defaultOptions.services.cli.volumes.push( gutenbergVolume );
+		defaultOptions.services[ 'phpunit-gutenberg' ] = {
+			image: 'garypendergast/wordpress-develop-phpunit',
+			volumes: [
+				normalize( cwds[ 'wordpress-folder' ] ) + ':/wordpress-develop',
+				normalize( cwds[ 'gutenberg-folder' ] ) + ':/wordpress-develop/build/wp-content/plugins/gutenberg',
+			],
+		};
+	}
+
+	const yamlString = yaml.safeDump( defaultOptions, { lineWidth: -1 } );
+	writeFileSync( normalize( TOOLS_DIR + '/docker-compose.yml' ), yamlString );
 
 	copyFileSync( normalize( __dirname + '/default.conf' ), normalize( TOOLS_DIR + '/default.conf' ) );
 
