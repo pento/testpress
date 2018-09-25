@@ -18,6 +18,7 @@ class Preferences {
 		this.defaults = {
 			basic: {
 				'wordpress-folder': '',
+				'gutenberg-folder': '',
 			},
 			site: {
 				port: 9999,

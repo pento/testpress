@@ -12,7 +12,10 @@ class PreferencesPanel extends Component {
 		const preferences = ipcRenderer.sendSync( 'getPreferences' );
 
 		this.state = {
-			directory: preferences.basic[ 'wordpress-folder' ],
+			directory: {
+				wordpress: preferences.basic[ 'wordpress-folder' ],
+				gutenberg: preferences.basic[ 'gutenberg-folder' ],
+			},
 			port: preferences.site.port,
 			editedPort: preferences.site.port,
 		};
@@ -22,22 +25,25 @@ class PreferencesPanel extends Component {
 		this.portChanged = this.portChanged.bind( this );
 	}
 
-	showDirectorySelect() {
+	showDirectorySelect( name ) {
 		remote.dialog.showOpenDialog( {
-				title: "Select WordPress Folder",
+				title: `Select ${ name } Folder`,
 				properties: [
 					'openDirectory',
 				],
 			},
-			this.directorySelected );
+			( paths ) => this.directorySelected( paths, name ) );
 	}
 
-	directorySelected( paths ) {
+	directorySelected( paths, name ) {
 		const directory = paths ? paths.shift() : '';
+		const preference = name.toLowerCase() + '-folder';
 
-		if ( directory && directory !== this.state.directory ) {
-			this.setState( { directory } );
-			ipcRenderer.send( 'updatePreference', 'basic', 'wordpress-folder', directory );
+		if ( directory && directory !== this.state.directory[ name.toLowerCase() ] ) {
+			const directoryState = this.state.directory;
+			directoryState[ name.toLowerCase() ] = directory;
+			this.setState( { directory: directoryState } );
+			ipcRenderer.send( 'updatePreference', 'basic', preference, directory );
 		}
 	}
 
@@ -53,16 +59,22 @@ class PreferencesPanel extends Component {
 	render() {
 		const { directory, editedPort } = this.state;
 
-		const dirLabel = directory ? directory : 'No folder selected';
-
 		const tabs = {
 			Basic: (
 				<div>
-					<label htmlFor="preferences-folder">Folder:</label>
-					{ dirLabel }
+					<label htmlFor="preferences-wordpress-folder">WordPress Folder:</label>
+					{ directory.wordpress ? directory.wordpress : 'No folder selected' }
 					<button
-						id="preferences-folder"
-						onClick={ this.showDirectorySelect }
+						id="preferences-wordpress-folder"
+						onClick={ () => this.showDirectorySelect( 'WordPress' ) }
+					>
+						{ 'Choose a folder' }
+					</button>
+					<label htmlFor="preferences-gutenberg-folder">Gutenberg Folder:</label>
+					{ directory.gutenberg ? directory.gutenberg : 'No folder selected' }
+					<button
+						id="preferences-gutenberg-folder"
+						onClick={ () => this.showDirectorySelect( 'Gutenberg' ) }
 					>
 						{ 'Choose a folder' }
 					</button>
