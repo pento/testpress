@@ -9,81 +9,129 @@ const debug = require( 'debug' )( 'testpress:services:npm-watcher' );
 const { NPM_CACHE_DIR, NODE_BIN, NPM_BIN } = require( '../constants.js' );
 const { preferences } = require( '../../preferences' );
 
-let installProcess = null;
-let cwd = '';
+let installProcesses = {
+	'wordpress-folder': null,
+	'gutenberg-folder': null,
+};
+let devProcess = null;
+let cwds = {
+	'wordpress-folder': '',
+	'gutenberg-folder': '',
+};
 
 /**
  * Registers a watcher for when NPM needs to run on the WordPress install.
  */
 function registerNPMJob() {
 	debug( 'Registering job' );
-	addAction( 'updated_node_and_npm', 'runNPMInstall', runNPMInstall );
 	addAction( 'preference_saved', 'preferenceSaved', preferenceSaved, 10 );
+	addAction( 'npm_install_finished', 'runNPMDev', runNPMDev );
+	addAction( 'shutdown', 'shutdown', shutdown );
 
-	cwd = preferences.value( 'basic', 'wordpress-folder' );
-	if ( ! cwd ) {
-		return;
-	}
+	Object.keys( cwds ).forEach( ( folderPref ) => {
+		addAction( 'updated_node_and_npm', 'runNPMInstall', () => runNPMInstall( folderPref ) );
 
-	const packageJson = normalize( cwd + '/package.json' );
+		cwds[ folderPref ] = preferences.value( 'basic', folderPref );
+		if ( ! cwds[ folderPref ] ) {
+			return;
+		}
 
-	if ( existsSync( packageJson ) ) {
-		debug( 'Registering package.json watcher' );
-		watch( packageJson ).on( 'change', () => {
-			debug( 'package.json change detected' );
-			runNPMInstall();
-		 } );
-	}
+		const packageJson = normalize( cwds[ folderPref ] + '/package.json' );
+
+		if ( existsSync( packageJson ) ) {
+			debug( '(%s) Registering package.json watcher', folderPref );
+			watch( packageJson ).on( 'change', () => {
+				debug( '(%s) package.json change detected', folderPref );
+				runNPMInstall( folderPref );
+			 } );
+		}
+	} );
 }
 
 /**
  * If the WordPress folder is defined, run `npm install` in it.
  */
-function runNPMInstall() {
-	debug( 'Preparing for `npm install`' );
-	if ( installProcess ) {
-		debug( 'Ending previous `npm install` process' );
-		installProcess.kill();
-		installProcess = null;
+function runNPMInstall( folderPref ) {
+	debug( '(%s) Preparing for `npm install`', folderPref );
+	if ( installProcesses[ folderPref ] ) {
+		debug( '(%s) Ending previous `npm install` process', folderPref );
+		installProcesses[ folderPref ].kill();
+		installProcesses[ folderPref ] = null;
 	}
 
 	if ( ! didAction( 'updated_node_and_npm' ) ) {
-		debug( "Bailing, node hasn't finished installing" );
+		debug( "(%s) Bailing, node hasn't finished installing", folderPref );
 		return;
 	}
 
-	if ( ! cwd ) {
-		debug( "Bailing, WordPress folder isn't set" );
+	if ( ! cwds[ folderPref ] ) {
+		debug( "(%s) Bailing, folder isn't set", folderPref );
 		return;
 	}
 
 	if ( ! existsSync( NPM_CACHE_DIR ) ) {
-		debug( 'Creating npm cache directory %s', NPM_CACHE_DIR );
+		debug( '(%s) Creating npm cache directory %s', folderPref, NPM_CACHE_DIR );
 		mkdirSync( NPM_CACHE_DIR );
 	}
 
-	debug( 'Starting `npm install`' );
-	installProcess = spawn( NODE_BIN, [
+	debug( '(%s) Starting `npm install`', folderPref );
+	installProcesses[ folderPref ] = spawn( NODE_BIN, [
 		NPM_BIN,
 		'install',
 		'--scripts-prepend-node-path=true'
 	], {
-		cwd,
+		cwd: cwds[ folderPref ],
 		env: {
 			npm_config_cache: NPM_CACHE_DIR,
 			PATH: process.env.PATH,
 		},
 	} );
 
-	installProcess.stderr.on( 'data', ( data ) => debug( '`npm install` error: %s', data ) );
+	installProcesses[ folderPref ].stderr.on( 'data', ( data ) => {
+		debug( '(%s) `npm install` error: %s', folderPref, data );
+	} );
 
-	installProcess.on( 'exit', ( code ) => {
+	installProcesses[ folderPref ].on( 'exit', ( code ) => {
 		if ( 0 !== code ) {
-			debug( '`npm install` finished with an error' );
+			debug( '(%s) `npm install` finished with an error', folderPref );
 			return;
 		}
-		debug( '`npm install` finished' );
-		doAction( 'npm_install_finished' );
+		debug( '(%s) `npm install` finished', folderPref );
+		doAction( 'npm_install_finished', folderPref );
+	} );
+}
+
+function runNPMDev( folderPref ) {
+	if ( 'gutenberg-folder' !== folderPref ) {
+		return;
+	}
+
+	debug( 'Preparing to run `npm run dev`' );
+
+	if ( devProcess ) {
+		debug( 'Ending previous `npm run dev` process' );
+		devProcess.kill();
+		devProcess = null;
+	}
+
+	if ( ! didAction( 'npm_install_finished' ) ) {
+		debug( "Bailing, `npm install` isn't finished" );
+		return;
+	}
+
+	if ( ! cwds[ 'gutenberg-folder' ] ) {
+		debug( "Bailing, Gutenberg folder isn't set" );
+		return;
+	}
+
+	debug( 'Starting `npm run dev`' );
+	devProcess = spawn( NODE_BIN, [
+		NPM_BIN,
+		'run',
+		'dev',
+	], {
+		cwd: cwds[ 'gutenberg-folder' ],
+		env: {},
 	} );
 }
 
@@ -95,19 +143,35 @@ function runNPMInstall() {
  * @param {*}      value      The value that the preference has been changed to.
  */
 function preferenceSaved( section, preference, value ) {
-	if ( section !== 'basic' || preference !== 'wordpress-folder' ) {
+	if ( section !== 'basic' || ( preference !== 'wordpress-folder' && preference !== 'gutenberg-folder' ) ) {
 		return;
 	}
 
-	if ( value === cwd ) {
+	if ( value === cwds[ preference ] ) {
 		return;
 	}
 
-	debug( 'WordPress folder updated' );
+	debug( `${ preference } updated` );
 
-	cwd = value;
+	cwds[ preference ] = value;
 
-	runNPMInstall();
+	if ( 'gutenberg-folder' === preference && devProcess ) {
+		devProcess.kill();
+		devProcess = null;
+	}
+
+	runNPMInstall( preference );
+}
+
+/**
+ * Shutdown handler, to ensure the Gutenberg watcher is stopped.
+ */
+function shutdown() {
+	debug( 'Shutdown, stopping `npm run dev` process' );
+	if ( devProcess ) {
+		devProcess.kill();
+		devProcess = null;
+	}
 }
 
 module.exports = {

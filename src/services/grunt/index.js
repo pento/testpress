@@ -43,7 +43,12 @@ function registerGruntJob() {
 /**
  * If the WordPress folder is defined, run `grunt watch` on it.
  */
-function runGruntWatch() {
+function runGruntWatch( folderPref = '' ) {
+	// We only need to run `grunt watch` on WordPress folder updates.
+	if ( folderPref && 'wordpress-folder' !== folderPref ) {
+		return;
+	}
+
 	debug( 'Preparing to run `grunt watch`' );
 
 	if ( watchProcess ) {
