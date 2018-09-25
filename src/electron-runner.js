@@ -93,6 +93,8 @@ const showWindow = () => {
 
 	const positioner = new Positioner( window );
 
+	debug( { trayBounds } );
+
 	positioner.move( 'trayRight', trayBounds );
 	window.show();
 	window.focus();
