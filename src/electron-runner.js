@@ -53,6 +53,7 @@ function createWindow() {
 		resizable: false,
 		transparent: true,
 		skipTaskbar: true,
+		alwaysOnTop: true,
 		webPreferences: {
 			// Prevents renderer process code from not running when window is hidden
 			backgroundThrottling: false,
