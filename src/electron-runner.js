@@ -1,4 +1,5 @@
-const { app, BrowserWindow, Tray, ipcMain } = require( 'electron' );
+const electron = require( 'electron' );
+const { app, BrowserWindow, Tray, ipcMain } = electron;
 const { doAction } = require( '@wordpress/hooks' );
 const path = require( 'path' );
 const url = require( 'url' );
@@ -32,14 +33,14 @@ const createTray = () => {
 	tray.on( 'right-click', toggleWindow );
 	tray.on( 'double-click', toggleWindow );
 	tray.on( 'click', ( event ) => {
-		toggleWindow();
-
-		// Show devtools when command clicked
-		if ( window.isVisible() && process.defaultApp && event.metaKey ) {
-			window.openDevTools( { mode: 'detach' } );
-		}
-	})
-  }
+		toggleWindow().then( () => {
+			// Show devtools when command clicked
+			if ( window.isVisible() && process.defaultApp && event.metaKey ) {
+				window.openDevTools( { mode: 'detach' } );
+			}
+		} );
+	} );
+};
 
 function createWindow() {
     // Create the browser window.
@@ -82,22 +83,39 @@ function createWindow() {
 
 const toggleWindow = () => {
 	if ( window.isVisible() ) {
-		window.hide();
+		return new Promise( ( resolve ) => {
+			window.hide();
+			resolve();
+		} );
 	} else {
-		showWindow();
+		return showWindow();
 	}
 };
 
 const showWindow = () => {
 	const trayBounds = tray.getBounds();
-
 	const positioner = new Positioner( window );
+	const activeDisplay = electron.screen.getDisplayMatching( trayBounds );
 
-	debug( { trayBounds } );
+	let position = 'trayCenter';
 
-	positioner.move( 'trayRight', trayBounds );
-	window.show();
-	window.focus();
+	// If the tray icon is too close to the edge of the screen, align the right edge
+	// of the window with the icon, instead of centering it.
+	if ( trayBounds.x > activeDisplay.bounds.x + activeDisplay.bounds.width - 175 ) {
+		trayBounds.x += 7;
+		position = 'trayRight';
+	}
+
+	const addClassScript =`
+	document.body.classList.remove( 'traycenter', 'trayright' );
+	document.body.classList.add( '${ position.toLowerCase() }' );
+	`;
+
+	return window.webContents.executeJavaScript( addClassScript ).then( () => {
+		positioner.move( position, trayBounds );
+		window.show();
+		window.focus();
+	} );
 };
 
 // This method will be called when Electron has finished

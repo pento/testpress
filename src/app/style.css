@@ -7,6 +7,10 @@
 	margin: 0 auto;
 }
 
+body.trayright .tray-pointer {
+	margin-right: 10px;
+}
+
 .testpress {
 	background-color: #fff;
 	color:#000;
