@@ -17,6 +17,7 @@
 		"debug": "4.0.1",
 		"decompress-zip": "0.3.1",
 		"electron-positioner": "4.1.0",
+		"electron-updater": "3.1.2",
 		"gridicons": "3.1.1",
 		"hasha": "3.0.0",
 		"hazardous": "0.3.0",
@@ -43,6 +44,7 @@
 		"react-start": "cross-env BROWSER=none NODE_ENV=development react-scripts start",
 		"pack": "electron-builder --dir",
 		"dist": "npm run build && electron-builder",
+		"publish": "npm run build && electron-builder --publish always",
 		"postinstall": "electron-builder install-app-deps"
 	},
 	"devDependencies": {
@@ -73,7 +75,8 @@
 				"LSEnvironment": {
 					"PATH": "/usr/local/bin:/usr/bin"
 				}
-			}
+			},
+			"publish": "github"
 		}
 	}
 }
