@@ -4,6 +4,8 @@ const { doAction } = require( '@wordpress/hooks' );
 const path = require( 'path' );
 const url = require( 'url' );
 const Positioner = require( 'electron-positioner' );
+const { autoUpdater } = require( 'electron-updater' );
+const schedule = require( 'node-schedule' );
 const { accessSync, mkdirSync } = require( 'fs' );
 const debug = require( 'debug' )( 'testpress:runner' );
 
@@ -123,6 +125,13 @@ const showWindow = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on( 'ready', () => {
+	const rule = new schedule.RecurrenceRule();
+	rule.hour = [ 8, 20 ];
+	rule.minute = 0;
+
+	schedule.scheduleJob( rule, autoUpdater.checkForUpdatesAndNotify );
+	autoUpdater.checkForUpdatesAndNotify();
+
 	createTray();
 	createWindow();
 	registerJobs();
