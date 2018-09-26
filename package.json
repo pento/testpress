@@ -44,6 +44,7 @@
 		"react-start": "cross-env BROWSER=none NODE_ENV=development react-scripts start",
 		"pack": "electron-builder --dir",
 		"dist": "npm run build && electron-builder",
+		"publish": "npm run build && electron-builder --publish always",
 		"postinstall": "electron-builder install-app-deps"
 	},
 	"devDependencies": {
@@ -74,7 +75,8 @@
 				"LSEnvironment": {
 					"PATH": "/usr/local/bin:/usr/bin"
 				}
-			}
+			},
+			"publish": "github"
 		}
 	}
 }
