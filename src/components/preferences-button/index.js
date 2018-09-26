@@ -20,7 +20,7 @@ class PreferencesButton extends Component {
 		this.menu.append( new MenuItem( {
 			label: 'Preferences...',
 			accelerator: preferencesShortcut,
-			click: this.props.togglePreferences,
+			click: () => { this.props.setActivePage( 1 ) },
 		} ) );
 
 		this.menu.append( new MenuItem( { type: 'separator'} ) );
@@ -30,13 +30,24 @@ class PreferencesButton extends Component {
 			accelerator: quitShortcut,
 			click: this.quit,
 		} ) );
+
+		this.buttonStyles = {
+			close: {
+				icon: 'cross',
+				text: 'Close Preferences',
+			},
+			preferences: {
+				icon: 'cog',
+				text: 'Preferences',
+			},
+		};
 	}
 
 	handleClick() {
-		const { togglePreferences, preferencesOpen } = this.props;
+		const { activePage, setActivePage } = this.props;
 
-		if ( preferencesOpen ) {
-			togglePreferences();
+		if ( activePage ) {
+			setActivePage( 0 );
 			return;
 		}
 
@@ -48,9 +59,9 @@ class PreferencesButton extends Component {
 	}
 
 	render() {
-		const { preferencesOpen } = this.props;
-		const icon = preferencesOpen ? 'cross' : 'cog';
-		const text = preferencesOpen ? 'Close Preferences' : 'Preferences';
+		const { activePage } = this.props;
+		const { icon, text } = this.buttonStyles[ activePage ? 'close' : 'preferences' ];
+
 		return (
 			<button
 				className="preferences-button"

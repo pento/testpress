@@ -27,6 +27,7 @@
 		"promisify-child-process": "2.0.0",
 		"react": "16.5.2",
 		"react-dom": "16.5.2",
+		"react-transition-group": "2.4.0",
 		"status-indicator": "1.0.9",
 		"tar": "4.4.6"
 	},
