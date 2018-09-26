@@ -30,7 +30,7 @@ class Pages extends Component {
 					pages.map( ( page, index ) => (
 						<CSSTransition
 							in={ index && index === activePage ? true : false }
-							timeout={ 3000 }
+							timeout={ 300 }
 							key={ "page" + index }
 							classNames="page"
 						>
