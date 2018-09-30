@@ -6,17 +6,32 @@ const url = require( 'url' );
 const Positioner = require( 'electron-positioner' );
 const { autoUpdater } = require( 'electron-updater' );
 const schedule = require( 'node-schedule' );
-const { accessSync, mkdirSync } = require( 'fs' );
+const { accessSync, mkdirSync, createWriteStream } = require( 'fs' );
+const intercept = require( 'intercept-stdout' );
+const stripColor = require( 'strip-color' );
+const { normalize } = require( 'path' );
+
+// We always want to capture debug info.
+if ( ! process.env.DEBUG ) {
+	process.env.DEBUG = 'testpress:*';
+}
+
 const debug = require( 'debug' )( 'testpress:runner' );
 
 // Check that the userData directory exists, and create it if needed.
 try {
 	accessSync( app.getPath( 'userData' ) );
-	debug( 'userData directory exists' );
 } catch ( err ) {
-	debug( "userData directory doesn't exist" );
 	mkdirSync( app.getPath( 'userData' ) );
 }
+
+const logFile = createWriteStream( normalize( app.getPath( 'userData' ) + '/debug.log' ), { flags: 'a' } );
+intercept( ( message ) => logFile.write( stripColor( message ) ) );
+
+logFile.write( "\n\n" );
+const started = new Date();
+debug( "TestPress started: %s", started.toUTCString() );
+logFile.write( "\n" );
 
 const { registerJobs } = require( './services' );
 const { setStatusWindow } = require( './utils/status' );
