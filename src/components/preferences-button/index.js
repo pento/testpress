@@ -18,6 +18,13 @@ class PreferencesButton extends Component {
 		const quitShortcut = process.platform === 'darwin' ? 'CmdOrCtrl+Q' : 'Alt+F4';
 
 		this.menu.append( new MenuItem( {
+			label: 'About TestPress',
+			click: () => { this.props.setActivePage( 2 ) },
+		} ) );
+
+		this.menu.append( new MenuItem( { type: 'separator'} ) );
+
+		this.menu.append( new MenuItem( {
 			label: 'Preferences...',
 			accelerator: preferencesShortcut,
 			click: () => { this.props.setActivePage( 1 ) },
