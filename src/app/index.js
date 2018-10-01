@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import Pages from '../components/pages';
 import PreferencesPanel from '../components/preferences-panel';
 import StatusPanel from '../components/status-panel';
+import AboutPanel from '../components/about-panel';
 
 import './style.css';
 
@@ -16,8 +17,11 @@ class TestPress extends Component {
 		}, {
 			heading: 'Preferences',
 			panel: ( <PreferencesPanel /> ),
+		}, {
+			heading: 'About TestPress',
+			panel: ( <AboutPanel /> ),
 		} ];
-	}
+}
 
 	render() {
 		return (
