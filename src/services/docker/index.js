@@ -274,9 +274,12 @@ async function installWordPress() {
 			'--dbhost=mysql',
 			'--path=/var/www/build' );
 
-		if ( existsSync( cwd + '/build/wp-config.php' ) ) {
+		if ( existsSync( normalize( cwds[ 'wordpress-folder' ] + '/build/wp-config.php' ) ) ) {
 			debug( 'Moving wp-config.php out of the build directory' );
-			renameSync( cwd + '/build/wp-config.php', cwd + '/wp-config.php' )
+			renameSync(
+				normalize( cwds[ 'wordpress-folder' ] + '/build/wp-config.php' ),
+				normalize( cwds[ 'wordpress-folder' ] + '/wp-config.php' )
+			);
 		}
 
 		debug( 'Adding debug options to wp-config.php' );
@@ -390,7 +393,11 @@ async function detectToolbox() {
 async function preferenceSaved( section, preference, value ) {
 	let changed = false;
 
-	if ( section === 'basic' && preference === 'wordpress-folder' && value !== cwd ) {
+	if ( section === 'basic' && preference === 'wordpress-folder' && value !== cwds[ 'wordpress-folder' ] ) {
+		changed = true;
+	}
+
+	if ( section === 'basic' && preference === 'gutenberg-folder' && value !== cwds[ 'gutenberg-folder' ] ) {
 		changed = true;
 	}
 
