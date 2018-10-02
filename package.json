@@ -75,7 +75,7 @@
 			"icon": "assets/icon.png",
 			"extendInfo": {
 				"LSEnvironment": {
-					"PATH": "/usr/local/bin:/usr/bin"
+					"PATH": "/usr/local/bin:/usr/bin:/bin"
 				}
 			},
 			"publish": "github"
