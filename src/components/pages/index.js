@@ -3,6 +3,7 @@
  */
 import React, { Component } from 'react';
 import { CSSTransition } from 'react-transition-group';
+import Gridicon from 'gridicons';
 
 /**
  * Internal dependencies
@@ -51,6 +52,15 @@ class Pages extends Component {
 										<h1 className="pages__page-title">
 											{ page.heading }
 										</h1>
+										{ activePage !== 3 &&
+											<button
+												className="patching-button"
+												onClick={ () => this.setActivePage( 3 ) }
+												title="Apply and upload patches"
+											>
+												<Gridicon icon="code" />
+											</button>
+										}
 										<PreferencesButton
 											activePage={ activePage }
 											setActivePage={ this.setActivePage }

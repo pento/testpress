@@ -10,6 +10,7 @@ import Pages from '../components/pages';
 import PreferencesPanel from '../components/preferences-panel';
 import StatusPanel from '../components/status-panel';
 import AboutPanel from '../components/about-panel';
+import PatchingPanel from '../components/patching-panel';
 
 import './style.scss';
 
@@ -26,6 +27,9 @@ class TestPress extends Component {
 		}, {
 			heading: 'About TestPress',
 			panel: ( <AboutPanel /> ),
+		}, {
+			heading: 'Patching',
+			panel: ( <PatchingPanel /> ),
 		} ];
 	}
 
