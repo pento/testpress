@@ -12,7 +12,7 @@ const DecompressZip = require( 'decompress-zip' );
 const { ARCHIVE_DIR, NODE_DIR, NODE_BIN, NPM_BIN } = require( '../constants' );
 const { fetch, fetchWrite } = require( '../../utils/network' );
 
-const NODE_URL = 'https://nodejs.org/dist/latest-carbon/';
+const NODE_URL = 'https://nodejs.org/dist/latest-dubnium/';
 
 const PLATFORM = ( 'win32' === process.platform ) ? 'win' : process.platform;
 const ARCH = ( 'x32' === process.arch ) ? 'x86' : process.arch;
