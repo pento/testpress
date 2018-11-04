@@ -116,7 +116,7 @@ async function startDocker() {
 	};
 
 	if ( cwds[ 'gutenberg-folder' ] ) {
-		const gutenbergVolume = normalize( cwds[ 'gutenberg-folder' ] ) + ':/var/www/build/wp-content/plugins/gutenberg';
+		const gutenbergVolume = normalize( cwds[ 'gutenberg-folder' ] ) + ':/var/www/src/wp-content/plugins/gutenberg';
 		defaultOptions.services[ 'wordpress-develop' ].volumes.push( gutenbergVolume );
 		defaultOptions.services.php.volumes.push( gutenbergVolume );
 		defaultOptions.services.cli.volumes.push( gutenbergVolume );
@@ -124,7 +124,7 @@ async function startDocker() {
 			image: 'garypendergast/wordpress-develop-phpunit',
 			volumes: [
 				normalize( cwds[ 'wordpress-folder' ] ) + ':/wordpress-develop',
-				normalize( cwds[ 'gutenberg-folder' ] ) + ':/wordpress-develop/build/wp-content/plugins/gutenberg',
+				normalize( cwds[ 'gutenberg-folder' ] ) + ':/wordpress-develop/src/wp-content/plugins/gutenberg',
 			],
 		};
 	}
