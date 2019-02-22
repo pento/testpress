@@ -76,6 +76,7 @@ async function startDocker() {
 			php: {
 				image: 'garypendergast/wordpress-develop-php',
 				volumes: [
+					'./php-config.ini:/usr/local/etc/php/conf.d/php-config.ini',
 					normalize( cwds[ 'wordpress-folder' ] ) + ':/var/www',
 				],
 				links: [
