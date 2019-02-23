@@ -81,6 +81,7 @@ function runNPMInstall( folderPref ) {
 		'--scripts-prepend-node-path=true'
 	], {
 		cwd: cwds[ folderPref ],
+		encoding: 'utf8',
 		env: {
 			npm_config_cache: NPM_CACHE_DIR,
 			PATH: process.env.PATH,
@@ -131,6 +132,7 @@ function runNPMDev( folderPref ) {
 		'dev',
 	], {
 		cwd: cwds[ 'gutenberg-folder' ],
+		encoding: 'utf8',
 		env: {},
 	} );
 }

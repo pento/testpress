@@ -75,6 +75,7 @@ function runGruntWatch( folderPref = '' ) {
 		'watch',
 	], {
 		cwd,
+		encoding: 'utf8',
 		env: {},
 	} );
 

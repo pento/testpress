@@ -215,6 +215,7 @@ async function startDockerMachine() {
 		'cmd',
 	], {
 		cwd: TOOLS_DIR,
+		encoding: 'utf8',
 		env: {
 			PATH: process.env.PATH,
 		},
@@ -250,6 +251,7 @@ async function installWordPress() {
 			'tools_mysql_1',
 		], {
 			cwd: TOOLS_DIR,
+			encoding: 'utf8',
 			env: {
 				PATH: process.env.PATH,
 				...dockerEnv,
@@ -326,6 +328,7 @@ function runCLICommand( ...args ) {
 			...args,
 		], {
 		cwd: TOOLS_DIR,
+		encoding: 'utf8',
 		env: {
 			PATH: process.env.PATH,
 			...dockerEnv,
@@ -350,10 +353,12 @@ async function detectToolbox() {
 			'/FO',
 			'CSV',
 		], {
-		env: {
-			PATH: process.env.PATH,
-		},
-	} );
+			encoding: 'utf8',
+			env: {
+				PATH: process.env.PATH,
+			},
+		}
+	);
 
 	const info = ( await csv().fromString( stdout.toString() ) )[ 0 ];
 
