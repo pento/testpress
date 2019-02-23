@@ -26,7 +26,7 @@ class PreferencesPanel extends Component {
 	}
 
 	showDirectorySelect( name ) {
-		remote.dialog.showOpenDialog( {
+		remote.dialog.showOpenDialog( remote.BrowserWindow.getFocusedWindow(), {
 				title: `Select ${ name } Folder`,
 				properties: [
 					'openDirectory',
