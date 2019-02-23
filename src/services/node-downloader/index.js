@@ -132,7 +132,7 @@ async function getLocalVersion() {
 		return false;
 	}
 
-	const versionInfo = await spawn( NODE_BIN, [ '-v' ] );
+	const versionInfo = await spawn( NODE_BIN, [ '-v' ], { encoding: 'utf8' } );
 
 	return versionInfo.stdout.toString().replace( 'v', '' ).trim();
 }
