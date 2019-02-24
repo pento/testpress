@@ -144,7 +144,7 @@ app.on( 'ready', () => {
 	rule.hour = [ 8, 20 ];
 	rule.minute = 0;
 
-	schedule.scheduleJob( rule, autoUpdater.checkForUpdatesAndNotify );
+	schedule.scheduleJob( rule, autoUpdater.checkForUpdatesAndNotify.bind( autoUpdater ) );
 	autoUpdater.checkForUpdatesAndNotify();
 
 	createTray();
