@@ -107,6 +107,7 @@ async function startDocker() {
 			phpunit: {
 				image: 'garypendergast/wordpress-develop-phpunit',
 				volumes: [
+					'./phpunit-config.ini:/usr/local/etc/php/conf.d/phpunit-config.ini',
 					normalize( cwds[ 'wordpress-folder' ] ) + ':/wordpress-develop',
 				],
 			},
