@@ -109,11 +109,13 @@ async function startDocker() {
 				volumes: [
 					'./phpunit-config.ini:/usr/local/etc/php/conf.d/phpunit-config.ini',
 					normalize( cwds[ 'wordpress-folder' ] ) + ':/wordpress-develop',
+					'phpunit-uploads:/wordpress-develop/src/wp-content/uploads',
 				],
 			},
 		},
 		volumes: {
 			mysql: {},
+			'phpunit-uploads': {},
 		},
 	};
 
