@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import Pages from '../components/pages';
 import PreferencesPanel from '../components/preferences-panel';
+import TestPanel from '../components/test-panel';
 import StatusPanel from '../components/status-panel';
 import AboutPanel from '../components/about-panel';
 
@@ -14,6 +15,9 @@ class TestPress extends Component {
 		this.pages = [ {
 			heading: 'Welcome to TestPress',
 			panel: ( <StatusPanel /> ),
+		}, {
+			heading: 'Tests',
+			panel: ( <TestPanel /> ),
 		}, {
 			heading: 'Preferences',
 			panel: ( <PreferencesPanel /> ),

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { CSSTransition } from 'react-transition-group';
+import Gridicon from 'gridicons';
 
 import PreferencesButton from '../preferences-button';
 
@@ -45,6 +46,15 @@ class Pages extends Component {
 											</svg>
 											<span>{ page.heading }</span>
 										</h1>
+										{ activePage !== 1 &&
+											<button
+												className="test-button"
+												onClick={ () => this.setActivePage( 1 ) }
+												title="Run unit tests."
+											>
+												<Gridicon icon="checkmark" />
+											</button>
+										}
 										<PreferencesButton
 											activePage={ activePage }
 											setActivePage={ this.setActivePage }
