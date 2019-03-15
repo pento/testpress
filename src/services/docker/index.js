@@ -58,7 +58,7 @@ async function startDocker() {
 	}
 
 	const defaultOptions = {
-		version: '3',
+		version: '3.7',
 		services: {
 			'wordpress-develop': {
 				image: 'nginx:alpine',
@@ -111,6 +111,7 @@ async function startDocker() {
 					normalize( cwds[ 'wordpress-folder' ] ) + ':/wordpress-develop',
 					'phpunit-uploads:/wordpress-develop/src/wp-content/uploads',
 				],
+				init: true,
 			},
 		},
 		volumes: {
