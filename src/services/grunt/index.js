@@ -73,6 +73,7 @@ function runGruntWatch( folderPref = '' ) {
 	watchProcess = spawn( NODE_BIN, [
 		grunt,
 		'watch',
+		'--dev',
 	], {
 		cwd,
 		encoding: 'utf8',
