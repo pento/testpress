@@ -1,5 +1,11 @@
+/**
+ * External dependencies
+ */
 import React, { Component } from 'react';
 
+/**
+ * Internal dependencies
+ */
 import './style.css';
 
 class PatchingPanel extends Component {
