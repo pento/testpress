@@ -168,7 +168,7 @@ async function startDocker() {
 			PATH: process.env.PATH,
 			...dockerEnv,
 		},
-	} ).catch( ( error ) => debug( error.stderr.toString() ) );
+	} ).catch( ( { stderr } ) => debug( stderr ) );
 
 	debug( 'Docker containers started' );
 
@@ -194,7 +194,7 @@ async function startDockerMachine() {
 		env: {
 			PATH: process.env.PATH,
 		},
-	} ).catch( ( error ) => debug( error.stderr.toString() ) );
+	} ).catch( ( { stderr } ) => debug( stderr ) );
 
 	const vboxManage = normalize( process.env.VBOX_MSI_INSTALL_PATH + '/VBoxManage' );
 
@@ -212,7 +212,7 @@ async function startDockerMachine() {
 			PATH: process.env.PATH,
 		},
 		shell: true,
-	} ).catch( ( error ) => debug( error.stderr.toString() ) );
+	} ).catch( ( { stderr } ) => debug( stderr ) );
 
 	await spawn( '"' + vboxManage + '"', [
 		'controlvm',
@@ -226,7 +226,7 @@ async function startDockerMachine() {
 			PATH: process.env.PATH,
 		},
 		shell: true,
-	} ).catch( ( error ) => debug( error.stderr.toString() ) );
+	} ).catch( ( { stderr } ) => debug( stderr ) );
 
 	debug( 'Collecting docker environment info' );
 	const { stdout } = await spawn( 'docker-machine', [
@@ -240,9 +240,9 @@ async function startDockerMachine() {
 		env: {
 			PATH: process.env.PATH,
 		},
-	} ).catch( ( error ) => debug( error.stderr.toString() ) );
+	} ).catch( ( { stderr } ) => debug( stderr ) );
 
-	stdout.toString().split( '\n' ).forEach( ( line ) => {
+	stdout.split( '\n' ).forEach( ( line ) => {
 		// Environment info is in the form: SET ENV_VAR=value
 		if ( ! line.startsWith( 'SET' ) ) {
 			return;
@@ -279,7 +279,7 @@ async function installWordPress() {
 			},
 		} );
 
-		if ( stdout.toString().trim() === '"healthy"' ) {
+		if ( stdout.trim() === '"healthy"' ) {
 			break;
 		}
 
@@ -360,9 +360,8 @@ function runCLICommand( ...args ) {
 		},
 	} )
 		.then( () => true )
-		.catch( ( { stdout, stderr } ) => {
-			debug( stdout.toString().trim() );
-			debug( stderr.toString().trim() );
+		.catch( ( { stderr } ) => {
+			debug( stderr.trim() );
 			return false;
 		} );
 }
@@ -386,7 +385,7 @@ async function detectToolbox() {
 	}
 	);
 
-	const info = ( await csv().fromString( stdout.toString() ) )[ 0 ];
+	const info = ( await csv().fromString( stdout ) )[ 0 ];
 
 	if ( ! info[ 'OS Name' ].includes( 'Pro' ) ) {
 		debug( 'Not running Windows Pro' );
