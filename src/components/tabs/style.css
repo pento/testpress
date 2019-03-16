@@ -1,34 +1,34 @@
-.tabs-headings {
+.tabs__headings {
 	padding: 20px 15px 10px;
 	border-bottom: 1px solid #ccc;
 	color: #82878c;
 }
 
-.tabs-headings span {
+.tabs__heading {
 	margin-right: 20px;
 	padding-bottom: 10px;
 	cursor: pointer;
 }
 
-.tabs-headings span.active {
+.tabs__heading--active {
 	color: #000;
 	border-bottom: 3px solid #377eb6;
 }
 
-.tabs-pages {
+.tabs__pages {
 	padding: 20px 15px;
 	color: #82878c;
 }
 
-.tabs-pages div.active {
+.tabs__page--active {
 	display: block;
 }
 
-.tabs-pages div.inactive {
+.tabs__page--inactive {
 	display: none;
 }
 
-.tabs-pages button {
+.tabs__pages button {
 	border: none;
 	color: #377eb6;
 	text-decoration: underline;
@@ -40,24 +40,24 @@
 	padding: 0;
 }
 
-.tabs-pages label {
+.tabs__pages label {
 	display: block;
 	margin: 10px 0;
 	color: #000;
 }
 
-.tabs-pages .page-site label {
+.tabs__page-site label {
 	display: inline-block;
 	margin-right: 10px;
 }
 
-.tabs-pages input {
+.tabs__pages input {
 	padding: 5px 10px;
 	background-color: #f6f6f6;
 	border: 1px solid #e8e8e8;
 	border-radius: 3px;
 }
 
-.tabs-pages input.shortinput {
+.tabs__pages input.shortinput {
 	width: 50px;
 }
