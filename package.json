@@ -66,9 +66,11 @@
 		"dist": "npm run build && electron-builder",
 		"publish": "npm run build && electron-builder --publish always",
 		"postinstall": "electron-builder install-app-deps",
-		"lint:css": "wp-scripts lint-style '**/*.css'",
-		"lint:js": "wp-scripts lint-js .",
-		"lint:pkg-json": "wp-scripts lint-pkg-json ."
+		"lint-css": "wp-scripts lint-style '**/*.css'",
+		"lint-css:fix": "npm run lint-css -- --fix",
+		"lint-js": "wp-scripts lint-js .",
+		"lint-js:fix": "npm run lint-js -- --fix",
+		"lint-pkg-json": "wp-scripts lint-pkg-json ."
 	},
 	"build": {
 		"appId": "org.wordpress.testpress",
@@ -109,5 +111,11 @@
 		"hooks": {
 			"pre-commit": "lint-staged"
 		}
-	}
+	},
+	"browserslist": [
+		">0.2%",
+		"not dead",
+		"not ie <= 11",
+		"not op_mini all"
+	]
 }
