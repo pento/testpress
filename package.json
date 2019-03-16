@@ -95,7 +95,7 @@
 		}
 	},
 	"lint-staged": {
-		"packages/*/package.json": [
+		"package.json": [
 			"wp-scripts lint-pkg-json"
 		],
 		"*.scss": [
