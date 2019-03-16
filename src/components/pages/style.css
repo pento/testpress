@@ -27,3 +27,13 @@
 	transition: 300ms;
 	left: 350px;
 }
+
+.test-button {
+	border: none;
+	background: none;
+	cursor: pointer;
+}
+
+.test-button .gridicon {
+	fill: #82878C;
+}
