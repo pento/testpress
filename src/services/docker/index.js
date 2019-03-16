@@ -83,12 +83,6 @@ async function startDocker() {
 					'mysql',
 				],
 			},
-			cli: {
-				image: 'wordpress:cli',
-				volumes: [
-					normalize( cwds[ 'wordpress-folder' ] ) + ':/var/www',
-				],
-			},
 			mysql: {
 				image: 'mysql:5.7',
 				environment: {
@@ -104,6 +98,21 @@ async function startDocker() {
 					'mysql:/var/lib/mysql',
 				],
 			},
+		},
+		volumes: {
+			mysql: {},
+		},
+	};
+
+	const scriptOptions = {
+		version: '3.7',
+		services: {
+			cli: {
+				image: 'wordpress:cli',
+				volumes: [
+					normalize( cwds[ 'wordpress-folder' ] ) + ':/var/www',
+				],
+			},
 			phpunit: {
 				image: 'garypendergast/wordpress-develop-phpunit',
 				volumes: [
@@ -115,7 +124,6 @@ async function startDocker() {
 			},
 		},
 		volumes: {
-			mysql: {},
 			'phpunit-uploads': {},
 		},
 	};
@@ -124,8 +132,9 @@ async function startDocker() {
 		const gutenbergVolume = normalize( cwds[ 'gutenberg-folder' ] ) + ':/var/www/src/wp-content/plugins/gutenberg';
 		defaultOptions.services[ 'wordpress-develop' ].volumes.push( gutenbergVolume );
 		defaultOptions.services.php.volumes.push( gutenbergVolume );
-		defaultOptions.services.cli.volumes.push( gutenbergVolume );
-		defaultOptions.services[ 'phpunit-gutenberg' ] = {
+
+		scriptOptions.services.cli.volumes.push( gutenbergVolume );
+		scriptOptions.services[ 'phpunit-gutenberg' ] = {
 			image: 'garypendergast/wordpress-develop-phpunit',
 			volumes: [
 				normalize( cwds[ 'wordpress-folder' ] ) + ':/wordpress-develop',
@@ -134,8 +143,11 @@ async function startDocker() {
 		};
 	}
 
-	const yamlString = yaml.safeDump( defaultOptions, { lineWidth: -1 } );
-	writeFileSync( normalize( TOOLS_DIR + '/docker-compose.yml' ), yamlString );
+	const defaultOptionsYaml = yaml.safeDump( defaultOptions, { lineWidth: -1 } );
+	writeFileSync( normalize( TOOLS_DIR + '/docker-compose.yml' ), defaultOptionsYaml );
+
+	const scriptOptionsYaml = yaml.safeDump( scriptOptions, { lineWidth: -1 } );
+	writeFileSync( normalize( TOOLS_DIR + '/docker-compose.scripts.yml' ), scriptOptionsYaml );
 
 	copyFileSync( normalize( __dirname + '/default.conf' ), normalize( TOOLS_DIR + '/default.conf' ) );
 
@@ -145,15 +157,18 @@ async function startDocker() {
 
 	debug( 'Starting docker containers' );
 	await spawn( 'docker-compose', [
+		'-f',
+		'docker-compose.yml',
 		'up',
 		'-d',
 	], {
 		cwd: TOOLS_DIR,
+		encoding: 'utf8',
 		env: {
 			PATH: process.env.PATH,
 			...dockerEnv,
 		},
-	} ).catch( ( error ) => debug( error.stderr.toString() ) );
+	} ).catch( ( { stderr } ) => debug( stderr ) );
 
 	debug( 'Docker containers started' );
 
@@ -179,7 +194,7 @@ async function startDockerMachine() {
 		env: {
 			PATH: process.env.PATH,
 		},
-	} ).catch( ( error ) => debug( error.stderr.toString() ) );
+	} ).catch( ( { stderr } ) => debug( stderr ) );
 
 	const vboxManage = normalize( process.env.VBOX_MSI_INSTALL_PATH + '/VBoxManage' );
 
@@ -192,11 +207,12 @@ async function startDockerMachine() {
 		'wphttp',
 	], {
 		cwd: TOOLS_DIR,
+		encoding: 'utf8',
 		env: {
 			PATH: process.env.PATH,
 		},
 		shell: true,
-	} ).catch( ( error ) => debug( error.stderr.toString() ) );
+	} ).catch( ( { stderr } ) => debug( stderr ) );
 
 	await spawn( '"' + vboxManage + '"', [
 		'controlvm',
@@ -205,11 +221,12 @@ async function startDockerMachine() {
 		'wphttp,tcp,127.0.0.1,' + port + ',,' + port,
 	], {
 		cwd: TOOLS_DIR,
+		encoding: 'utf8',
 		env: {
 			PATH: process.env.PATH,
 		},
 		shell: true,
-	} ).catch( ( error ) => debug( error.stderr.toString() ) );
+	} ).catch( ( { stderr } ) => debug( stderr ) );
 
 	debug( 'Collecting docker environment info' );
 	const { stdout } = await spawn( 'docker-machine', [
@@ -223,9 +240,9 @@ async function startDockerMachine() {
 		env: {
 			PATH: process.env.PATH,
 		},
-	} ).catch( ( error ) => debug( error.stderr.toString() ) );
+	} ).catch( ( { stderr } ) => debug( stderr ) );
 
-	stdout.toString().split( '\n' ).forEach( ( line ) => {
+	stdout.split( '\n' ).forEach( ( line ) => {
 		// Environment info is in the form: SET ENV_VAR=value
 		if ( ! line.startsWith( 'SET' ) ) {
 			return;
@@ -262,7 +279,7 @@ async function installWordPress() {
 			},
 		} );
 
-		if ( stdout.toString().trim() === '"healthy"' ) {
+		if ( stdout.trim() === '"healthy"' ) {
 			break;
 		}
 
@@ -326,6 +343,10 @@ async function installWordPress() {
  */
 function runCLICommand( ...args ) {
 	return spawn( 'docker-compose', [
+		'-f',
+		'docker-compose.yml',
+		'-f',
+		'docker-compose.scripts.yml',
 		'run',
 		'--rm',
 		'cli',
@@ -339,8 +360,8 @@ function runCLICommand( ...args ) {
 		},
 	} )
 		.then( () => true )
-		.catch( ( { stdout, stderr } ) => {
-			debug( stderr.toString().trim() );
+		.catch( ( { stderr } ) => {
+			debug( stderr.trim() );
 			return false;
 		} );
 }
@@ -364,7 +385,7 @@ async function detectToolbox() {
 	}
 	);
 
-	const info = ( await csv().fromString( stdout.toString() ) )[ 0 ];
+	const info = ( await csv().fromString( stdout ) )[ 0 ];
 
 	if ( ! info[ 'OS Name' ].includes( 'Pro' ) ) {
 		debug( 'Not running Windows Pro' );
@@ -424,9 +445,12 @@ async function preferenceSaved( section, preference, value ) {
 	if ( existsSync( normalize( TOOLS_DIR + '/docker-compose.yml' ) ) ) {
 		debug( 'Stopping containers' );
 		await spawn( 'docker-compose', [
+			'-f',
+			'docker-compose.yml',
 			'down',
 		], {
 			cwd: TOOLS_DIR,
+			encoding: 'utf8',
 			env: {
 				PATH: process.env.PATH,
 				...dockerEnv,
@@ -443,9 +467,12 @@ async function preferenceSaved( section, preference, value ) {
 function shutdown() {
 	debug( 'Shutdown, stopping containers' );
 	spawn( 'docker-compose', [
+		'-f',
+		'docker-compose.yml',
 		'down',
 	], {
 		cwd: TOOLS_DIR,
+		encoding: 'utf8',
 		env: {
 			PATH: process.env.PATH,
 			...dockerEnv,
