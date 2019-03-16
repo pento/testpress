@@ -16,24 +16,3 @@ body.trayright .tray-pointer {
 	color: #000;
 	height: 340px;
 }
-
-.quit-button {
-	border: none;
-	background: none;
-	cursor: pointer;
-}
-
-.quit-button .gridicon {
-	fill: #82878c;
-}
-
-@keyframes testpress-logo-spin {
-
-	from {
-		transform: rotate(0deg);
-	}
-
-	to {
-		transform: rotate(360deg);
-	}
-}
