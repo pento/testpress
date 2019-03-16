@@ -60,7 +60,7 @@ class Pages extends Component {
 								</div>
 							) }
 						</CSSTransition>
-					 ) )
+					) )
 				}
 			</div>
 		);
