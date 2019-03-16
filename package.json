@@ -80,7 +80,8 @@
 		"appId": "org.wordpress.testpress",
 		"productName": "TestPress",
 		"asarUnpack": [
-			"src/services/docker/default.conf"
+			"src/services/docker/default.conf",
+			"src/services/grunt/testpress.user.js"
 		],
 		"extends": null,
 		"files": [

@@ -5,6 +5,7 @@ const { addAction, doAction, didAction } = require( '@wordpress/hooks' );
 const debug = require( 'debug' )( 'testpress:services:grunt' );
 const { normalize } = require( 'path' );
 const { createServer } = require( 'http' );
+const { createReadStream } = require( 'fs' );
 
 const { NODE_BIN } = require( '../constants.js' );
 const { preferences } = require( '../../preferences' );
@@ -146,20 +147,31 @@ function preferenceSaved( section, preference, value ) {
  * @param {ServerResponse}  response The response handler, for sending data back to the client.
  */
 function patchListener( request, response ) {
-	debug( 'Recieved a HTTP message.' );
+	debug( 'Received a HTTP request for %s.', request.url );
 
-	const chunks = [];
-	request.on( 'data', ( chunk ) => chunks.push( chunk ) );
-	request.on( 'end', () => {
-		const data = JSON.parse( Buffer.concat( chunks ).toString() );
-		debug( 'HTTP data: %o', data );
+	switch ( request.url ) {
+		case '/testpress.user.js':
+			response.writeHead( 200, { 'Content-Type': 'text/javascript' } );
+			createReadStream( __dirname + '/testpress.user.js' ).pipe( response );
 
-		runGruntPatch( data.ticket, data.filename );
+			break;
 
-		response.writeHead( 200, { 'Content-Type': 'text/json' } );
-		response.write( JSON.stringify( { success: true } ) );
-		response.end();
-	} );
+		case '/patch':
+			const chunks = [];
+			request.on( 'data', ( chunk ) => chunks.push( chunk ) );
+			request.on( 'end', () => {
+				const data = JSON.parse( Buffer.concat( chunks ).toString() );
+				debug( 'HTTP data: %o', data );
+
+				runGruntPatch( data.ticket, data.filename );
+
+				response.writeHead( 200, { 'Content-Type': 'text/json' } );
+				response.write( JSON.stringify( { success: true } ) );
+				response.end();
+			} );
+
+			break;
+	}
 }
 
 /**

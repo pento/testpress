@@ -4,6 +4,7 @@
 // @namespace    https://github.com/pento/testpress/
 // @version      0.1
 // @description  Helper functions that talk to the TestPress app.
+// @updateURL    http://localhost:21853/testpress.user.js
 // @author       The WordPress Contributors
 // @match        *://*.wordpress.org/*
 // @grant        GM_xmlhttpRequest
@@ -43,7 +44,7 @@
 
 		GM_xmlhttpRequest( {
 			method: 'POST',
-			url: 'http://localhost:21853',
+			url: 'http://localhost:21853/patch',
 			data: JSON.stringify( {
 				ticket,
 				filename,
