@@ -1,4 +1,10 @@
+/**
+ * External dependencies
+ */
 import React, { Component } from 'react';
+/**
+ * Internal dependencies
+ */
 import Tabs from '../tabs';
 
 import './style.css';
@@ -27,12 +33,12 @@ class PreferencesPanel extends Component {
 
 	showDirectorySelect( name ) {
 		remote.dialog.showOpenDialog( remote.BrowserWindow.getFocusedWindow(), {
-				title: `Select ${ name } Folder`,
-				properties: [
-					'openDirectory',
-				],
-			},
-			( paths ) => this.directorySelected( paths, name ) );
+			title: `Select ${ name } Folder`,
+			properties: [
+				'openDirectory',
+			],
+		},
+		( paths ) => this.directorySelected( paths, name ) );
 	}
 
 	directorySelected( paths, name ) {
@@ -88,11 +94,11 @@ class PreferencesPanel extends Component {
 						id="preferences-port"
 						className="shortinput"
 						value={ editedPort }
-						onChange= { event => this.setState( { editedPort: event.target.value } ) }
+						onChange={ ( event ) => this.setState( { editedPort: event.target.value } ) }
 						onBlur={ () => this.portChanged() }
 					/>
 				</div>
-			)
+			),
 		};
 
 		return (

@@ -1,5 +1,11 @@
+/**
+ * External dependencies
+ */
 import React, { Component } from 'react';
 
+/**
+ * Internal dependencies
+ */
 import Pages from '../components/pages';
 import PreferencesPanel from '../components/preferences-panel';
 import StatusPanel from '../components/status-panel';
@@ -21,7 +27,7 @@ class TestPress extends Component {
 			heading: 'About TestPress',
 			panel: ( <AboutPanel /> ),
 		} ];
-}
+	}
 
 	render() {
 		return (

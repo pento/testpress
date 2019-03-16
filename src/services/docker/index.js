@@ -15,7 +15,7 @@ const { TOOLS_DIR } = require( '../constants' );
 const { preferences } = require( '../../preferences' );
 const { setStatus } = require( '../../utils/status' );
 
-let cwds = {
+const cwds = {
 	'wordpress-folder': '',
 	'gutenberg-folder': '',
 };
@@ -102,7 +102,7 @@ async function startDocker() {
 				},
 				volumes: [
 					'mysql:/var/lib/mysql',
-				]
+				],
 			},
 			phpunit: {
 				image: 'garypendergast/wordpress-develop-phpunit',
@@ -225,11 +225,11 @@ async function startDockerMachine() {
 		},
 	} ).catch( ( error ) => debug( error.stderr.toString() ) );
 
-	stdout.toString().split( "\n" ).forEach( ( line ) => {
+	stdout.toString().split( '\n' ).forEach( ( line ) => {
 		// Environment info is in the form: SET ENV_VAR=value
 		if ( ! line.startsWith( 'SET' ) ) {
 			return;
-		};
+		}
 
 		const parts = line.trim().split( /[ =]/, 3 );
 		if ( 3 === parts.length ) {
@@ -321,16 +321,16 @@ async function installWordPress() {
 /**
  * Spawns a process to run a WP-CLI command in a Docker container.
  *
- * @param {...String} args The WP-CLI command and arguments to be run.
+ * @param {...string} args The WP-CLI command and arguments to be run.
  * @return Promise that resolves to true if the command succeeded, false if it failed.
  */
 function runCLICommand( ...args ) {
 	return spawn( 'docker-compose', [
-			'run',
-			'--rm',
-			'cli',
-			...args,
-		], {
+		'run',
+		'--rm',
+		'cli',
+		...args,
+	], {
 		cwd: TOOLS_DIR,
 		encoding: 'utf8',
 		env: {
@@ -338,30 +338,30 @@ function runCLICommand( ...args ) {
 			...dockerEnv,
 		},
 	} )
-	.then( () => true )
-	.catch( ( { stdout, stderr } ) => {
-		debug( stderr.toString().trim() );
-		return false;
-	} );
+		.then( () => true )
+		.catch( ( { stdout, stderr } ) => {
+			debug( stderr.toString().trim() );
+			return false;
+		} );
 }
 
 /**
  * Figure out if we're using Docker Toolbox or not. Uses Docker for Windows' version and Hyper-V
  * requirements as a baseline to determine whether Toolbox is being used.
  *
- * @returns {Boolean} true if Docker Toolbox is being used, false if it isn't.
+ * @return {boolean} true if Docker Toolbox is being used, false if it isn't.
  */
 async function detectToolbox() {
 	debug( 'Detecting if we should use Docker Toolbox or not' );
 	const { stdout } = await spawn( 'systeminfo', [
-			'/FO',
-			'CSV',
-		], {
-			encoding: 'utf8',
-			env: {
-				PATH: process.env.PATH,
-			},
-		}
+		'/FO',
+		'CSV',
+	], {
+		encoding: 'utf8',
+		env: {
+			PATH: process.env.PATH,
+		},
+	}
 	);
 
 	const info = ( await csv().fromString( stdout.toString() ) )[ 0 ];
@@ -371,12 +371,12 @@ async function detectToolbox() {
 		return true;
 	}
 
-	if ( info[ 'OS Version' ].match( /^\d+/ )[0] < 10 ) {
+	if ( info[ 'OS Version' ].match( /^\d+/ )[ 0 ] < 10 ) {
 		debug( 'Not running Windows 10' );
 		return true;
 	}
 
-	if ( info[ 'OS Version' ].match( /\d+$/ )[0] < 14393 ) {
+	if ( info[ 'OS Version' ].match( /\d+$/ )[ 0 ] < 14393 ) {
 		debug( 'Not running build 14393 or later' );
 		return true;
 	}
@@ -396,8 +396,8 @@ async function detectToolbox() {
 /**
  * Action handler for when preferences have been saved.
  *
- * @param {String} section    The preferences section that the saved preference is in.
- * @param {String} preference The preferences that has been saved.
+ * @param {string} section    The preferences section that the saved preference is in.
+ * @param {string} preference The preferences that has been saved.
  * @param {*}      value      The value that the preference has been changed to.
  */
 async function preferenceSaved( section, preference, value ) {

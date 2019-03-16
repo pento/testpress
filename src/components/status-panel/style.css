@@ -1,6 +1,6 @@
 .status-row {
 	padding: 15px;
-	border-bottom: 1px solid #cccccc;
+	border-bottom: 1px solid #ccc;
 	display: flex;
 	flex-direction: row;
 }
@@ -17,10 +17,10 @@ status-indicator {
 }
 
 .status-site {
-    background-color: #F6F6F6;
-    margin-left: 25px;
+	background-color: #f6f6f6;
+	margin-left: 25px;
 	padding: 5px 10px;
-	border: 1px solid #cccccc;
+	border: 1px solid #ccc;
 	color: #808080;
 	border-radius: 2px;
 	cursor: pointer;
@@ -28,7 +28,7 @@ status-indicator {
 }
 
 .status-site:hover {
-	background-color: #F0F0F0;
+	background-color: #f0f0f0;
 }
 
 .status-description {

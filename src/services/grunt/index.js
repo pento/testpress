@@ -37,7 +37,6 @@ function registerGruntJob() {
 			runGruntWatch();
 		 } );
 	}
-
 }
 
 /**
@@ -103,15 +102,14 @@ function runGruntWatch( folderPref = '' ) {
 			showedBuilding = true;
 			doAction( 'grunt_watch_first_run_finished' );
 		}
-
 	} );
 }
 
 /**
  * Action handler for when preferences have been saved.
  *
- * @param {String} section    The preferences section that the saved preference is in.
- * @param {String} preference The preferences that has been saved.
+ * @param {string} section    The preferences section that the saved preference is in.
+ * @param {string} preference The preferences that has been saved.
  * @param {*}      value      The value that the preference has been changed to.
  */
 function preferenceSaved( section, preference, value ) {

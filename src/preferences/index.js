@@ -10,8 +10,8 @@ class Preferences {
 		this.dataStore = path.resolve( app.getPath( 'userData' ), 'preferences.json' );
 		if ( ! existsSync( this.dataStore ) ) {
 			writeFileSync( this.dataStore, '{}', {
-					encoding: 'utf-8',
-				}
+				encoding: 'utf-8',
+			}
 			);
 		}
 
@@ -49,7 +49,7 @@ class Preferences {
 
 		Object.keys( this.defaults ).forEach( ( section ) => {
 			if ( ! this.preferences[ section ] ) {
-				debug( `Creating missing preferences section "${ section }"` )
+				debug( `Creating missing preferences section "${ section }"` );
 				this.preferences[ section ] = {};
 			}
 
@@ -70,21 +70,21 @@ class Preferences {
 	writePreferences() {
 		debug( 'Writing preferences to disk' );
 		writeFileSync( this.dataStore, JSON.stringify( this.preferences ), {
-				encoding: 'utf-8',
-			}
+			encoding: 'utf-8',
+		}
 		);
 	}
 
 	/**
 	 * Updates a preference value.
 	 *
-	 * @param {String} section    The preferences section to save the preference in.
-	 * @param {String} preference The preference to save.
+	 * @param {string} section    The preferences section to save the preference in.
+	 * @param {string} preference The preference to save.
 	 * @param {*}      value      The value of the preference.
 	 */
 	update( section, preference, value ) {
-		debug( `Updated preference "${ section }.${ preference }" to "${ value }"`)
-		this.preferences[ section ][ preference ]  = value;
+		debug( `Updated preference "${ section }.${ preference }" to "${ value }"` );
+		this.preferences[ section ][ preference ] = value;
 		this.writePreferences();
 
 		doAction( 'preference_saved', section, preference, value, this.preferences );
@@ -93,15 +93,15 @@ class Preferences {
 	/**
 	 * Get the value of a preference.
 	 *
-	 * @param {String} section    The preferences section that the preference is in.
-	 * @param {String} preference The preference to retrieve.
+	 * @param {string} section    The preferences section that the preference is in.
+	 * @param {string} preference The preference to retrieve.
 	 *
-	 * @returns The value of the preference.
+	 * @return The value of the preference.
 	 */
 	value( section, preference ) {
 		return this.preferences[ section ][ preference ];
 	}
-};
+}
 
 debug( 'Initialising preferences' );
 const preferences = new Preferences();

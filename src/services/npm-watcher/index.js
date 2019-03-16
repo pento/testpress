@@ -9,12 +9,12 @@ const debug = require( 'debug' )( 'testpress:services:npm-watcher' );
 const { NPM_CACHE_DIR, NODE_BIN, NPM_BIN } = require( '../constants.js' );
 const { preferences } = require( '../../preferences' );
 
-let installProcesses = {
+const installProcesses = {
 	'wordpress-folder': null,
 	'gutenberg-folder': null,
 };
 let devProcess = null;
-let cwds = {
+const cwds = {
 	'wordpress-folder': '',
 	'gutenberg-folder': '',
 };
@@ -78,7 +78,7 @@ function runNPMInstall( folderPref ) {
 	installProcesses[ folderPref ] = spawn( NODE_BIN, [
 		NPM_BIN,
 		'install',
-		'--scripts-prepend-node-path=true'
+		'--scripts-prepend-node-path=true',
 	], {
 		cwd: cwds[ folderPref ],
 		encoding: 'utf8',
@@ -140,8 +140,8 @@ function runNPMDev( folderPref ) {
 /**
  * Action handler for when preferences have been saved.
  *
- * @param {String} section    The preferences section that the saved preference is in.
- * @param {String} preference The preferences that has been saved.
+ * @param {string} section    The preferences section that the saved preference is in.
+ * @param {string} preference The preferences that has been saved.
  * @param {*}      value      The value that the preference has been changed to.
  */
 function preferenceSaved( section, preference, value ) {
