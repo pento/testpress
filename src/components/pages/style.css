@@ -4,7 +4,7 @@
 	overflow: hidden;
 }
 
-.pages .page {
+.pages__page {
 	height: 100%;
 	position: absolute;
 	left: 350px;
@@ -12,23 +12,23 @@
 	background: #fff;
 }
 
-.pages .page0,
-.pages .page-enter-done,
-.pages .page-exit {
+.pages__page.page0,
+.pages__page-transition-enter-done,
+.pages__page-transition-exit {
 	left: 0;
 }
 
-.pages .page-enter-active {
+.pages__page-transition-enter-active {
 	transition: 300ms;
 	left: 0;
 }
 
-.pages .page-exit-active {
+.pages__page-transition-exit-active {
 	transition: 300ms;
 	left: 350px;
 }
 
-.header {
+.pages__page-header {
 	height: 35px;
 	padding: 10px;
 	color: #82878c;
@@ -37,20 +37,20 @@
 	flex-direction: row;
 }
 
-.title {
+.pages__page-title {
 	margin: 0;
 	flex: auto;
 	display: flex;
 	flex-direction: row;
 }
 
-.logo {
+.pages__page-logo {
 	padding: 5px;
 	height: 25px;
 	fill: #82878c;
 }
 
-.title span {
+.pages__page-title span {
 	padding-left: 5px;
 	font-size: 18px;
 	font-weight: normal;
