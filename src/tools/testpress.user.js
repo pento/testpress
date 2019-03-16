@@ -16,6 +16,12 @@
 	const attachments = document.querySelectorAll( 'body.core.trac dl.attachments dt' );
 
 	attachments.forEach( ( attachment ) => {
+		const attachmentUrl = attachment.querySelector( 'a' ).href.split( '/' );
+		const filename = attachmentUrl.pop();
+
+		if ( ! filename.match( /\.(patch|diff)$/ ) ) {
+			return;
+		}
 		const openButton = document.createElement( 'button' );
 
 		openButton.innerHTML = 'Open';
@@ -24,6 +30,12 @@
 		attachment.insertBefore( openButton, attachment.firstChild );
 	} );
 
+	/**
+	 * When the user clicks on the attachment open button, this will send the details to
+	 * TestPress, which can apply the patch.
+	 *
+	 * @param {Event} event The click event.
+	 */
 	function openClickHandler( event ) {
 		const attachmentUrl = event.target.parentNode.querySelector( 'a' ).href.split( '/' );
 		const filename = attachmentUrl.pop();
