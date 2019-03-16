@@ -47,9 +47,13 @@
 		"pack": "electron-builder --dir",
 		"dist": "npm run build && electron-builder",
 		"publish": "npm run build && electron-builder --publish always",
-		"postinstall": "electron-builder install-app-deps"
+		"postinstall": "electron-builder install-app-deps",
+		"lint:css": "wp-scripts lint-style '**/*.css'",
+		"lint:js": "wp-scripts lint-js .",
+		"lint:pkg-json": "wp-scripts lint-pkg-json ."
 	},
 	"devDependencies": {
+		"@wordpress/scripts": "^3.0.0",
 		"concurrently": "4.1.0",
 		"cross-env": "5.2.0",
 		"electron": "4.0.5",
