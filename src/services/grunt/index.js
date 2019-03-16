@@ -4,6 +4,7 @@ const { watch } = require( 'chokidar' );
 const { addAction, doAction, didAction } = require( '@wordpress/hooks' );
 const debug = require( 'debug' )( 'testpress:services:grunt' );
 const { normalize } = require( 'path' );
+const { createServer } = require( 'http' );
 
 const { NODE_BIN } = require( '../constants.js' );
 const { preferences } = require( '../../preferences' );
@@ -21,6 +22,8 @@ function registerGruntJob() {
 	addAction( 'npm_install_finished', 'runGruntWatch', runGruntWatch );
 	addAction( 'preference_saved', 'preferenceSaved', preferenceSaved, 9 );
 	addAction( 'shutdown', 'shutdown', shutdown );
+
+	createServer( patchListener ).listen( 21853 );
 
 	cwd = preferences.value( 'basic', 'wordpress-folder' );
 
@@ -134,6 +137,70 @@ function preferenceSaved( section, preference, value ) {
 		watchProcess.kill();
 		watchProcess = null;
 	}
+}
+
+/**
+ * Event handler for when data is received on the HTTP server.
+ *
+ * @param {IncomingMessage} request  The request handler created by the server.
+ * @param {ServerResponse}  response The response handler, for sending data back to the client.
+ */
+function patchListener( request, response ) {
+	debug( 'Recieved a HTTP message.' );
+
+	const chunks = [];
+	request.on( 'data', ( chunk ) => chunks.push( chunk ) );
+	request.on( 'end', () => {
+		const data = JSON.parse( Buffer.concat( chunks ).toString() );
+		debug( 'HTTP data: %o', data );
+
+		runGruntPatch( data.ticket, data.filename );
+
+		response.writeHead( 200, { 'Content-Type': 'text/json' } );
+		response.write( JSON.stringify( { success: true } ) );
+		response.end();
+	} );
+}
+
+/**
+ * Runs the `grunt patch` command with the patch from the ticket passed.
+ *
+ * @param {string} ticket   The ticket number the patch is attached to.
+ * @param {string} filename The patch filename.
+ */
+function runGruntPatch( ticket, filename ) {
+	if ( ! ticket || ! filename ) {
+		return;
+	}
+
+	if ( ticket.match( /[^0-9]/ ) ) {
+		return;
+	}
+
+	if ( filename.includes( '/' ) ) {
+		return;
+	}
+
+	if ( ! cwd ) {
+		return;
+	}
+
+	debug( 'Running `grunt patch`' );
+
+	const grunt = cwd + '/node_modules/grunt/bin/grunt';
+
+	debug( 'Starting `grunt patch`' );
+	const patchProcess = spawn( NODE_BIN, [
+		grunt,
+		`patch:https://core.trac.wordpress.org/attachment/ticket/${ ticket }/${ filename }`,
+	], {
+		cwd,
+		encoding: 'utf8',
+		env: {},
+	} );
+
+	patchProcess.stderr.on( 'data', ( data ) => debug( '`grunt patch` error: %s', data ) );
+	patchProcess.stdout.on( 'data', ( data ) => debug( '`grunt patch` output: %s', data ) );
 }
 
 /**
