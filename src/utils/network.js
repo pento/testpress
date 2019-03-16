@@ -5,9 +5,9 @@ const promisePipe = require( 'promisepipe' );
 /**
  * Fetches a URL, and returns the content.
  *
- * @param {String} url The URL to fetch.
+ * @param {string} url The URL to fetch.
  *
- * @returns {Promise<String|Boolean>} A Promise that resolves to the content from the URL, or false if the fetch failed.
+ * @return {Promise<string|boolean>} A Promise that resolves to the content from the URL, or false if the fetch failed.
  */
 async function fetch( url ) {
 	return await nodeFetch( url )
@@ -23,10 +23,10 @@ async function fetch( url ) {
 /**
  * Fetches a URL, and writes it to a fileStream.
  *
- * @param {String} url The URL to fetch.
+ * @param {string} url The URL to fetch.
  * @param {tty.WriteStream} fileStream The file to write to.
  *
- * @returns {Promise<Boolean>} A Promise that resolves to true if the fetch succeeded, false if it didn't.
+ * @return {Promise<boolean>} A Promise that resolves to true if the fetch succeeded, false if it didn't.
  */
 async function fetchWrite( url, fileStream ) {
 	return await nodeFetch( url )

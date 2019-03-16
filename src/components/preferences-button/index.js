@@ -1,6 +1,12 @@
+/**
+ * External dependencies
+ */
 import React, { Component } from 'react';
 import Gridicon from 'gridicons';
 
+/**
+ * Internal dependencies
+ */
 import './style.css';
 
 const { ipcRenderer, remote } = window.require( 'electron' );
@@ -19,18 +25,22 @@ class PreferencesButton extends Component {
 
 		this.menu.append( new MenuItem( {
 			label: 'About TestPress',
-			click: () => { this.props.setActivePage( 2 ) },
+			click: () => {
+				this.props.setActivePage( 2 );
+			},
 		} ) );
 
-		this.menu.append( new MenuItem( { type: 'separator'} ) );
+		this.menu.append( new MenuItem( { type: 'separator' } ) );
 
 		this.menu.append( new MenuItem( {
 			label: 'Preferences...',
 			accelerator: preferencesShortcut,
-			click: () => { this.props.setActivePage( 1 ) },
+			click: () => {
+				this.props.setActivePage( 1 );
+			},
 		} ) );
 
-		this.menu.append( new MenuItem( { type: 'separator'} ) );
+		this.menu.append( new MenuItem( { type: 'separator' } ) );
 
 		this.menu.append( new MenuItem( {
 			label: 'Quit',

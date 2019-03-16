@@ -28,18 +28,18 @@ try {
 const logFile = createWriteStream( normalize( app.getPath( 'userData' ) + '/debug.log' ), { flags: 'a' } );
 intercept( ( message ) => logFile.write( stripColor( message ) ) );
 
-logFile.write( "\n\n" );
+logFile.write( '\n\n' );
 const started = new Date();
-debug( "TestPress started: %s", started.toUTCString() );
-logFile.write( "\n" );
+debug( 'TestPress started: %s', started.toUTCString() );
+logFile.write( '\n' );
 
 const { registerJobs } = require( './services' );
 const { setStatusWindow } = require( './utils/status' );
 
-const assetsDirectory = path.join( __dirname, '/../assets/' )
+const assetsDirectory = path.join( __dirname, '/../assets/' );
 
-let tray = undefined;
-let window = undefined;
+let tray;
+let window;
 
 if ( 'darwin' === process.platform ) {
 	app.dock.hide();
@@ -60,8 +60,8 @@ const createTray = () => {
 };
 
 function createWindow() {
-    // Create the browser window.
-    window = new BrowserWindow( {
+	// Create the browser window.
+	window = new BrowserWindow( {
 		width: 350,
 		height: 350,
 		show: false,
@@ -79,8 +79,8 @@ function createWindow() {
 
 	setStatusWindow( window );
 
-    // and load the index.html of the app.
-    const startUrl = process.env.ELECTRON_START_URL || url.format( {
+	// and load the index.html of the app.
+	const startUrl = process.env.ELECTRON_START_URL || url.format( {
 		pathname: path.join( __dirname, '/../build/index.html' ),
 		protocol: 'file:',
 		slashes: true,
@@ -94,9 +94,9 @@ function createWindow() {
 		}
 	} );
 
-    window.on( 'closed', () => {
-        window = null;
-    } );
+	window.on( 'closed', () => {
+		window = null;
+	} );
 }
 
 const toggleWindow = () => {
@@ -105,9 +105,8 @@ const toggleWindow = () => {
 			window.hide();
 			resolve();
 		} );
-	} else {
-		return showWindow();
 	}
+	return showWindow();
 };
 
 const showWindow = () => {
@@ -124,7 +123,7 @@ const showWindow = () => {
 		position = 'trayRight';
 	}
 
-	const addClassScript =`
+	const addClassScript = `
 	document.body.classList.remove( 'traycenter', 'trayright' );
 	document.body.classList.add( '${ position.toLowerCase() }' );
 	`;
@@ -154,11 +153,11 @@ app.on( 'ready', () => {
 
 // Quit when all windows are closed.
 app.on( 'window-all-closed', () => {
-    // On OS X it is common for applications and their menu bar
-    // to stay active until the user quits explicitly with Cmd + Q
-    if ( process.platform !== 'darwin' ) {
-        app.quit();
-    }
+	// On OS X it is common for applications and their menu bar
+	// to stay active until the user quits explicitly with Cmd + Q
+	if ( process.platform !== 'darwin' ) {
+		app.quit();
+	}
 } );
 
 ipcMain.on( 'quit', () => {

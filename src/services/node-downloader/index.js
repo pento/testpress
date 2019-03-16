@@ -36,7 +36,7 @@ function registerNodeJob() {
 /**
  * Checks for a new version of Node, and installs it if needed.
  *
- * @return {Boolean} false if the download failed.
+ * @return {boolean} false if the download failed.
  */
 async function checkAndInstallUpdates() {
 	debug( 'Checking for updates' );
@@ -105,7 +105,7 @@ async function checkAndInstallUpdates() {
 					strip: 1,
 					filter: ( file ) => file.type !== 'Directory',
 				} );
-			} )
+			} );
 		} else {
 			await tar.extract( {
 				file: filename,
@@ -125,7 +125,7 @@ async function checkAndInstallUpdates() {
  * Get the version of the local install of Node. If there isn't a copy of Node installed,
  * it returns a generic version number of '0.0.0', to ensure version comparisons will assume it's outdated.
  *
- * @return {String|Boolean} The version number of the local copy of node, or false if the version couldn't be retrieved.
+ * @return {string|boolean} The version number of the local copy of node, or false if the version couldn't be retrieved.
  */
 async function getLocalVersion() {
 	if ( ! existsSync( NODE_BIN ) ) {
@@ -140,7 +140,7 @@ async function getLocalVersion() {
 /**
  * Retrieves the version (and filename) of the latest remote version of Node.
  *
- * @return {Object|Boolean} Object containing the `version` and `filename`, or false if the version couldn't be fetched.
+ * @return {Object|boolean} Object containing the `version` and `filename`, or false if the version couldn't be fetched.
  */
 async function getRemoteVersion() {
 	const remotels = await fetch( NODE_URL );
@@ -153,7 +153,7 @@ async function getRemoteVersion() {
 	const versionInfo = VERSION_REGEX.exec( remotels );
 
 	if ( ! versionInfo ) {
-		debug( "Remote version regex (%s) failed on html:\n%s\n%O", VERSION_REGEX, remotels, versionInfo );
+		debug( 'Remote version regex (%s) failed on html:\n%s\n%O', VERSION_REGEX, remotels, versionInfo );
 		return false;
 	}
 
@@ -166,10 +166,10 @@ async function getRemoteVersion() {
 /**
  * Checksums the local copy of the Node archive against the official checksums.
  *
- * @param {String} filename The filename to be using for checks.
- * @param {String} version  The Node version corresponding to the archive.
+ * @param {string} filename The filename to be using for checks.
+ * @param {string} version  The Node version corresponding to the archive.
  *
- * @return {Boolean} True if the checksum matches, false if it doesn't.
+ * @return {boolean} True if the checksum matches, false if it doesn't.
  */
 async function checksumLocalArchive( filename, version ) {
 	const archiveFilename = normalize( ARCHIVE_DIR + '/' + filename );
@@ -196,7 +196,7 @@ async function checksumLocalArchive( filename, version ) {
 	const localSum = hasha.fromFileSync( archiveFilename, { algorithm: 'sha256' } );
 	const checksums = readFileSync( checksumFilename ).toString();
 
-	const passed = checksums.split( "\n" ).reduce( ( allowed, line ) => {
+	const passed = checksums.split( '\n' ).reduce( ( allowed, line ) => {
 		const [ checksum, checkname ] = line.split( /\s+/ ).map( ( value ) => value.trim() );
 		if ( checkname === filename && checksum === localSum ) {
 			return true;
