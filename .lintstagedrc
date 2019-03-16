@@ -1,0 +1,11 @@
+{
+    "packages/*/package.json": [
+        "wp-scripts lint-pkg-json"
+    ],
+    "*.scss": [
+        "wp-scripts lint-style"
+    ],
+    "*.js": [
+        "wp-scripts lint-js"
+    ]
+}
