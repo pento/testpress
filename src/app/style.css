@@ -13,14 +13,14 @@ body.trayright .tray-pointer {
 
 .testpress {
 	background-color: #fff;
-	color:#000;
+	color: #000;
 	height: 340px;
 }
 
 .header {
 	height: 35px;
 	padding: 10px;
-	color: #82878C;
+	color: #82878c;
 	border-bottom: 1px solid #ccc;
 	display: flex;
 	flex-direction: row;
@@ -36,7 +36,7 @@ body.trayright .tray-pointer {
 .logo {
 	padding: 5px;
 	height: 25px;
-	fill: #82878C;
+	fill: #82878c;
 }
 
 .title span {
@@ -53,10 +53,16 @@ body.trayright .tray-pointer {
 }
 
 .quit-button .gridicon {
-	fill: #82878C;
+	fill: #82878c;
 }
 
 @keyframes testpress-logo-spin {
-	from { transform: rotate( 0deg ); }
-	to { transform: rotate( 360deg ); }
+
+	from {
+		transform: rotate(0deg);
+	}
+
+	to {
+		transform: rotate(360deg);
+	}
 }
