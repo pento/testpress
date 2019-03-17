@@ -54,7 +54,7 @@ class Pages extends Component {
 										</h1>
 										{ activePage !== 3 &&
 											<button
-												className="patching-button"
+												className="pages__page-patching-button"
 												onClick={ () => this.setActivePage( 3 ) }
 												title="Apply and upload patches"
 											>
