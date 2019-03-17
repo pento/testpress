@@ -7,7 +7,7 @@ import Gridicon from 'gridicons';
 /**
  * Internal dependencies
  */
-import './style.css';
+import './style.scss';
 
 const { ipcRenderer, remote } = window.require( 'electron' );
 const { Menu, MenuItem, process } = remote;

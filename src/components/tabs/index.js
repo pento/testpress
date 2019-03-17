@@ -6,7 +6,7 @@ import React, { Component } from 'react';
 /**
  * Internal dependencies
  */
-import './style.css';
+import './style.scss';
 
 class Tabs extends Component {
 	constructor() {

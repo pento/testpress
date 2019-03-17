@@ -7,7 +7,7 @@ import React, { Component } from 'react';
  */
 import Tabs from '../tabs';
 
-import './style.css';
+import './style.scss';
 import BasicPreferences from './basic-preferences';
 import SitePreferences from './site-preferences';
 

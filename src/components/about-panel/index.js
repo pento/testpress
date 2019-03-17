@@ -7,7 +7,7 @@ import { normalize } from 'path';
 /**
  * Internal dependencies
  */
-import './style.css';
+import './style.scss';
 
 const { shell, remote } = window.require( 'electron' );
 

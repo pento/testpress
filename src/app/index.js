@@ -11,7 +11,7 @@ import PreferencesPanel from '../components/preferences-panel';
 import StatusPanel from '../components/status-panel';
 import AboutPanel from '../components/about-panel';
 
-import './style.css';
+import './style.scss';
 
 class TestPress extends Component {
 	constructor() {

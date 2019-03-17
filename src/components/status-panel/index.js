@@ -7,7 +7,7 @@ import 'status-indicator/styles.css';
 /**
  * Internal dependencies
  */
-import './style.css';
+import './style.scss';
 
 const { shell, ipcRenderer } = window.require( 'electron' );
 

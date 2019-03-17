@@ -9,7 +9,7 @@ import { CSSTransition } from 'react-transition-group';
  */
 import PreferencesButton from '../preferences-button';
 
-import './style.css';
+import './style.scss';
 
 class Pages extends Component {
 	constructor() {
