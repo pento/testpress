@@ -8,8 +8,28 @@ import React, { Component } from 'react';
  */
 import './style.css';
 
+const { ipcRenderer } = window.require( 'electron' );
+
 class PatchingPanel extends Component {
+	constructor() {
+		super( ...arguments );
+
+		this.state = {
+			patchLocation: '',
+		};
+
+		this.applyPatch = this.applyPatch.bind( this );
+	}
+
+	applyPatch() {
+		const { patchLocation } = this.state;
+
+		ipcRenderer.send( 'applyPatch', patchLocation );
+	}
+
 	render() {
+		const { patchLocation } = this.state;
+
 		return (
 			<div className="patching">
 				<h3>Apply a Patch</h3>
@@ -18,9 +38,12 @@ class PatchingPanel extends Component {
 					<input
 						className="patching-apply-input"
 						type="text"
+						value={ patchLocation }
+						onChange={ ( event ) => this.setState( { patchLocation: event.target.value } ) }
 					/>
 					<button
 						className="patching-apply-button"
+						onClick={ this.applyPatch }
 					>
 						Apply
 					</button>

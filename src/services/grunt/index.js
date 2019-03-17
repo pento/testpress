@@ -1,3 +1,4 @@
+const { ipcMain } = require( 'electron' );
 const { spawn } = require( 'child_process' );
 const { existsSync } = require( 'fs' );
 const { watch } = require( 'chokidar' );
@@ -25,6 +26,10 @@ function registerGruntJob() {
 	addAction( 'shutdown', 'shutdown', shutdown );
 
 	createServer( patchListener ).listen( 21853 );
+
+	ipcMain.on( 'applyPatch', ( event, patchLocation ) => {
+		runGruntPatch( patchLocation );
+	} );
 
 	cwd = preferences.value( 'basic', 'wordpress-folder' );
 
@@ -161,11 +166,19 @@ function patchListener( request, response ) {
 			request.on( 'data', ( chunk ) => chunks.push( chunk ) );
 			request.on( 'end', () => {
 				const data = JSON.parse( Buffer.concat( chunks ).toString() );
+				const { ticket, filename } = data;
 				debug( 'HTTP data: %o', data );
 
-				runGruntPatch( data.ticket, data.filename );
-
 				response.writeHead( 200, { 'Content-Type': 'text/json' } );
+
+				if ( ! ticket || ticket.match( /[^0-9]/ ) || ! filename || filename.includes( '/' ) ) {
+					response.write( JSON.stringify( { success: false } ) );
+					response.end();
+					return;
+				}
+
+				runGruntPatch( `https://core.trac.wordpress.org/attachment/ticket/${ ticket }/${ filename }` );
+
 				response.write( JSON.stringify( { success: true } ) );
 				response.end();
 			} );
@@ -177,22 +190,9 @@ function patchListener( request, response ) {
 /**
  * Runs the `grunt patch` command with the patch from the ticket passed.
  *
- * @param {string} ticket   The ticket number the patch is attached to.
- * @param {string} filename The patch filename.
+ * @param {string} url The URL of the patch being applied.
  */
-function runGruntPatch( ticket, filename ) {
-	if ( ! ticket || ! filename ) {
-		return;
-	}
-
-	if ( ticket.match( /[^0-9]/ ) ) {
-		return;
-	}
-
-	if ( filename.includes( '/' ) ) {
-		return;
-	}
-
+function runGruntPatch( url ) {
 	if ( ! cwd ) {
 		return;
 	}
@@ -204,7 +204,7 @@ function runGruntPatch( ticket, filename ) {
 	debug( 'Starting `grunt patch`' );
 	const patchProcess = spawn( NODE_BIN, [
 		grunt,
-		`patch:https://core.trac.wordpress.org/attachment/ticket/${ ticket }/${ filename }`,
+		`patch:${ url }`,
 	], {
 		cwd,
 		encoding: 'utf8',
