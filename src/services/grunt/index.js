@@ -31,6 +31,10 @@ function registerGruntJob() {
 		runGruntPatch( patchLocation );
 	} );
 
+	ipcMain.on( 'uploadPatch', ( event, ticket, username, password ) => {
+		runGruntUploadPatch( ticket, username, password );
+	} );
+
 	cwd = preferences.value( 'basic', 'wordpress-folder' );
 
 	if ( ! cwd ) {
@@ -197,8 +201,6 @@ function runGruntPatch( url ) {
 		return;
 	}
 
-	debug( 'Running `grunt patch`' );
-
 	const grunt = cwd + '/node_modules/grunt/bin/grunt';
 
 	debug( 'Starting `grunt patch`' );
@@ -213,6 +215,38 @@ function runGruntPatch( url ) {
 
 	patchProcess.stderr.on( 'data', ( data ) => debug( '`grunt patch` error: %s', data ) );
 	patchProcess.stdout.on( 'data', ( data ) => debug( '`grunt patch` output: %s', data ) );
+}
+
+/**
+ * Upload a patch to the specified ticket, using the passed credentials.
+ *
+ * @param {number} ticket   Ticket number.
+ * @param {string} username WordPress.org username.
+ * @param {string} password WordPress.org password.
+ */
+function runGruntUploadPatch( ticket, username, password ) {
+	if ( ! cwd ) {
+		return;
+	}
+
+	const grunt = cwd + '/node_modules/grunt/bin/grunt';
+
+	debug( 'Starting `grunt upload_patch`' );
+	const patchProcess = spawn( NODE_BIN, [
+		grunt,
+		`upload_patch:${ ticket }`,
+		'--useEnv',
+	], {
+		cwd,
+		encoding: 'utf8',
+		env: {
+			WPORG_USERNAME: username,
+			WPORG_PASSWORD: password,
+		},
+	} );
+
+	patchProcess.stderr.on( 'data', ( data ) => debug( '`grunt upload_patch` error: %s', data ) );
+	patchProcess.stdout.on( 'data', ( data ) => debug( '`grunt upload_patch` output: %s', data ) );
 }
 
 /**

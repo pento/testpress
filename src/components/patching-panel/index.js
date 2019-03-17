@@ -16,9 +16,13 @@ class PatchingPanel extends Component {
 
 		this.state = {
 			patchLocation: '',
+			uploadTicket: '',
+			wporgUsername: '',
+			wporgPassword: '',
 		};
 
 		this.applyPatch = this.applyPatch.bind( this );
+		this.uploadPatch = this.uploadPatch.bind( this );
 	}
 
 	applyPatch() {
@@ -27,8 +31,14 @@ class PatchingPanel extends Component {
 		ipcRenderer.send( 'applyPatch', patchLocation );
 	}
 
+	uploadPatch() {
+		const { uploadTicket, wporgUsername, wporgPassword } = this.state;
+
+		ipcRenderer.send( 'uploadPatch', uploadTicket, wporgUsername, wporgPassword );
+	}
+
 	render() {
-		const { patchLocation } = this.state;
+		const { patchLocation, uploadTicket, wporgUsername, wporgPassword } = this.state;
 
 		return (
 			<div className="patching">
@@ -49,16 +59,36 @@ class PatchingPanel extends Component {
 					</button>
 				</p>
 				<h3>Upload a Patch</h3>
-				<p>Enter the ticket number to upload the current changes.</p>
+				<p>Enter the ticket number and your WordPress.org credentials to upload the current changes.</p>
 				<p>
+					Ticket:
 					<input
 						className="patching-upload-input"
 						type="text"
+						value={ uploadTicket }
+						onChange={ ( event ) => this.setState( { uploadTicket: event.target.value } ) }
+					/>
+					<br />
+					Username:
+					<input
+						className="patching-upload-username"
+						type="text"
+						value={ wporgUsername }
+						onChange={ ( event ) => this.setState( { wporgUsername: event.target.value } ) }
+					/>
+					<br />
+					Password:
+					<input
+						className="patching-upload-password"
+						type="password"
+						value={ wporgPassword }
+						onChange={ ( event ) => this.setState( { wporgPassword: event.target.value } ) }
 					/>
 					<button
 						className="patching-upload-button"
+						onClick={ this.uploadPatch }
 					>
-						Apply
+						Upload
 					</button>
 				</p>
 			</div>

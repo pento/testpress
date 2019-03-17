@@ -63,7 +63,7 @@ function createWindow() {
 	// Create the browser window.
 	window = new BrowserWindow( {
 		width: 350,
-		height: 350,
+		height: 400,
 		show: false,
 		frame: false,
 		fullscreenable: false,
