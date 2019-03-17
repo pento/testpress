@@ -1,35 +1,36 @@
+.preferences-panel {
+	&__directory-select > label,
+	&__input > label {
+		display: block;
+		margin: 10px 0;
+		color: #000;
+	}
 
-.preferences-panel__directory-select > label,
-.preferences-panel__input > label {
-	display: block;
-	margin: 10px 0;
-	color: #000;
-}
+	&__directory-select > button {
+		border: none;
+		color: #377eb6;
+		text-decoration: underline;
+		cursor: pointer;
+		background: none;
+		display: block;
+		font-size: inherit;
+		margin: 10px 0;
+		padding: 0;
+	}
 
-.preferences-panel__directory-select > button {
-	border: none;
-	color: #377eb6;
-	text-decoration: underline;
-	cursor: pointer;
-	background: none;
-	display: block;
-	font-size: inherit;
-	margin: 10px 0;
-	padding: 0;
-}
+	&__input--inline > label {
+		display: inline-block;
+		margin-right: 10px;
+	}
 
-.preferences-panel__input--inline > label {
-	display: inline-block;
-	margin-right: 10px;
-}
+	&__input > input {
+		padding: 5px 10px;
+		background-color: #f6f6f6;
+		border: 1px solid #e8e8e8;
+		border-radius: 3px;
+	}
 
-.preferences-panel__input > input {
-	padding: 5px 10px;
-	background-color: #f6f6f6;
-	border: 1px solid #e8e8e8;
-	border-radius: 3px;
-}
-
-.preferences-panel__input--short > input {
-	width: 50px;
+	&__input--short > input {
+		width: 50px;
+	}
 }
