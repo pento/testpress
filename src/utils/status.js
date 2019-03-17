@@ -1,12 +1,9 @@
+const { ipcMain } = require( 'electron' );
 const debug = require( 'debug' )( 'testpress:utils:status' );
 
 let statusWindow;
 
-const statusMap = {
-	okay: 'positive',
-	warning: 'intermediary',
-	error: 'negative',
-};
+const statuses = {};
 
 /**
  * Set the BrowserWindow that receives the status message.
@@ -20,24 +17,35 @@ function setStatusWindow( window ) {
 /**
  * Send a status message to the status window.
  *
- * @param {string} status The status type. Valid values are 'okay', 'warning', or 'error'.
- * @param {string} statusMessage The message to display.
+ * @param {string} service The service which has had a status change.
+ * @param {string} status The new status of the service.
  */
-function setStatus( status, statusMessage ) {
+function setStatus( service, status ) {
 	if ( ! statusWindow ) {
-		debug( 'setStatus() called before setStatusWindow, with status "%s", message "%s"', status, statusMessage );
+		debug( 'setStatus() called before setStatusWindow, with service "%s", status "%s"', service, status );
 		return;
 	}
 
-	if ( ! statusMap[ status ] ) {
-		debug( 'setStatus() called with invalid status "%s", message "%s"', status, statusWindow );
-		return;
-	}
+	statuses[ service ] = status;
 
-	statusWindow.send( 'status', statusMap[ status ], statusMessage );
+	statusWindow.send( 'status', statuses );
 }
+
+/**
+ * Gets the current statuses.
+ *
+ * @return {Object} An object which maps service names to the status of that service.
+ */
+function getStatuses() {
+	return statuses;
+}
+
+ipcMain.on( 'getStatuses', ( event ) => {
+	event.returnValue = getStatuses();
+} );
 
 module.exports = {
 	setStatusWindow,
 	setStatus,
+	getStatuses,
 };

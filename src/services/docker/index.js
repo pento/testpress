@@ -45,7 +45,15 @@ async function registerDockerJob() {
  * Get docker up and running.
  */
 async function startDocker() {
+	debug( 'Checking if daemon is running' );
+	while ( ! await detectDockerDaemon() ) {
+		setStatus( 'docker', 'missing-daemon' );
+		await sleep( 1000 );
+	}
+
 	debug( 'Preparing to start Docker' );
+
+	setStatus( 'docker', 'starting' );
 
 	cwds[ 'wordpress-folder' ] = preferences.value( 'basic', 'wordpress-folder' );
 	cwds[ 'gutenberg-folder' ] = preferences.value( 'basic', 'gutenberg-folder' );
@@ -53,6 +61,7 @@ async function startDocker() {
 	port = preferences.value( 'site', 'port' ) || 9999;
 
 	if ( ! cwds[ 'wordpress-folder' ] || ! port ) {
+		setStatus( 'docker', 'missing-wordpress-folder' );
 		debug( 'Bailing, preferences not set' );
 		return;
 	}
@@ -172,7 +181,7 @@ async function startDocker() {
 
 	debug( 'Docker containers started' );
 
-	setStatus( 'warning', 'Building environment ...' );
+	setStatus( 'docker', 'ready' );
 
 	addAction( 'grunt_watch_first_run_finished', 'installWordPress', installWordPress );
 
@@ -261,7 +270,7 @@ async function startDockerMachine() {
  * Runs the WP-CLI commands to install WordPress.
  */
 async function installWordPress() {
-	setStatus( 'warning', 'Building environment ...' );
+	setStatus( 'wordpress', 'installing' );
 
 	debug( 'Waiting for mysqld to start in the MySQL container' );
 	while ( 1 ) {
@@ -330,7 +339,7 @@ async function installWordPress() {
 			'--skip-email' );
 	}
 
-	setStatus( 'okay', 'Ready :' );
+	setStatus( 'wordpress', 'ready' );
 
 	debug( 'WordPress ready at http://localhost:%d/', port );
 }
@@ -339,7 +348,8 @@ async function installWordPress() {
  * Spawns a process to run a WP-CLI command in a Docker container.
  *
  * @param {...string} args The WP-CLI command and arguments to be run.
- * @return Promise that resolves to true if the command succeeded, false if it failed.
+ *
+ * @return {Promise} Promise that resolves to true if the command succeeded, false if it failed.
  */
 function runCLICommand( ...args ) {
 	return spawn( 'docker-compose', [
@@ -364,6 +374,21 @@ function runCLICommand( ...args ) {
 			debug( stderr.trim() );
 			return false;
 		} );
+}
+
+/**
+ * Figure out if the Docker daemon is running. No daemon implies that the user
+ * needs to install and/or open Docker.
+ *
+ * @return {boolean} true if the Docker daemon is running, false if it isn't.
+ */
+async function detectDockerDaemon() {
+	try {
+		await spawn( 'docker', [ 'info' ] );
+		return true;
+	} catch {
+		return false;
+	}
 }
 
 /**
