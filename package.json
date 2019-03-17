@@ -44,7 +44,6 @@
 		"react": "16.8.3",
 		"react-dom": "16.8.3",
 		"react-transition-group": "2.5.3",
-		"status-indicator": "1.0.9",
 		"strip-color": "0.1.0",
 		"tar": "4.4.8"
 	},
