@@ -16,6 +16,10 @@
 		"url": "https://github.com/pento/testpress"
 	},
 	"bugs": "https://github.com/pento/testpress/issues",
+	"engines": {
+		"node": ">=8.0.0",
+		"npm": ">=6.9.0"
+	},
 	"main": "src/electron-runner.js",
 	"dependencies": {
 		"@wordpress/hooks": "2.0.5",
