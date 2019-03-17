@@ -1,43 +1,45 @@
-.status-row {
-	padding: 15px;
-	border-bottom: 1px solid #ccc;
-	display: flex;
-	flex-direction: row;
+.status {
+	&__row {
+		padding: 15px;
+		border-bottom: 1px solid #ccc;
+		display: flex;
+		flex-direction: row;
+	}
+
+	&__message {
+		padding: 5px 0;
+		font-weight: bold;
+	}
+
+	&__site {
+		background-color: #f6f6f6;
+		margin-left: 25px;
+		padding: 5px 10px;
+		border: 1px solid #ccc;
+		color: #808080;
+		border-radius: 2px;
+		cursor: pointer;
+		flex: auto;
+
+		&:hover {
+			background-color: #f0f0f0;
+		}
+	}
+
+	&__description {
+		padding: 0 15px;
+		font-size: 15px;
+		line-height: 1.3;
+	}
+
+	&__error-text {
+		width: 98%;
+		height: 65px;
+	}
 }
 
 status-indicator {
 	margin: 7px 8px -7px;
 	height: 15px;
 	width: 15px;
-}
-
-.status-message {
-	padding: 5px 0;
-	font-weight: bold;
-}
-
-.status-site {
-	background-color: #f6f6f6;
-	margin-left: 25px;
-	padding: 5px 10px;
-	border: 1px solid #ccc;
-	color: #808080;
-	border-radius: 2px;
-	cursor: pointer;
-	flex: auto;
-}
-
-.status-site:hover {
-	background-color: #f0f0f0;
-}
-
-.status-description {
-	padding: 0 15px;
-	font-size: 15px;
-	line-height: 1.3;
-}
-
-textarea {
-	width: 98%;
-	height: 65px;
 }
