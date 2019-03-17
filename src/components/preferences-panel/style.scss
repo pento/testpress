@@ -1,0 +1,36 @@
+.preferences-panel {
+	&__directory-select > label,
+	&__input > label {
+		display: block;
+		margin: 10px 0;
+		color: #000;
+	}
+
+	&__directory-select > button {
+		border: none;
+		color: #377eb6;
+		text-decoration: underline;
+		cursor: pointer;
+		background: none;
+		display: block;
+		font-size: inherit;
+		margin: 10px 0;
+		padding: 0;
+	}
+
+	&__input--inline > label {
+		display: inline-block;
+		margin-right: 10px;
+	}
+
+	&__input > input {
+		padding: 5px 10px;
+		background-color: #f6f6f6;
+		border: 1px solid #e8e8e8;
+		border-radius: 3px;
+	}
+
+	&__input--short > input {
+		width: 50px;
+	}
+}

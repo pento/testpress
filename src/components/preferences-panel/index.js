@@ -7,7 +7,9 @@ import React, { Component } from 'react';
  */
 import Tabs from '../tabs';
 
-import './style.css';
+import './style.scss';
+import BasicPreferences from './basic-preferences';
+import SitePreferences from './site-preferences';
 
 const { remote, ipcRenderer } = window.require( 'electron' );
 
@@ -66,39 +68,15 @@ class PreferencesPanel extends Component {
 		const { directory, editedPort } = this.state;
 
 		const tabs = {
-			Basic: (
-				<div>
-					<label htmlFor="preferences-wordpress-folder">WordPress Folder:</label>
-					{ directory.wordpress ? directory.wordpress : 'No folder selected' }
-					<button
-						id="preferences-wordpress-folder"
-						onClick={ () => this.showDirectorySelect( 'WordPress' ) }
-					>
-						{ 'Choose a folder' }
-					</button>
-					<label htmlFor="preferences-gutenberg-folder">Gutenberg Folder:</label>
-					{ directory.gutenberg ? directory.gutenberg : 'No folder selected' }
-					<button
-						id="preferences-gutenberg-folder"
-						onClick={ () => this.showDirectorySelect( 'Gutenberg' ) }
-					>
-						{ 'Choose a folder' }
-					</button>
-				</div>
-			),
-			Site: (
-				<div>
-					<label htmlFor="preferences-port">Port Number:</label>
-					<input
-						type="number"
-						id="preferences-port"
-						className="shortinput"
-						value={ editedPort }
-						onChange={ ( event ) => this.setState( { editedPort: event.target.value } ) }
-						onBlur={ () => this.portChanged() }
-					/>
-				</div>
-			),
+			Basic: <BasicPreferences
+				directory={ directory }
+				showDirectorySelect={ this.showDirectorySelect }
+			/>,
+			Site: <SitePreferences
+				port={ editedPort }
+				onPortChange={ ( value ) => this.setState( { editedPort: value } ) }
+				onPortInputBlur={ this.portChanged }
+			/>,
 		};
 
 		return (

@@ -1,0 +1,18 @@
+.tray-pointer {
+	height: 0;
+	width: 0;
+	border-left: 8px solid transparent;
+	border-right: 8px solid transparent;
+	border-bottom: 8px solid #fff;
+	margin: 0 auto;
+}
+
+body.trayright .tray-pointer {
+	margin-right: 10px;
+}
+
+.testpress {
+	background-color: #fff;
+	color: #000;
+	height: 340px;
+}

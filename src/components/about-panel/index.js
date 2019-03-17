@@ -7,14 +7,14 @@ import { normalize } from 'path';
 /**
  * Internal dependencies
  */
-import './style.css';
+import './style.scss';
 
 const { shell, remote } = window.require( 'electron' );
 
 class AboutPanel extends Component {
 	render() {
 		return (
-			<div className="about">
+			<div className="about-panel">
 				<p><strong>Version:</strong> { remote.app.getVersion() }</p>
 				<p>
 					Please submit bug reports to the <a href="#" onClick={ () => shell.openExternal( 'https://github.com/pento/testpress' ) }>GitHub repository</a>.

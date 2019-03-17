@@ -7,7 +7,7 @@ import 'status-indicator/styles.css';
 /**
  * Internal dependencies
  */
-import './style.css';
+import './style.scss';
 
 const { shell, ipcRenderer } = window.require( 'electron' );
 
@@ -74,24 +74,24 @@ class StatusPanel extends Component {
 
 		return (
 			<div className="status">
-				<div className="status-row">
+				<div className="status__row">
 					<status-indicator { ...statusProps } />
-					<span className="status-message">
+					<span className="status__message">
 						{ message }
 					</span>
 					{ 'positive' === status &&
 						<span
-							className="status-site"
+							className="status__site"
 							onClick={ () => shell.openExternal( url ) }
 						>
 							{ url }
 						</span>
 					}
 				</div>
-				<div className="status-description">
+				<div className="status__description">
 					{ description }
 					{ 'negative' === status && errors &&
-						<textarea readOnly>{ errors }</textarea>
+						<textarea className="status__error-text" readOnly>{ errors }</textarea>
 					}
 				</div>
 			</div>

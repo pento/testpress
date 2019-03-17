@@ -6,7 +6,7 @@ import React, { Component } from 'react';
 /**
  * Internal dependencies
  */
-import './style.css';
+import './style.scss';
 
 class Tabs extends Component {
 	constructor() {
@@ -22,12 +22,12 @@ class Tabs extends Component {
 
 		return (
 			<div className="tabs">
-				<div className="tabs-headings">
+				<div className="tabs__headings">
 					{ Object.keys( tabs ).map( ( label ) => {
-						const className = label === activeTab ? 'active' : 'inactive';
+						const statusClassName = label === activeTab ? 'tabs__heading--active' : 'tabs__heading--inactive';
 						return (
 							<span
-								className={ className }
+								className={ `tabs__heading ${ statusClassName }` }
 								onClick={ () => this.setState( { activeTab: label } ) }
 								key={ label + '-tab' }
 							>
@@ -36,12 +36,12 @@ class Tabs extends Component {
 						);
 					} ) }
 				</div>
-				<div className="tabs-pages">
+				<div className="tabs__pages">
 					{ Object.keys( tabs ).map( ( label ) => {
-						const className = 'page-' + label.toLowerCase() + ' ' + ( label === activeTab ? 'active' : 'inactive' );
+						const statusClassName = label === activeTab ? 'tabs__page--active' : 'tabs__page--inactive';
 						return (
 							<div
-								className={ className }
+								className={ `tabs__page tabs__page-${ label.toLowerCase() } ${ statusClassName } ` }
 								key={ label + '-page' }
 							>
 								{ tabs[ label ] }
