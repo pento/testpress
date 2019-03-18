@@ -6,7 +6,7 @@ import React, { Component } from 'react';
 /**
  * Internal dependencies
  */
-import './style.css';
+import './style.scss';
 
 const { ipcRenderer } = window.require( 'electron' );
 
@@ -41,18 +41,18 @@ class PatchingPanel extends Component {
 		const { patchLocation, uploadTicket, wporgUsername, wporgPassword } = this.state;
 
 		return (
-			<div className="patching">
+			<div className="patching-panel">
 				<h3>Apply a Patch</h3>
 				<p>Paste the link to the <tt>.patch</tt> or <tt>.diff</tt> file.</p>
 				<p>
 					<input
-						className="patching-apply-input"
+						className="patching-panel__apply-input"
 						type="text"
 						value={ patchLocation }
 						onChange={ ( event ) => this.setState( { patchLocation: event.target.value } ) }
 					/>
 					<button
-						className="patching-apply-button"
+						className="patching-panel__apply-button"
 						onClick={ this.applyPatch }
 					>
 						Apply
@@ -63,7 +63,7 @@ class PatchingPanel extends Component {
 				<p>
 					Ticket:
 					<input
-						className="patching-upload-input"
+						className="patching-panel__upload-input"
 						type="text"
 						value={ uploadTicket }
 						onChange={ ( event ) => this.setState( { uploadTicket: event.target.value } ) }
@@ -71,7 +71,7 @@ class PatchingPanel extends Component {
 					<br />
 					Username:
 					<input
-						className="patching-upload-username"
+						className="patching-panel__upload-username"
 						type="text"
 						value={ wporgUsername }
 						onChange={ ( event ) => this.setState( { wporgUsername: event.target.value } ) }
@@ -79,13 +79,13 @@ class PatchingPanel extends Component {
 					<br />
 					Password:
 					<input
-						className="patching-upload-password"
+						className="patching-panel__upload-password"
 						type="password"
 						value={ wporgPassword }
 						onChange={ ( event ) => this.setState( { wporgPassword: event.target.value } ) }
 					/>
 					<button
-						className="patching-upload-button"
+						className="patching-panel__upload-button"
 						onClick={ this.uploadPatch }
 					>
 						Upload
