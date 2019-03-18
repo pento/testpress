@@ -1,3 +1,5 @@
+@import "../../_colors.scss";
+
 .status {
 	padding: 0 15px 15px;
 	position: absolute;
@@ -24,6 +26,14 @@
 		.components-spinner {
 			transform: scale(0.8);
 			background-color: currentColor;
+			&::before {
+				.theme-light & {
+					background-color: #fff;
+				}
+				.theme-dark & {
+					background-color: #000;
+				}
+			}
 		}
 
 		&-icon {
@@ -35,4 +45,5 @@
 			margin: 0 0.8ch 0 0;
 		}
 	}
+
 }
