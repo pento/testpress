@@ -10,4 +10,25 @@
 	&__site-link.is-link {
 		font-size: 16px;
 	}
+
+	&__message {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		line-height: 1.6;
+
+		.components-spinner {
+			transform: scale(0.8);
+			background-color: currentColor;
+		}
+
+		&-icon {
+			transform: scale(1.25);
+		}
+
+		.components-spinner,
+		&-icon {
+			margin: 0 0.8ch 0 0;
+		}
+	}
 }
