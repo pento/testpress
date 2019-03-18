@@ -34,7 +34,7 @@ export default function NotReadyInfo( { statuses } ) {
 				{ statuses.wordpress === 'ready' ? '👍' : '👉' } Installing WordPress…
 			</p>
 			<p>
-				<button onClick={ () => shell.openItem( logPath ) }>View Log</button>
+				<button onClick={ () => shell.openItem( logPath ) }>View log</button>
 			</p>
 		</div>
 	);

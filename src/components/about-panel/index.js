@@ -25,7 +25,7 @@ class AboutPanel extends Component {
 					If something has gone wrong, please also attach the debug log to your bug report.
 				</p>
 				<p>
-					<button onClick={ () => shell.openItem( logPath ) }>View Debug Log</button>
+					<button onClick={ () => shell.openItem( logPath ) }>View debug log</button>
 				</p>
 			</div>
 		);
