@@ -22,7 +22,7 @@
 	},
 	"main": "src/electron-runner.js",
 	"dependencies": {
-		"@wordpress/components": "^7.1.0",
+		"@wordpress/components": "7.1.0",
 		"@wordpress/hooks": "2.0.5",
 		"await-sleep": "0.0.1",
 		"chokidar": "2.1.2",
@@ -37,7 +37,7 @@
 		"intercept-stdout": "0.1.2",
 		"js-yaml": "3.12.1",
 		"node-fetch": "2.3.0",
-		"node-sass": "npm:sass@^1.17.3",
+		"node-sass": "npm:sass@1.17.3",
 		"node-schedule": "1.3.2",
 		"promisepipe": "3.0.0",
 		"promisify-child-process": "3.1.0",
@@ -48,7 +48,7 @@
 		"tar": "4.4.8"
 	},
 	"devDependencies": {
-		"@wordpress/scripts": "^3.0.0",
+		"@wordpress/scripts": "3.0.0",
 		"concurrently": "4.1.0",
 		"cross-env": "5.2.0",
 		"electron": "4.0.5",
