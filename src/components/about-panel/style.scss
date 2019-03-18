@@ -1,4 +1,9 @@
-.about-panel > p {
-	margin: 20px 15px;
+.about-panel {
+	padding: 0 15px 15px;
+	position: absolute;
 	text-align: center;
+
+	.about-panel__repository-link {
+		font-size: 16px;
+	}
 }

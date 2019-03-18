@@ -21,9 +21,13 @@ const logPath = normalize( remote.app.getPath( 'userData' ) + '/debug.log' );
 class AboutPanel extends Component {
 	render() {
 		const repositoryLink = (
-			<a href="#" onClick={ () => shell.openExternal( 'https://github.com/pento/testpress' ) }>
+			<Button
+				isLink
+				className="about-panel__repository-link"
+				onClick={ () => shell.openExternal( 'https://github.com/pento/testpress' ) }
+			>
 				GitHub repository
-			</a>
+			</Button>
 		);
 
 		return (
