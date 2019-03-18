@@ -37,7 +37,7 @@ export default function NotReadyInfo( { statuses } ) {
 				</strong>
 			</p>
 			<p>Please wait a moment while TestPress gets everything ready.</p>
-			<p>
+			<p className="status__message-container">
 				<StatusMessage isReady={ statuses.docker === 'ready' }>
 					Starting Docker…
 				</StatusMessage>

@@ -11,11 +11,15 @@
 		font-size: 16px;
 	}
 
+	&__message-container {
+		display: inline-block;
+		margin-top: 0;
+	}
+
 	&__message {
 		display: flex;
 		align-items: center;
-		justify-content: center;
-		line-height: 1.6;
+		line-height: 1.8;
 
 		.components-spinner {
 			transform: scale(0.8);
