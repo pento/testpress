@@ -94,6 +94,28 @@ function createWindow() {
 		}
 	} );
 
+	if ( process.platform === 'darwin' ) {
+		const { systemPreferences } = electron;
+
+		const setSystemThemeClass = () => {
+			const currentTheme = systemPreferences.isDarkMode() ? 'dark' : 'light';
+			const oldTheme = systemPreferences.isDarkMode() ? 'light' : 'dark';
+			return `
+				document.body.classList.remove( 'theme-${ oldTheme }' );
+				document.body.classList.add( 'theme-${ currentTheme }' );
+			`;
+		};
+
+		window.webContents.executeJavaScript( setSystemThemeClass() );
+
+		systemPreferences.subscribeNotification(
+			'AppleInterfaceThemeChangedNotification',
+			() => {
+				window.webContents.executeJavaScript( setSystemThemeClass() );
+			}
+		);
+	}
+
 	window.on( 'closed', () => {
 		window = null;
 	} );

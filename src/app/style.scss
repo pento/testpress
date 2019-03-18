@@ -1,3 +1,5 @@
+@import "../_colors.scss";
+
 .tray-pointer {
 	height: 0;
 	width: 0;
@@ -15,4 +17,12 @@ body.trayright .tray-pointer {
 	background-color: #fff;
 	color: #191e23;
 	height: 340px;
+	.theme-light & {
+		color: $dark-gray-700;
+		background-color: $light-gray-100;
+	}
+	.theme-dark & {
+		color: $light-gray-200;
+		background-color: $dark-gray-400;
+	}
 }
