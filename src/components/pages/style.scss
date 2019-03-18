@@ -99,17 +99,7 @@
 		margin: 0 0 0 5px;
 	}
 
-	.preferences-button {
+	.pages__page-patching-button {
 		margin-left: auto;
-	}
-
-	&__page-patching-button {
-		border: none;
-		background: none;
-		cursor: pointer;
-		
-		.gridicon {
-			fill: #82878C;
-		}
 	}
 }

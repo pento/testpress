@@ -3,7 +3,11 @@
  */
 import React, { Component } from 'react';
 import { CSSTransition } from 'react-transition-group';
-import Gridicon from 'gridicons';
+
+/**
+ * WordPress dependencies
+ */
+import { IconButton } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -52,14 +56,13 @@ class Pages extends Component {
 										<h1 className="pages__page-title">
 											{ page.heading }
 										</h1>
-										{ activePage !== 3 &&
-											<button
+										{ activePage === 0 &&
+											<IconButton
 												className="pages__page-patching-button"
 												onClick={ () => this.setActivePage( 3 ) }
-												title="Apply and upload patches"
-											>
-												<Gridicon icon="code" />
-											</button>
+												icon="editor-code"
+												label="Apply and upload patches"
+											/>
 										}
 										<PreferencesButton
 											activePage={ activePage }
