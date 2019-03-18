@@ -2,12 +2,11 @@
  * External dependencies
  */
 import React, { Component } from 'react';
-import Gridicon from 'gridicons';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import './style.scss';
+import { IconButton } from '@wordpress/components';
 
 const { ipcRenderer, remote } = window.require( 'electron' );
 const { Menu, MenuItem, process } = remote;
@@ -50,12 +49,12 @@ class PreferencesButton extends Component {
 
 		this.buttonStyles = {
 			close: {
-				icon: 'cross',
+				icon: 'no-alt',
 				text: 'Close Preferences',
 			},
 			preferences: {
-				icon: 'cog',
-				text: 'Preferences',
+				icon: 'admin-generic',
+				text: 'Settings',
 			},
 		};
 	}
@@ -80,15 +79,13 @@ class PreferencesButton extends Component {
 		const { icon, text } = this.buttonStyles[ activePage ? 'close' : 'preferences' ];
 
 		return (
-			<button
+			<IconButton
 				className="preferences-button"
 				onClick={ this.handleClick }
 				title={ text }
-			>
-				<Gridicon
-					icon={ icon }
-				/>
-			</button>
+				icon={ icon }
+				label={ text }
+			/>
 		);
 	}
 }

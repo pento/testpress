@@ -30,29 +30,25 @@
 	&__page-header {
 		height: 35px;
 		padding: 10px;
-		color: #82878c;
+		color: #555d66;
 		border-bottom: 1px solid #ccc;
 		display: flex;
-		flex-direction: row;
-	}
-
-	&__page-title {
-		margin: 0;
-		flex: auto;
-		display: flex;
-		flex-direction: row;
+		align-items: center;
 	}
 
 	&__page-title-logo {
-		padding: 5px;
+		margin: 5px;
 		height: 25px;
-		fill: #82878c;
+		fill: #555d66;
 	}
 
-	&__page-title-text {
-		padding-left: 5px;
+	&__page-title {
 		font-size: 18px;
 		font-weight: normal;
-		margin: auto 0;
+		margin: 0 0 0 5px;
+	}
+
+	.preferences-button {
+		margin-left: auto;
 	}
 }
