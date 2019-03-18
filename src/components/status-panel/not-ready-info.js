@@ -7,7 +7,7 @@ import { normalize } from 'path';
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { Button, Icon, Spinner } from '@wordpress/components';
 
 /**
  * Electron dependencies
@@ -15,6 +15,15 @@ import { Button } from '@wordpress/components';
 const { shell, remote } = window.require( 'electron' );
 
 const logPath = normalize( remote.app.getPath( 'userData' ) + '/debug.log' );
+
+function StatusMessage( { isReady, children } ) {
+	return (
+		<div className="status__message">
+			{ isReady ? <Icon icon="yes" className="status__message-icon" /> : <Spinner /> }
+			<span>{ children }</span>
+		</div>
+	);
+}
 
 export default function NotReadyInfo( { statuses } ) {
 	return (
@@ -28,15 +37,22 @@ export default function NotReadyInfo( { statuses } ) {
 				</strong>
 			</p>
 			<p>Please wait a moment while TestPress gets everything ready.</p>
-			<p>
-				{ statuses.docker === 'ready' ? '👍' : '👉' } Starting Docker…
-				<br />
-				{ /* TODO: Make this work */ }
-				{ /* { statuses.node === 'ready' ? '👍' : '👉' } Installing node… */ }
-				{ /* <br /> */ }
-				{ statuses.grunt === 'ready' ? '👍' : '👉' } Compiling assets…
-				<br />
-				{ statuses.wordpress === 'ready' ? '👍' : '👉' } Installing WordPress…
+			<p className="status__message-container">
+				<StatusMessage isReady={ statuses.docker === 'ready' }>
+					Starting Docker…
+				</StatusMessage>
+				{ /*
+					// TODO: make this work
+					<StatusMessage isReady={ statuses.node === 'ready' }>
+						Installing node…
+					</StatusMessage>
+				*/ }
+				<StatusMessage isReady={ statuses.grunt === 'ready' }>
+					Compiling assets…
+				</StatusMessage>
+				<StatusMessage isReady={ statuses.wordpress === 'ready' }>
+					Installing WordPress…
+				</StatusMessage>
 			</p>
 			<p>
 				<Button isLarge onClick={ () => shell.openItem( logPath ) }>View log</Button>
