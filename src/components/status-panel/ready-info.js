@@ -11,7 +11,25 @@ import { Button } from '@wordpress/components';
 /**
  * Electron dependencies
  */
-const { ipcRenderer, shell } = window.require( 'electron' );
+const { ipcRenderer, shell, remote } = window.require( 'electron' );
+const { spawn } = window.require( 'child_process' );
+
+async function openWPCLITerminal() {
+	const preferences = ipcRenderer.sendSync( 'getPreferences' );
+	const appDataPath = remote.app.getPath( 'appData' ).replace( /(\s+)/g, '\\\\\\\\$1' );
+	const wordpressFolder = preferences.basic[ 'wordpress-folder' ].replace( /(\s+)/g, '\\\\\\\\$1' );
+	const dockerConfigFolder = appDataPath + '/testpress/tools/';
+	const dockerCompose = dockerConfigFolder + 'docker-compose.yml';
+	const dockerComposeScripts = dockerConfigFolder + 'docker-compose.scripts.yml';
+
+	const osascript = `"tell application \\"Terminal\\"
+		activate
+		set currentTab to do script \\"alias wp='docker-compose -f ${ dockerCompose } -f ${ dockerComposeScripts } run --rm cli'\\"
+		delay 2
+		do script \\"cd ${ wordpressFolder }\\" in currentTab
+	end tell"`;
+	await spawn( 'osascript', [ '-e', osascript ], { shell: true } );
+}
 
 export default function ReadyInfo() {
 	const {
@@ -42,10 +60,15 @@ export default function ReadyInfo() {
 				Password: password
 			</p>
 			<p>
-				<Button isLarge onClick={ () => shell.openExternal( siteURL ) }>View site</Button>
-				<Button isLarge onClick={ () => shell.openExternal( adminURL ) }>WP Admin</Button>
-				{ /* TODO: Make this button do something */ }
-				{ /* <Button isLarge>WP CLI</Button> */ }
+				<Button isLarge onClick={ () => shell.openExternal( siteURL ) }>
+					View site
+				</Button>
+				<Button isLarge onClick={ () => shell.openExternal( adminURL ) }>
+					WP Admin
+				</Button>
+				<Button isLarge onClick={ openWPCLITerminal }>
+					WP CLI
+				</Button>
 			</p>
 		</div>
 	);
