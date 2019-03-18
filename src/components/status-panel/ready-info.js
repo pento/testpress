@@ -4,6 +4,11 @@
 import React from 'react';
 
 /**
+ * WordPress dependencies
+ */
+import { Button } from '@wordpress/components';
+
+/**
  * Electron dependencies
  */
 const { ipcRenderer, shell } = window.require( 'electron' );
@@ -37,10 +42,10 @@ export default function ReadyInfo() {
 				Password: password
 			</p>
 			<p>
-				<button onClick={ () => shell.openExternal( siteURL ) }>View site</button>
-				<button onClick={ () => shell.openExternal( adminURL ) }>WP Admin</button>
+				<Button isLarge onClick={ () => shell.openExternal( siteURL ) }>View site</Button>
+				<Button isLarge onClick={ () => shell.openExternal( adminURL ) }>WP Admin</Button>
 				{ /* TODO: Make this button do something */ }
-				{ /* <button>WP CLI</button> */ }
+				{ /* <Button isLarge>WP CLI</Button> */ }
 			</p>
 		</div>
 	);

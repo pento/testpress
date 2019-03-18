@@ -10,7 +10,7 @@ import ReactDOM from 'react-dom';
 import TestPress from './app';
 import registerServiceWorker from './registerServiceWorker';
 
-import './index.css';
+import './index.scss';
 
 ReactDOM.render( <TestPress />, document.getElementById( 'root' ) );
 registerServiceWorker();

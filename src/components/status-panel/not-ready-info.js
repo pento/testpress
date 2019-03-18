@@ -5,6 +5,11 @@ import React from 'react';
 import { normalize } from 'path';
 
 /**
+ * WordPress dependencies
+ */
+import { Button } from '@wordpress/components';
+
+/**
  * Electron dependencies
  */
 const { shell, remote } = window.require( 'electron' );
@@ -34,7 +39,7 @@ export default function NotReadyInfo( { statuses } ) {
 				{ statuses.wordpress === 'ready' ? '👍' : '👉' } Installing WordPress…
 			</p>
 			<p>
-				<button onClick={ () => shell.openItem( logPath ) }>View log</button>
+				<Button isLarge onClick={ () => shell.openItem( logPath ) }>View log</Button>
 			</p>
 		</div>
 	);
