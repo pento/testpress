@@ -2,6 +2,14 @@
  * External dependencies
  */
 import React from 'react';
+import { normalize } from 'path';
+
+/**
+ * Electron dependencies
+ */
+const { shell, remote } = window.require( 'electron' );
+
+const logPath = normalize( remote.app.getPath( 'userData' ) + '/debug.log' );
 
 export default function NotReadyInfo( { statuses } ) {
 	return (
@@ -26,8 +34,7 @@ export default function NotReadyInfo( { statuses } ) {
 				{ statuses.wordpress === 'ready' ? '👍' : '👉' } Installing WordPress…
 			</p>
 			<p>
-				{ /* TODO: Make this button do something */ }
-				{ /* <button>Show log</button> */ }
+				<button onClick={ () => shell.openItem( logPath ) }>View log</button>
 			</p>
 		</div>
 	);

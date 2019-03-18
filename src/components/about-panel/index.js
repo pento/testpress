@@ -11,6 +11,8 @@ import './style.scss';
 
 const { shell, remote } = window.require( 'electron' );
 
+const logPath = normalize( remote.app.getPath( 'userData' ) + '/debug.log' );
+
 class AboutPanel extends Component {
 	render() {
 		return (
@@ -23,7 +25,7 @@ class AboutPanel extends Component {
 					If something has gone wrong, please also attach the debug log to your bug report.
 				</p>
 				<p>
-					<button onClick={ () => shell.showItemInFolder( normalize( remote.app.getPath( 'userData' ) + '/debug.log' ) ) }>Open Debug Log</button>
+					<button onClick={ () => shell.openItem( logPath ) }>View debug log</button>
 				</p>
 			</div>
 		);
