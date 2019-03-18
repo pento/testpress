@@ -56,18 +56,20 @@ class Pages extends Component {
 										<h1 className="pages__page-title">
 											{ page.heading }
 										</h1>
-										{ activePage === 0 &&
-											<IconButton
-												className="pages__page-patching-button"
-												onClick={ () => this.setActivePage( 3 ) }
-												icon="editor-code"
-												label="Apply and upload patches"
+										<div className="pages__page-button-group">
+											{ activePage === 0 &&
+												<IconButton
+													className="pages__page-patching-button"
+													onClick={ () => this.setActivePage( 3 ) }
+													icon="editor-code"
+													label="Apply and upload patches"
+												/>
+											}
+											<PreferencesButton
+												activePage={ activePage }
+												setActivePage={ this.setActivePage }
 											/>
-										}
-										<PreferencesButton
-											activePage={ activePage }
-											setActivePage={ this.setActivePage }
-										/>
+										</div>
 									</header>
 									{ page.panel }
 								</div>
