@@ -5,6 +5,11 @@ import React, { Component } from 'react';
 import { normalize } from 'path';
 
 /**
+ * WordPress dependencies
+ */
+import { Button } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -25,7 +30,7 @@ class AboutPanel extends Component {
 					If something has gone wrong, please also attach the debug log to your bug report.
 				</p>
 				<p>
-					<button onClick={ () => shell.openItem( logPath ) }>View debug log</button>
+					<Button isLarge onClick={ () => shell.openItem( logPath ) }>View debug log</Button>
 				</p>
 			</div>
 		);

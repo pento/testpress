@@ -4,6 +4,11 @@
 import React from 'react';
 
 /**
+ * WordPress dependencies
+ */
+import { Button } from '@wordpress/components';
+
+/**
  * Electron dependencies
  */
 const { remote, ipcRenderer } = window.require( 'electron' );
@@ -45,7 +50,7 @@ export default function MissingFolderInfo() {
 				clone { repositoryLink }.
 			</p>
 			<p>
-				<button onClick={ selectWordPressFolder }>Choose WordPress Folder</button>
+				<Button isLarge onClick={ selectWordPressFolder }>Choose WordPress Folder</Button>
 			</p>
 		</div>
 	);

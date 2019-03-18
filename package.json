@@ -22,6 +22,7 @@
 	},
 	"main": "src/electron-runner.js",
 	"dependencies": {
+		"@wordpress/components": "^7.1.0",
 		"@wordpress/hooks": "2.0.5",
 		"await-sleep": "0.0.1",
 		"chokidar": "2.1.2",

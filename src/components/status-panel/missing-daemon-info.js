@@ -4,6 +4,11 @@
 import React from 'react';
 
 /**
+ * WordPress dependencies
+ */
+import { Button } from '@wordpress/components';
+
+/**
  * Electron dependencies
  */
 const { platform } = window.require( 'process' );
@@ -33,15 +38,15 @@ export default function MissingDaemonInfo() {
 
 	if ( dockerDesktopPath && existsSync( dockerDesktopPath ) ) {
 		button = (
-			<button onClick={ () => shell.openItem( dockerDesktopPath ) }>
+			<Button isLarge onClick={ () => shell.openItem( dockerDesktopPath ) }>
 				Open { dockerDesktopName }
-			</button>
+			</Button>
 		);
 	} else {
 		button = (
-			<button onClick={ () => shell.openExternal( dockerDesktopURL ) }>
+			<Button isLarge onClick={ () => shell.openExternal( dockerDesktopURL ) }>
 				Download { dockerDesktopName }
-			</button>
+			</Button>
 		);
 	}
 
