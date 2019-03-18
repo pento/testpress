@@ -1,3 +1,5 @@
+@import "../../_colors.scss";
+
 .about-panel {
 	padding: 0 15px 15px;
 	position: absolute;
@@ -5,5 +7,14 @@
 
 	&__repository-link.is-link {
 		font-size: 16px;
+	}
+
+	.components-button.is-link {
+		.theme-light & {
+			color: $blue-medium-500;
+		}
+		.theme-dark & {
+			color: $blue-medium-200;
+		}
 	}
 }

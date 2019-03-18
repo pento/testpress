@@ -5,7 +5,13 @@
 	width: 0;
 	border-left: 8px solid transparent;
 	border-right: 8px solid transparent;
-	border-bottom: 8px solid #fff;
+
+	.theme-light & {
+		border-bottom: 8px solid $light-gray-100;
+	}
+	.theme-dark & {
+		border-bottom: 8px solid $dark-gray-400;
+	}
 	margin: 0 auto;
 }
 

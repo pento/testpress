@@ -71,7 +71,9 @@
 		}
 	}
 
-	.components-button:focus {
+	.components-icon-button:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
+	.components-icon-button:not(:disabled):not([aria-disabled="true"]):not(.is-default):active,
+	.components-icon-button:not(:disabled):not([aria-disabled="true"]):not(.is-default):focus {
 		.theme-light & {
 			color: $dark-gray-700;
 			background-color: $light-gray-200;
@@ -79,6 +81,15 @@
 		.theme-dark & {
 			color: $light-gray-200;
 			background-color: $dark-gray-700;
+		}
+	}
+
+	.components-button.is-link {
+		.theme-light & {
+			color: $blue-medium-500;
+		}
+		.theme-dark & {
+			color: $blue-medium-200;
 		}
 	}
 
