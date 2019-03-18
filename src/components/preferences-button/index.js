@@ -82,7 +82,6 @@ class PreferencesButton extends Component {
 			<IconButton
 				className="preferences-button"
 				onClick={ this.handleClick }
-				title={ text }
 				icon={ icon }
 				label={ text }
 			/>
