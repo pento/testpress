@@ -53,7 +53,13 @@ export default function ReadyInfo() {
 				something amazing!
 			</p>
 			<p>
-				<a href={ siteURL }>{ siteURL }</a>
+				<Button
+					isLink
+					className="status__site-link"
+					onClick={ () => shell.openExternal( siteURL ) }
+				>
+					{ siteURL }
+				</Button>
 				<br />
 				Username: admin
 				<br />
