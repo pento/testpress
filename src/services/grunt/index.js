@@ -35,18 +35,22 @@ function registerGruntJob() {
 		watch( gruntfileJs ).on( 'change', () => {
 			debug( 'Gruntfile.js change detected' );
 			runGruntWatch();
-		 } );
+		} );
 	}
 }
 
 /**
  * If the WordPress folder is defined, run `grunt watch` on it.
+ *
+ * @param {string=} folderPref The folder preference to try and watch.
  */
 function runGruntWatch( folderPref = '' ) {
 	// We only need to run `grunt watch` on WordPress folder updates.
 	if ( folderPref && 'wordpress-folder' !== folderPref ) {
 		return;
 	}
+
+	setStatus( 'grunt', 'building' );
 
 	debug( 'Preparing to run `grunt watch`' );
 
@@ -89,14 +93,15 @@ function runGruntWatch( folderPref = '' ) {
 		if ( finishedFirstRun ) {
 			if ( waiting ) {
 				showedBuilding = false;
+				setStatus( 'grunt', 'ready' );
 				debug( 'Ready' );
-				setStatus( 'okay', 'Ready :' );
 			} else if ( ! showedBuilding ) {
 				showedBuilding = true;
+				setStatus( 'grunt', 'rebuilding' );
 				debug( 'Building...' );
-				setStatus( 'okay', 'Building environment...' );
 			}
 		} else if ( waiting ) {
+			setStatus( 'grunt', 'ready' );
 			debug( 'Ready' );
 			finishedFirstRun = true;
 			showedBuilding = true;

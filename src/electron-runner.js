@@ -149,6 +149,8 @@ app.on( 'ready', () => {
 	createTray();
 	createWindow();
 	registerJobs();
+
+	window.once( 'ready-to-show', showWindow );
 } );
 
 // Quit when all windows are closed.

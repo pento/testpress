@@ -18,7 +18,7 @@ class TestPress extends Component {
 		super( ...arguments );
 
 		this.pages = [ {
-			heading: 'Welcome to TestPress',
+			heading: 'TestPress',
 			panel: ( <StatusPanel /> ),
 		}, {
 			heading: 'Preferences',
