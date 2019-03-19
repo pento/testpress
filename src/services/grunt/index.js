@@ -235,7 +235,6 @@ function runGruntUploadPatch( ticket, username, password ) {
 	const patchProcess = spawn( NODE_BIN, [
 		grunt,
 		`upload_patch:${ ticket }`,
-		'--useEnv',
 	], {
 		cwd,
 		encoding: 'utf8',
