@@ -5,6 +5,11 @@ import React, { Component } from 'react';
 import { CSSTransition } from 'react-transition-group';
 
 /**
+ * WordPress dependencies
+ */
+import { IconButton } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import PreferencesButton from '../preferences-button';
@@ -51,10 +56,20 @@ class Pages extends Component {
 										<h1 className="pages__page-title">
 											{ page.heading }
 										</h1>
-										<PreferencesButton
-											activePage={ activePage }
-											setActivePage={ this.setActivePage }
-										/>
+										<div className="pages__page-button-group">
+											{ activePage === 0 &&
+												<IconButton
+													className="pages__page-patching-button"
+													onClick={ () => this.setActivePage( 3 ) }
+													icon="editor-code"
+													label="Apply and upload patches"
+												/>
+											}
+											<PreferencesButton
+												activePage={ activePage }
+												setActivePage={ this.setActivePage }
+											/>
+										</div>
 									</header>
 									{ page.panel }
 								</div>
