@@ -63,9 +63,6 @@
 	}
 
 	.components-icon-button .dashicon {
-		.theme-light & {
-			fill: $blue-wordpress-700;
-		}
 		.theme-dark & {
 			fill: $blue-medium-100;
 		}
@@ -74,10 +71,6 @@
 	.components-icon-button:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
 	.components-icon-button:not(:disabled):not([aria-disabled="true"]):not(.is-default):active,
 	.components-icon-button:not(:disabled):not([aria-disabled="true"]):not(.is-default):focus {
-		.theme-light & {
-			color: $dark-gray-700;
-			background-color: $light-gray-200;
-		}
 		.theme-dark & {
 			color: $light-gray-200;
 			background-color: $dark-gray-700;
