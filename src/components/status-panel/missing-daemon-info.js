@@ -9,6 +9,11 @@ import React, { useState } from 'react';
 import { Button } from '@wordpress/components';
 
 /**
+ * Internal dependencies
+ */
+import ExternalLink from '../external-link';
+
+/**
  * Electron dependencies
  */
 const { platform } = window.require( 'process' );
@@ -49,7 +54,7 @@ function OpenDockerButton() {
 }
 
 export default function MissingDaemonInfo() {
-	const link = <a href={ dockerDesktopURL }>{ dockerDesktopName }</a>;
+	const link = <ExternalLink href={ dockerDesktopURL }>{ dockerDesktopName }</ExternalLink>;
 
 	let button;
 
