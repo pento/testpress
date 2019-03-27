@@ -6,17 +6,16 @@
 	overflow: hidden;
 
 	&__page {
+		background-color: $light-gray-100;
+		color: $dark-gray-700;
 		height: 100%;
-		position: absolute;
 		left: 350px;
+		position: absolute;
 		width: 350px;
-		.theme-light & {
-			color: $dark-gray-700;
-			background-color: $light-gray-100;
-		}
+
 		.theme-dark & {
-			color: $light-gray-200;
 			background-color: $dark-gray-400;
+			color: $light-gray-200;
 		}
 	}
 
@@ -37,35 +36,32 @@
 	}
 
 	&__page-header {
+		align-items: center;
+		border-bottom: 1px solid $dark-gray-400;
+		color: $dark-gray-700;
+		display: flex;
 		height: 35px;
 		padding: 10px;
-		display: flex;
-		align-items: center;
-		.theme-light & {
-			color: $dark-gray-700;
-			border-bottom: 1px solid $dark-gray-400;
-		}
+
 		.theme-dark & {
-			color: $light-gray-200;
 			border-bottom: 1px solid $light-gray-100;
+			color: $light-gray-200;
 		}
 	}
 
 	&__page-title-logo {
-		margin: 5px;
+		fill: $blue-wordpress-700;
 		height: 25px;
-		.theme-light & {
-			fill: $blue-wordpress-700;
-		}
+		margin: 5px;
+
 		.theme-dark & {
 			fill: $blue-medium-100;
 		}
 	}
 
 	.components-icon-button .dashicon {
-		.theme-light & {
-			fill: $blue-wordpress-700;
-		}
+		fill: $blue-wordpress-700;
+
 		.theme-dark & {
 			fill: $blue-medium-100;
 		}
@@ -74,20 +70,18 @@
 	.components-icon-button:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
 	.components-icon-button:not(:disabled):not([aria-disabled="true"]):not(.is-default):active,
 	.components-icon-button:not(:disabled):not([aria-disabled="true"]):not(.is-default):focus {
-		.theme-light & {
-			color: $dark-gray-700;
-			background-color: $light-gray-200;
-		}
+		background-color: $light-gray-200;
+		color: $dark-gray-700;
+
 		.theme-dark & {
-			color: $light-gray-200;
 			background-color: $dark-gray-700;
+			color: $light-gray-200;
 		}
 	}
 
 	.components-button.is-link {
-		.theme-light & {
-			color: $blue-medium-500;
-		}
+		color: $blue-medium-500;
+
 		.theme-dark & {
 			color: $blue-medium-200;
 		}

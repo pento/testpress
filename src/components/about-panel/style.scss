@@ -10,9 +10,8 @@
 	}
 
 	.components-button.is-link {
-		.theme-light & {
-			color: $blue-medium-500;
-		}
+		color: $blue-medium-500;
+
 		.theme-dark & {
 			color: $blue-medium-200;
 		}
