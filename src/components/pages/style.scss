@@ -44,7 +44,7 @@
 		padding: 10px;
 
 		.theme-dark & {
-			border-bottom: 1px solid $light-gray-100;
+			border-bottom-color: $light-gray-100;
 			color: $light-gray-200;
 		}
 	}
