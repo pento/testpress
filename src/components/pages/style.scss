@@ -7,7 +7,6 @@
 
 	&__page {
 		background-color: $light-gray-100;
-		color: $dark-gray-700;
 		height: 100%;
 		left: 350px;
 		position: absolute;
@@ -15,7 +14,6 @@
 
 		.theme-dark & {
 			background-color: $dark-gray-400;
-			color: $light-gray-200;
 		}
 	}
 
