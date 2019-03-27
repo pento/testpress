@@ -4,16 +4,4 @@
 	padding: 0 15px 15px;
 	position: absolute;
 	text-align: center;
-
-	&__repository-link.is-link {
-		font-size: inherit;
-	}
-
-	.components-button.is-link {
-		color: $blue-medium-500;
-
-		.theme-dark & {
-			color: $blue-medium-200;
-		}
-	}
 }
