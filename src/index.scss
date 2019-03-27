@@ -1,8 +1,10 @@
 @import "../node_modules/@wordpress/components/build-style/style.css";
 @import "./_colors.scss";
+
 body {
+	font-family: sans-serif;
+	font-size: 16px;
+	line-height: 1.35;
 	margin: 0;
 	padding: 0;
-	font-family: sans-serif;
-	line-height: 1.35;
 }
