@@ -32,3 +32,11 @@ body.trayright .tray-pointer {
 		background-color: $dark-gray-400;
 	}
 }
+
+.components-button.is-large {
+	.theme-dark & {
+		color: $light-gray-200;
+		background-color: $dark-gray-400;
+		box-shadow: inset 0 -1px 0 $dark-gray-700;
+	}
+}
