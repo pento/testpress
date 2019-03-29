@@ -497,11 +497,13 @@ function shutdown() {
 		'down',
 	], {
 		cwd: TOOLS_DIR,
+		detached: true,
 		encoding: 'utf8',
 		env: {
 			PATH: process.env.PATH,
 			...dockerEnv,
 		},
+		stdio: [ 'ignore', 'ignore', 'ignore' ],
 	} );
 }
 
