@@ -159,6 +159,8 @@ async function startDocker() {
 	writeFileSync( normalize( TOOLS_DIR + '/docker-compose.scripts.yml' ), scriptOptionsYaml );
 
 	copyFileSync( normalize( __dirname + '/default.conf' ), normalize( TOOLS_DIR + '/default.conf' ) );
+	copyFileSync( normalize( __dirname + '/php-config.ini' ), normalize( TOOLS_DIR + '/php-config.ini' ) );
+	copyFileSync( normalize( __dirname + '/phpunit-config.ini' ), normalize( TOOLS_DIR + '/phpunit-config.ini' ) );
 
 	if ( USING_TOOLBOX ) {
 		await startDockerMachine();
