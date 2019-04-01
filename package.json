@@ -89,6 +89,7 @@
 			"node_modules/**/*",
 			"src/**/*"
 		],
+		"publish": "github",
 		"mac": {
 			"category": "public.app-category.developer-tools",
 			"icon": "assets/icon.png",
@@ -97,8 +98,10 @@
 				"LSEnvironment": {
 					"PATH": "/usr/local/bin:/usr/bin:/bin"
 				}
-			},
-			"publish": "github"
+			}
+		},
+		"win": {
+			"icon": "assets/icon.ico"
 		}
 	},
 	"lint-staged": {
