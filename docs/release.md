@@ -1,17 +1,27 @@
 # TestPress Release Process
 
-It's currently only possible to build release packages on MacOS.
+It's currently only possible to build release packages on MacOS and Windows.
 
-## GitHub Token
+## Signing
 
-If you don't already have a GitHub token configured:
-
-* [Create a new token](https://github.com/settings/tokens/new) with the `repo` permissions.
-* Assign it to the `GH_TOKEN` environment variable on your computer.
+* **GitHub**: [Create a new token](https://github.com/settings/tokens/new) with the `repo` permissions, and assign it to the `GH_TOKEN` environment variable.
+* **MacOS**: Install a MacOS Developer ID Application Key in your keychain.
+* **Windows**: Install a Windows Authenticode certificate.
 
 ## MacOS Key
 
-You need a MacOS Developer ID Application key in order to release TestPress. Ensure it's installed in your keychain, and up-to-date.
+You need a MacOS Developer ID Application key. Ensure it's installed in your keychain, and up-to-date.
+
+## Windows Key
+
+You need a Windows Authenticode certificate file. Ensure it's up-to-date.
+
+Set the file location like so:
+
+```
+$env:CSC_LINK = "C:\Users\Me\Desktop\code-signing.pfx"
+$env:CSC_KEY_PASSWORD = "MySuperSecureCertificatePassword"
+```
 
 ## Building and Releasing
 
