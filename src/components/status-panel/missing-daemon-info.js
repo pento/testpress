@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import React from 'react';
+import React, { useState } from 'react';
 
 /**
  * WordPress dependencies
@@ -31,17 +31,30 @@ if ( platform === 'win32' ) {
 	// TODO: Set dockerDesktopPath to something reasonable for Windows.
 }
 
+function OpenDockerButton() {
+	const [ isOpening, setIsOpening ] = useState( false );
+
+	return (
+		<Button
+			isLarge
+			disabled={ isOpening }
+			onClick={ () => {
+				shell.openItem( dockerDesktopPath );
+				setIsOpening( true );
+			} }
+		>
+			{ isOpening ? `Opening ${ dockerDesktopName }…` : `Open ${ dockerDesktopName }` }
+		</Button>
+	);
+}
+
 export default function MissingDaemonInfo() {
 	const link = <a href={ dockerDesktopURL }>{ dockerDesktopName }</a>;
 
 	let button;
 
 	if ( dockerDesktopPath && existsSync( dockerDesktopPath ) ) {
-		button = (
-			<Button isLarge onClick={ () => shell.openItem( dockerDesktopPath ) }>
-				Open { dockerDesktopName }
-			</Button>
-		);
+		button = <OpenDockerButton />;
 	} else {
 		button = (
 			<Button isLarge onClick={ () => shell.openExternal( dockerDesktopURL ) }>
