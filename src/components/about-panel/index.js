@@ -12,6 +12,7 @@ import { Button } from '@wordpress/components';
 /**
  * Internal dependencies
  */
+import ExternalLink from '../external-link';
 import './style.scss';
 
 const { shell, remote } = window.require( 'electron' );
@@ -21,13 +22,7 @@ const logPath = normalize( remote.app.getPath( 'userData' ) + '/debug.log' );
 class AboutPanel extends Component {
 	render() {
 		const repositoryLink = (
-			<Button
-				isLink
-				className="about-panel__repository-link"
-				onClick={ () => shell.openExternal( 'https://github.com/pento/testpress' ) }
-			>
-				GitHub repository
-			</Button>
+			<ExternalLink href="https://github.com/pento/testpress">GitHub repository</ExternalLink>
 		);
 
 		return (

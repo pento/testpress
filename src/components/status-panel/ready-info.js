@@ -9,6 +9,11 @@ import React from 'react';
 import { Button } from '@wordpress/components';
 
 /**
+ * Internal dependencies
+ */
+import ExternalLink from '../external-link';
+
+/**
  * Electron dependencies
  */
 const { ipcRenderer, shell, remote } = window.require( 'electron' );
@@ -53,13 +58,7 @@ export default function ReadyInfo() {
 				something amazing!
 			</p>
 			<p>
-				<Button
-					isLink
-					className="status__site-link"
-					onClick={ () => shell.openExternal( siteURL ) }
-				>
-					{ siteURL }
-				</Button>
+				<ExternalLink href={ siteURL }>{ siteURL }</ExternalLink>
 				<br />
 				Username: admin
 				<br />

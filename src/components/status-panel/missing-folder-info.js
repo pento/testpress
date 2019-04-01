@@ -9,6 +9,11 @@ import React from 'react';
 import { Button } from '@wordpress/components';
 
 /**
+ * Internal dependencies
+ */
+import ExternalLink from '../external-link';
+
+/**
  * Electron dependencies
  */
 const { remote, ipcRenderer } = window.require( 'electron' );
@@ -29,9 +34,13 @@ function selectWordPressFolder() {
 }
 
 export default function MissingFolderInfo() {
-	const desktopLink = <a href="https://desktop.github.com">GitHub Desktop</a>;
+	const desktopLink = (
+		<ExternalLink href="https://desktop.github.com">GitHub Desktop</ExternalLink>
+	);
 	const repositoryLink = (
-		<a href="https://github.com/WordPress/wordpress-develop">wordpress-develop</a>
+		<ExternalLink href="https://github.com/WordPress/wordpress-develop">
+			wordpress-develop
+		</ExternalLink>
 	);
 
 	return (
@@ -50,7 +59,9 @@ export default function MissingFolderInfo() {
 				clone { repositoryLink }.
 			</p>
 			<p>
-				<Button isLarge onClick={ selectWordPressFolder }>Choose WordPress Folder</Button>
+				<Button isLarge onClick={ selectWordPressFolder }>
+					Choose WordPress Folder
+				</Button>
 			</p>
 		</div>
 	);
