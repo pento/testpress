@@ -2,8 +2,6 @@
 
 TestPress is a tool for contributing to WordPress. It automatically configures a development environment on your computer, allowing you to focus on making WordPress!
 
-This is currently tested on MacOS and Windows, but it should probably run on Linux, too. Bug reports and PRs are greatly appreciated. 🙂
-
 You'll need to install Docker in order to use TestPress. You can download it for [MacOS](https://download.docker.com/mac/stable/Docker.dmg), [Windows 10 Pro](https://download.docker.com/win/stable/Docker%20for%20Windows%20Installer.exe), [other versions of Windows](https://download.docker.com/win/stable/DockerToolbox.exe), and [all other operating systems](https://hub.docker.com/search/?type=edition&offering=community).
 
 This is currently tested on MacOS and Windows, but it should probably run on Linux, too. Bug reports and PRs are greatly appreciated! 💖
