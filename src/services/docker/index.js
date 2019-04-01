@@ -45,6 +45,10 @@ async function registerDockerJob() {
  * Get docker up and running.
  */
 async function startDocker() {
+	if ( USING_TOOLBOX ) {
+		await startDockerMachine();
+	}
+
 	debug( 'Checking if daemon is running' );
 	while ( ! await detectDockerDaemon() ) {
 		setStatus( 'docker', 'missing-daemon' );
@@ -160,10 +164,6 @@ async function startDocker() {
 
 	copyFileSync( normalize( __dirname + '/default.conf' ), normalize( TOOLS_DIR + '/default.conf' ) );
 
-	if ( USING_TOOLBOX ) {
-		await startDockerMachine();
-	}
-
 	debug( 'Starting docker containers' );
 	await spawn( 'docker-compose', [
 		'-f',
@@ -200,6 +200,7 @@ async function startDockerMachine() {
 		'default',
 	], {
 		cwd: TOOLS_DIR,
+		encoding: 'utf8',
 		env: {
 			PATH: process.env.PATH,
 		},
@@ -238,7 +239,7 @@ async function startDockerMachine() {
 	} ).catch( ( { stderr } ) => debug( stderr ) );
 
 	debug( 'Collecting docker environment info' );
-	const { stdout } = await spawn( 'docker-machine', [
+	await spawn( 'docker-machine', [
 		'env',
 		'default',
 		'--shell',
@@ -249,21 +250,23 @@ async function startDockerMachine() {
 		env: {
 			PATH: process.env.PATH,
 		},
-	} ).catch( ( { stderr } ) => debug( stderr ) );
+	} )
+		.then( ( { stdout } ) => {
+			stdout.split( '\n' ).forEach( ( line ) => {
+				// Environment info is in the form: SET ENV_VAR=value
+				if ( ! line.startsWith( 'SET' ) ) {
+					return;
+				}
 
-	stdout.split( '\n' ).forEach( ( line ) => {
-		// Environment info is in the form: SET ENV_VAR=value
-		if ( ! line.startsWith( 'SET' ) ) {
-			return;
-		}
+				const parts = line.trim().split( /[ =]/, 3 );
+				if ( 3 === parts.length ) {
+					dockerEnv[ parts[ 1 ] ] = parts[ 2 ];
+				}
+			} );
 
-		const parts = line.trim().split( /[ =]/, 3 );
-		if ( 3 === parts.length ) {
-			dockerEnv[ parts[ 1 ] ] = parts[ 2 ];
-		}
-	} );
-
-	debug( 'Docker environment: %O', dockerEnv );
+			debug( 'Docker environment: %O', dockerEnv );
+		} )
+		.catch( ( { stderr } ) => debug( stderr ) );
 }
 
 /**
@@ -399,7 +402,7 @@ async function detectDockerDaemon() {
  */
 async function detectToolbox() {
 	debug( 'Detecting if we should use Docker Toolbox or not' );
-	const { stdout } = await spawn( 'systeminfo', [
+	return await spawn( 'systeminfo', [
 		'/FO',
 		'CSV',
 	], {
@@ -407,36 +410,39 @@ async function detectToolbox() {
 		env: {
 			PATH: process.env.PATH,
 		},
-	}
-	);
+	} )
+		.then( ( { stdout } ) => csv().fromString( stdout ) )
+		.then( ( info ) => {
+			if ( ! info[ 0 ][ 'OS Name' ].includes( 'Pro' ) ) {
+				debug( 'Not running Windows Pro' );
+				return true;
+			}
 
-	const info = ( await csv().fromString( stdout ) )[ 0 ];
+			if ( info[ 0 ][ 'OS Version' ].match( /^\d+/ )[ 0 ] < 10 ) {
+				debug( 'Not running Windows 10' );
+				return true;
+			}
 
-	if ( ! info[ 'OS Name' ].includes( 'Pro' ) ) {
-		debug( 'Not running Windows Pro' );
-		return true;
-	}
+			if ( info[ 'OS Version' ].match( /\d+$/ )[ 0 ] < 14393 ) {
+				debug( 'Not running build 14393 or later' );
+				return true;
+			}
 
-	if ( info[ 'OS Version' ].match( /^\d+/ )[ 0 ] < 10 ) {
-		debug( 'Not running Windows 10' );
-		return true;
-	}
+			const hyperv = info[ 0 ][ 'Hyper-V Requirements' ].split( ',' );
 
-	if ( info[ 'OS Version' ].match( /\d+$/ )[ 0 ] < 14393 ) {
-		debug( 'Not running build 14393 or later' );
-		return true;
-	}
-
-	const hyperv = info[ 'Hyper-V Requirements' ].split( ',' );
-
-	return hyperv.reduce( ( allowed, line ) => {
-		const [ requirement, enabled ] = line.split( ':' ).map( ( val ) => val.trim().toLowerCase() );
-		if ( 'yes' !== enabled ) {
-			debug( "Don't have Hyper-V requirement \"%s\" available", requirement );
+			return hyperv.reduce( ( allowed, line ) => {
+				const [ requirement, enabled ] = line.split( ':' ).map( ( val ) => val.trim().toLowerCase() );
+				if ( 'yes' !== enabled ) {
+					debug( "Don't have Hyper-V requirement \"%s\" available", requirement );
+					return false;
+				}
+				return allowed;
+			}, true );
+		} )
+		.catch( ( { stderr } ) => {
+			debug( stderr );
 			return false;
-		}
-		return allowed;
-	}, true );
+		} );
 }
 
 /**
