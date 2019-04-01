@@ -28,16 +28,26 @@ After using NVM to ensure the correct version of Node is installed, building Tes
 
 ```
 npm install
-export DEBUG=wordpress:*
 npm run dev
 ```
 
-This enable all debugging messages, then build and start TestPress. If you find the debugging messages to be too noisy, you can restrict them by stopping TestPress (quit the application, or press `Ctrl+C` in your terminal), and altering the `DEBUG` environment variable. For example, if you're only interested in debug messages from the Docker service:
+### Debugging
+
+Before running `npm run dev`, you can set TestPress to display debug messages, like so:
+
+```
+export DEBUG=testpress:*
+npm run dev
+```
+
+This enable all debugging messages, then builds and starts TestPress. If you find the debugging messages to be too noisy, you can restrict them by stopping TestPress (quit the application, or press `Ctrl+C` in your terminal), and altering the `DEBUG` environment variable. For example, if you're only interested in debug messages from the Docker service:
 
 ```
 export DEBUG=testpress:services:docker
 npm run dev
 ```
+
+If you need to debug the the TestPress window, holding down Cmd+Shift while clicking the icon will open Dev Tools.
 
 ## Workflow
 
