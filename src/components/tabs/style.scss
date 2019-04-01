@@ -2,11 +2,10 @@
 
 .tabs {
 	&__headings {
-		padding: 20px 15px 10px;
 		border-bottom: 1px solid #ccc;
-		.theme-light & {
-			color: $dark-gray-700;
-		}
+		color: $dark-gray-700;
+		padding: 20px 15px 10px;
+
 		.theme-dark & {
 			color: $light-gray-200;
 		}
@@ -19,21 +18,19 @@
 	}
 
 	&__heading--active {
-		.theme-light & {
-			color: $blue-wordpress-700;
-			border-bottom: 1px solid $light-gray-100;
-		}
+		color: $blue-wordpress-700;
+		border-bottom: 1px solid $light-gray-100;
+
 		.theme-dark & {
 			color: $blue-medium-200;
-			border-bottom: 1px solid $dark-gray-400;
+			border-bottom-color: $dark-gray-400;
 		}
 	}
 
 	&__pages {
+		color: $dark-gray-700;
 		padding: 20px 15px;
-		.theme-light & {
-			color: $dark-gray-700;
-		}
+
 		.theme-dark & {
 			color: $light-gray-200;
 		}

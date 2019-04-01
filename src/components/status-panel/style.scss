@@ -10,7 +10,7 @@
 	}
 
 	&__site-link.is-link {
-		font-size: 16px;
+		font-size: inherit;
 	}
 
 	&__message-container {
@@ -26,10 +26,10 @@
 		.components-spinner {
 			transform: scale(0.8);
 			background-color: currentColor;
+
 			&::before {
-				.theme-light & {
-					background-color: #fff;
-				}
+				background-color: #fff;
+
 				.theme-dark & {
 					background-color: #000;
 				}

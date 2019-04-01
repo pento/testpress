@@ -5,26 +5,24 @@
 	&__input > label {
 		display: block;
 		margin: 10px 0;
-		.theme-light & {
-			color: $dark-gray-700;
-		}
+		color: $dark-gray-700;
+
 		.theme-dark & {
 			color: $light-gray-200;
 		}
 	}
 
 	&__directory-select > button {
-		border: none;
-		text-decoration: underline;
-		cursor: pointer;
 		background: none;
+		border: none;
+		color: $dark-gray-700;
+		cursor: pointer;
 		display: block;
 		font-size: inherit;
 		margin: 10px 0;
 		padding: 0;
-		.theme-light & {
-			color: $dark-gray-700;
-		}
+		text-decoration: underline;
+
 		.theme-dark & {
 			color: $light-gray-200;
 		}
@@ -36,17 +34,16 @@
 	}
 
 	&__input > input {
-		padding: 5px 10px;
+		background-color: $light-gray-100;
 		border-radius: 3px;
-		.theme-light & {
-			color: $dark-gray-700;
-			background-color: $light-gray-100;
-			border: 1px solid $light-gray-100;
-		}
+		border: 1px solid $light-gray-100;
+		color: $dark-gray-700;
+		padding: 5px 10px;
+
 		.theme-dark & {
 			color: $light-gray-200;
 			background-color: $dark-gray-400;
-			border: 1px solid $light-gray-200;
+			border-color: $light-gray-200;
 		}
 	}
 

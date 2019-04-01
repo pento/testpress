@@ -6,13 +6,12 @@
 	text-align: center;
 
 	&__repository-link.is-link {
-		font-size: 16px;
+		font-size: inherit;
 	}
 
 	.components-button.is-link {
-		.theme-light & {
-			color: $blue-medium-500;
-		}
+		color: $blue-medium-500;
+
 		.theme-dark & {
 			color: $blue-medium-200;
 		}
