@@ -1,24 +1,15 @@
-This is an experiment with creating a WordPress testing and contribution environment.
+# TestPress
 
-## Usage
-
-Run `npm install`, then `npm run dev` to check it out.
-
-## Notes
-
-Holding down Cmd+Shift while clicking the icon will open Dev Tools.
+TestPress is a tool for contributing to WordPress. It automatically configures a development environment on your computer, allowing you to focus on making WordPress!
 
 This is currently tested on MacOS and Windows, but it should probably run on Linux, too. Bug reports and PRs are greatly appreciated. 🙂
 
-You'll need to [install Docker](https://www.docker.com/community-edition#/download) manually before running TestPress.
+You'll need to install Docker in order to use TestPress. You can download it for [MacOS](https://download.docker.com/mac/stable/Docker.dmg), [Windows 10 Pro](https://download.docker.com/win/stable/Docker%20for%20Windows%20Installer.exe), [other versions of Windows](https://download.docker.com/win/stable/DockerToolbox.exe), and [all other operating systems](https://hub.docker.com/search/?type=edition&offering=community).
 
-## Releasing
+This is currently tested on MacOS and Windows, but it should probably run on Linux, too. Bug reports and PRs are greatly appreciated! 💖
 
-It's currently only possible to build release packages on MacOS.
+## Getting Started
 
-If you don't already have a GitHub token configured, [create a new token](https://github.com/settings/tokens/new) with the `repo` permissions, and assigning it to the `GH_TOKEN` environment variable.
-
-* Update the version in `package.json` in a PR, and merge.
-* On `master`, run `npm run dist` to create the package for testing.
-* After smoke testing has passed, run `npm run publish` to push the package to GitHub.
-* Visit the [Releases page](https://github.com/pento/testpress/releases), edit the release notes, and publish.
+- **Download**: If you want to use the latest TestPress release, you can [download it here](https://github.com/pento/testpress/releases).
+- **Discuss**: If you have a question about TestPress, you can [ask it here](https://github.com/pento/testpress/issues/new?template=question.md).
+- **Contribute**: Development of TestPress happens in this GitHub repository. Get started by [reading the contributing guidelines](/CONTRIBUTING.md).
