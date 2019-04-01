@@ -145,8 +145,13 @@ const showWindow = () => {
 		position = 'trayRight';
 	}
 
+	// If the tray isn't at the top, assume it's at the bottom.
+	if ( trayBounds.y > 500 ) {
+		position = position.replace( 'tray', 'trayBottom' );
+	}
+
 	const addClassScript = `
-	document.body.classList.remove( 'traycenter', 'trayright' );
+	document.body.classList.remove( 'traycenter', 'trayright', 'traybottomcenter', 'traybottomright' );
 	document.body.classList.add( '${ position.toLowerCase() }' );
 	`;
 

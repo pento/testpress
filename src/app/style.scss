@@ -13,6 +13,18 @@
 	}
 }
 
+.traybottomcenter,
+.traybottomright {
+	.tray-pointer {
+		position: absolute;
+		bottom: 2px;
+		left: 0;
+		right: 0;
+		border-bottom: unset;
+		border-top: 8px solid $light-gray-100;
+	}
+}
+
 body.trayright .tray-pointer {
 	margin-right: 10px;
 }
