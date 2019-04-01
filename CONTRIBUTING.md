@@ -17,10 +17,12 @@ To get started, you will need to [Node.js installed](https://nodejs.org/en/). Mo
 TestPress can sometimes need a different version of Node than you have on your system, you can use [nvm](https://github.com/creationix/nvm) to change node versions on the command line:
 
 ```
-npx nvm install
+nvm install
 ```
 
-You also should have the latest release of [npm installed][npm]. npm is a separate project from Node.js and is updated frequently. If you've just installed Node.js which includes a version of npm within the installation you most likely will need also to update your npm installation. To update npm, type this into your terminal: `npm install npm@latest -g`
+You also should have the latest release of [npm installed][npm]. npm is a separate project from Node.js and is updated frequently. If you've just installed Node.js which includes a version of npm within the installation you most likely will need also to update your npm installation. To update npm, type this into your terminal: `nvm install-latest-npm`
+
+Finally, you need to install Docker in order to use TestPress. You can download it for [MacOS](https://download.docker.com/mac/stable/Docker.dmg), [Windows 10 Pro](https://download.docker.com/win/stable/Docker%20for%20Windows%20Installer.exe), [other versions of Windows](https://download.docker.com/win/stable/DockerToolbox.exe), and [all other operating systems](https://hub.docker.com/search/?type=edition&offering=community).
 
 ### Building
 
