@@ -9,9 +9,9 @@ If you don't already have a GitHub token configured:
 * [Create a new token](https://github.com/settings/tokens/new) with the `repo` permissions.
 * Assign it to the `GH_TOKEN` environment variable on your computer.
 
-## Distribution Key
+## MacOS Key
 
-You need a MacOS Developer ID Application key in order to release TestPress. Please ensure it's installed in your keychain, and up-to-date.
+You need a MacOS Developer ID Application key in order to release TestPress. Ensure it's installed in your keychain, and up-to-date.
 
 ## Building and Releasing
 

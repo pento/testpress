@@ -47,6 +47,11 @@ export DEBUG=testpress:services:docker
 npm run dev
 ```
 
+In Windows, you can set the `DEBUG` environment variable using the appropriate method for your shell:
+
+* **CMD**: `set DEBUG=testpress:*`
+* **PowerShell**: `$env:DEBUG = "testpress:*"`
+
 If you need to debug the the TestPress window, holding down Cmd+Shift while clicking the icon will open Dev Tools.
 
 ## Workflow
