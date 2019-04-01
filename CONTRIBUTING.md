@@ -68,8 +68,8 @@ Ideally name your branches with prefixes and descriptions, like this: `[type]/[c
 
 For example, `add/linux-support` means you're working on adding Linux support.
 
-You can pick among all the [/issues](issues), or some of the ones labelled [Good First Issue](/labels/Good%20First%20Issue).
+You can pick among all the [issues](https://github.com/pento/testpress/issues), or some of the ones labelled [Good First Issue](https://github.com/pento/testpress/labels/Good%20First%20Issue).
 
 ## How Can Designers Contribute?
 
-If you'd like to contribute to the application design, feel free to contribute to tickets labelled [Needs Design](/labels/Needs%20Design) or [Needs Design Feedback](/labels/Needs%20Design%20Feedback). We could use your thoughtful replies, mockups, animatics, sketches, doodles. Proposed changes are best done as minimal and specific iterations on the work that precedes it, so they can be easily compared.
+If you'd like to contribute to the application design, feel free to contribute to tickets labelled [Needs Design](https://github.com/pento/testpress/labels/Needs%20Design) or [Needs Design Feedback](https://github.com/pento/testpress/labels/Needs%20Design%20Feedback). We could use your thoughtful replies, mockups, animatics, sketches, doodles. Proposed changes are best done as minimal and specific iterations on the work that precedes it, so they can be easily compared.
