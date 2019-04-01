@@ -1,6 +1,6 @@
 const { spawn } = require( 'child_process' );
 const { mkdirSync, existsSync } = require( 'fs' );
-const { watch } = require( 'chokidar' );
+const watch = require( 'nsfw' );
 const { normalize } = require( 'path' );
 const { addAction, doAction, didAction } = require( '@wordpress/hooks' );
 const process = require( 'process' );
@@ -40,16 +40,19 @@ function registerNPMJob() {
 
 		if ( existsSync( packageJson ) ) {
 			debug( '(%s) Registering package.json watcher', folderPref );
-			watch( packageJson ).on( 'change', () => {
+			watch( packageJson, () => {
 				debug( '(%s) package.json change detected', folderPref );
 				runNPMInstall( folderPref );
-			 } );
+			} )
+				.then( ( watcher ) => watcher.start() );
 		}
 	} );
 }
 
 /**
  * If the WordPress folder is defined, run `npm install` in it.
+ *
+ * @param {string} folderPref The folder to run `npm install` on.
  */
 function runNPMInstall( folderPref ) {
 	debug( '(%s) Preparing for `npm install`', folderPref );

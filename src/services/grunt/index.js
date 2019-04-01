@@ -1,6 +1,6 @@
 const { spawn } = require( 'child_process' );
 const { existsSync } = require( 'fs' );
-const { watch } = require( 'chokidar' );
+const watch = require( 'nsfw' );
 const { addAction, doAction, didAction } = require( '@wordpress/hooks' );
 const debug = require( 'debug' )( 'testpress:services:grunt' );
 const { normalize } = require( 'path' );
@@ -32,10 +32,11 @@ function registerGruntJob() {
 
 	if ( existsSync( gruntfileJs ) ) {
 		debug( 'Registering Gruntfile.js watcher' );
-		watch( gruntfileJs ).on( 'change', () => {
+		watch( gruntfileJs, () => {
 			debug( 'Gruntfile.js change detected' );
 			runGruntWatch();
-		} );
+		} )
+			.then( ( watcher ) => watcher.start() );
 	}
 }
 
