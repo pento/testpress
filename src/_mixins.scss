@@ -1,0 +1,182 @@
+@import "./variables.scss";
+
+// Tabs, Inputs, Square buttons.
+@mixin input-style__neutral() {
+	box-shadow: 0 0 0 transparent;
+	transition: box-shadow 0.1s linear;
+	border-radius: $radius-round-rectangle;
+	border: $border-width solid $dark-gray-150;
+}
+
+@mixin input-style__focus() {
+	color: $dark-gray-900;
+	border-color: $blue-medium-500;
+	box-shadow: 0 0 0 1px $blue-medium-500;
+
+	// Windows High Contrast mode will show this outline, but not the box-shadow.
+	outline: 2px solid transparent;
+	outline-offset: -2px;
+}
+
+/**
+ * Reset default styles for JavaScript UI based pages.
+ * This is a WP-admin agnostic reset
+ */
+@mixin reset {
+	box-sizing: border-box;
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: inherit;
+	}
+
+	select {
+		font-size: $default-font-size;
+		color: $dark-gray-500;
+	}
+
+	.input-control, // Upstream name is `.regular-text`.
+	input[type="text"],
+	input[type="search"],
+	input[type="radio"],
+	input[type="tel"],
+	input[type="time"],
+	input[type="url"],
+	input[type="week"],
+	input[type="password"],
+	input[type="checkbox"],
+	input[type="color"],
+	input[type="date"],
+	input[type="datetime"],
+	input[type="datetime-local"],
+	input[type="email"],
+	input[type="month"],
+	input[type="number"],
+	select,
+	textarea {
+		font-family: $default-font;
+		padding: 6px 8px;
+		@include input-style__neutral();
+
+		font-size: $default-font-size;
+
+		&:focus {
+			@include input-style__focus();
+		}
+	}
+
+	input[type="number"] {
+		padding-left: 4px;
+		padding-right: 4px;
+	}
+
+	select {
+		padding: 2px;
+
+		&:focus {
+			border-color: $blue-medium-600;
+			// Windows High Contrast mode will show this outline
+			outline: 2px solid transparent;
+			outline-offset: 0;
+		}
+	}
+
+	input[type="checkbox"],
+	input[type="radio"] {
+		border: $border-width + 1 solid $dark-gray-300;
+		margin-right: 12px;
+		transition: none;
+
+		&:focus {
+			border-color: $dark-gray-300;
+			box-shadow: 0 0 0 1px $dark-gray-300;
+		}
+
+		&:checked {
+			background: theme(toggle);
+			border-color: theme(toggle);
+		}
+
+		&:checked:focus {
+			box-shadow: 0 0 0 2px $dark-gray-500;
+		}
+	}
+
+	input[type="checkbox"] {
+		border-radius: $radius-round-rectangle / 2;
+
+		&:checked::before,
+		&[aria-checked="mixed"]::before {
+			margin: -3px -5px;
+			color: $white;
+		}
+
+		&[aria-checked="mixed"] {
+			background: theme(toggle);
+			border-color: theme(toggle);
+
+			&::before {
+				// Inherited from `forms.css`.
+				// See: https://github.com/WordPress/wordpress-develop/tree/5.1.1/src/wp-admin/css/forms.css#L122-L132
+				content: "\f460";
+				float: left;
+				display: inline-block;
+				vertical-align: middle;
+				width: 16px;
+				/* stylelint-disable */
+				font: normal 30px/1 dashicons;
+				/* stylelint-enable */
+				speak: none;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+			}
+
+			&:focus {
+				box-shadow: 0 0 0 2px $dark-gray-500;
+			}
+		}
+	}
+
+	input[type="radio"] {
+		border-radius: $radius-round;
+
+		&:checked::before {
+			margin: 6px 0 0 6px;
+			background-color: $white;
+		}
+	}
+
+	// Placeholder colors
+	input,
+	textarea {
+		// Use opacity to work in various editor styles.
+		&::-webkit-input-placeholder {
+			color: $dark-opacity-300;
+		}
+
+		&::-moz-placeholder {
+			opacity: 1; // Necessary because Firefox reduces this from 1.
+			color: $dark-opacity-300;
+		}
+
+		&:-ms-input-placeholder {
+			color: $dark-opacity-300;
+		}
+
+		.is-dark-theme & {
+			&::-webkit-input-placeholder {
+				color: $light-opacity-300;
+			}
+
+			&::-moz-placeholder {
+				opacity: 1; // Necessary because Firefox reduces this from 1.
+				color: $light-opacity-300;
+			}
+
+			&:-ms-input-placeholder {
+				color: $light-opacity-300;
+			}
+		}
+	}
+}

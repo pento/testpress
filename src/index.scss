@@ -1,5 +1,6 @@
 @import "../node_modules/@wordpress/components/build-style/style.css";
 @import "./_colors.scss";
+@import "./_mixins.scss";
 
 body {
 	font-family: sans-serif;
@@ -7,4 +8,7 @@ body {
 	line-height: 1.35;
 	margin: 0;
 	padding: 0;
+
+	@include reset;
 }
+
