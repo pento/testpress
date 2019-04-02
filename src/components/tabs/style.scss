@@ -2,6 +2,10 @@
 
 .tabs {
 	&__headings {
+		display: flex;
+		padding: 0;
+		margin: 0;
+		list-style: none;
 		height: 3rem;
 		border-bottom: 1px solid #ccc;
 		color: $dark-gray-700;

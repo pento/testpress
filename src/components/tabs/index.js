@@ -22,20 +22,21 @@ class Tabs extends Component {
 
 		return (
 			<div className="tabs">
-				<div className="tabs__headings">
+				<ul className="tabs__headings">
 					{ Object.keys( tabs ).map( ( label ) => {
 						const statusClassName = label === activeTab ? 'tabs__heading--active' : 'tabs__heading--inactive';
 						return (
-							<button
-								key={ label + '-tab' }
-								className={ `tabs__heading ${ statusClassName }` }
-								onClick={ () => this.setState( { activeTab: label } ) }
-							>
-								{ label }
-							</button>
+							<li key={ label + '-tab' }>
+								<button
+									className={ `tabs__heading ${ statusClassName }` }
+									onClick={ () => this.setState( { activeTab: label } ) }
+								>
+									{ label }
+								</button>
+							</li>
 						);
 					} ) }
-				</div>
+				</ul>
 				<div className="tabs__pages">
 					{ Object.keys( tabs ).map( ( label ) => {
 						const statusClassName = label === activeTab ? 'tabs__page--active' : 'tabs__page--inactive';
