@@ -26,13 +26,13 @@ class Tabs extends Component {
 					{ Object.keys( tabs ).map( ( label ) => {
 						const statusClassName = label === activeTab ? 'tabs__heading--active' : 'tabs__heading--inactive';
 						return (
-							<span
+							<button
+								key={ label + '-tab' }
 								className={ `tabs__heading ${ statusClassName }` }
 								onClick={ () => this.setState( { activeTab: label } ) }
-								key={ label + '-tab' }
 							>
 								{ label }
-							</span>
+							</button>
 						);
 					} ) }
 				</div>

@@ -2,9 +2,9 @@
 
 .tabs {
 	&__headings {
+		height: 3rem;
 		border-bottom: 1px solid #ccc;
 		color: $dark-gray-700;
-		padding: 20px 15px 10px;
 
 		.theme-dark & {
 			color: $light-gray-200;
@@ -12,24 +12,41 @@
 	}
 
 	&__heading {
-		margin-right: 20px;
-		padding-bottom: 10px;
+		height: 100%;
+		padding: 0 1rem;
+		font-size: 1rem;
 		cursor: pointer;
+		border: none;
+		background: none;
+
+		&:focus {
+			outline-offset: -1px;
+			outline: 1px dotted $dark-gray-500;
+		}
+
+		.theme-dark & {
+			color: $light-gray-200;
+
+			&:focus {
+				outline-color: $light-gray-500;
+			}
+		}
 	}
 
 	&__heading--active {
 		color: $blue-wordpress-700;
-		border-bottom: 1px solid $light-gray-100;
+		box-shadow: inset 0 -3px $blue-wordpress-700;
 
 		.theme-dark & {
 			color: $blue-medium-200;
-			border-bottom-color: $dark-gray-400;
+			box-shadow: inset 0 -3px $blue-medium-200;
 		}
+
 	}
 
 	&__pages {
 		color: $dark-gray-700;
-		padding: 20px 15px;
+		padding: 1rem;
 
 		.theme-dark & {
 			color: $light-gray-200;
