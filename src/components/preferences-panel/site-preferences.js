@@ -24,10 +24,6 @@ export default function SitePreferences( { port, onPortChange, onPortInputBlur }
 					onBlur={ onPortInputBlur }
 				/>
 			</BaseControl>
-			{ /* <div className="preferences-panel__input preferences-panel__input--short preferences-panel__input--inline">
-				<label htmlFor="preferences-port">Port Number:</label>
-
-			</div> */ }
 		</div>
 	);
 }
