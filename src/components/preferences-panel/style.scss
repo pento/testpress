@@ -1,28 +1,32 @@
 @import "../../_colors.scss";
 
 .preferences-panel {
-	&__directory-select > label,
-	&__input > label {
-		display: block;
-		margin: 10px 0;
-		color: $dark-gray-700;
+	&__directory-select {
+		margin-bottom: 1rem;
+	}
 
+	&__directory-select-path {
+		margin-bottom: 4px;
+	}
+
+	&__directory-select .components-button {
 		.theme-dark & {
 			color: $light-gray-200;
+
+			&:focus {
+				background: transparent;
+			}
 		}
 	}
 
-	&__directory-select > button {
-		background: none;
-		border: none;
-		color: $dark-gray-700;
-		cursor: pointer;
+	&__input label {
 		display: block;
-		font-size: inherit;
 		margin: 10px 0;
-		padding: 0;
-		text-decoration: underline;
+		color: $dark-gray-700;
+	}
 
+	&__directory-select label,
+	&__input label {
 		.theme-dark & {
 			color: $light-gray-200;
 		}

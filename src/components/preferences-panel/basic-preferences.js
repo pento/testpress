@@ -3,30 +3,47 @@
  */
 import React from 'react';
 
+/**
+ * WordPress dependencies
+ */
+import { BaseControl, Button } from '@wordpress/components';
+
+function DirectorySelect( { id, label, onClick, path } ) {
+	return (
+		<BaseControl
+			id={ id }
+			className="preferences-panel__directory-select"
+			label={ label }
+		>
+			<div className="preferences-panel__directory-select-path">
+				{ path ? path : 'No folder selected' }
+			</div>
+			<Button
+				id={ id }
+				onClick={ onClick }
+				isLink
+			>
+				Choose a folder
+			</Button>
+		</BaseControl>
+	);
+}
+
 export default function BasicPreferences( { directory, showDirectorySelect } ) {
 	return (
 		<div className="preferences-panel">
-			<div className="preferences-panel__directory-select">
-				<label htmlFor="preferences-wordpress-folder">WordPress Folder:</label>
-				{ directory.wordpress ? directory.wordpress : 'No folder selected' }
-				<button
-					id="preferences-wordpress-folder"
-					onClick={ () => showDirectorySelect( 'WordPress' ) }
-				>
-					{ 'Choose a folder' }
-				</button>
-			</div>
-			<div className="preferences-panel__directory-select">
-				<label htmlFor="preferences-gutenberg-folder">Gutenberg Folder:</label>
-				{ directory.gutenberg ? directory.gutenberg : 'No folder selected' }
-				<button
-					id="preferences-gutenberg-folder"
-					onClick={ () => showDirectorySelect( 'Gutenberg' ) }
-				>
-					{ 'Choose a folder' }
-				</button>
-
-			</div>
+			<DirectorySelect
+				id="preferences-wordpress-folder"
+				label="WordPress Folder"
+				onClick={ () => showDirectorySelect( 'WordPress' ) }
+				path={ directory.wordpress }
+			/>
+			<DirectorySelect
+				id="preferences-gutenberg-folder"
+				label="Gutenberg Folder"
+				onClick={ () => showDirectorySelect( 'Gutenberg' ) }
+				path={ directory.gutenberg }
+			/>
 		</div>
 	);
 }
