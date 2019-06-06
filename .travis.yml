@@ -1,0 +1,22 @@
+language: generic
+
+notifications:
+  email:
+    on_success: never
+    on_failure: change
+
+branches:
+  only:
+    - master
+
+before_install:
+  - nvm install
+
+install:
+  - npm ci
+
+jobs:
+  include:
+    - name: License Compatibility
+      script:
+        - npm run check-licenses
